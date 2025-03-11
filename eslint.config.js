@@ -8,10 +8,11 @@ export default [
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  { 
-    rules: 
+  {
+    rules:
     {
-      "react/react-in-jsx-scope": "off"
+      "react/react-in-jsx-scope": "off",
+			'@typescript-eslint/no-explicit-any': 'off',
     }
   },
 ]

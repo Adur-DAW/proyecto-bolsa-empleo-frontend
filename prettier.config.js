@@ -9,9 +9,10 @@ const config = {
   tabWidth: 2,
   semi: false,
   singleQuote: true,
-  importOrder: ["^@pages/(.*)$", "^@shared/(.*)$", "^[./]"],
+  importOrder: ["^@/pages/(.*)$", "^@/shared/(.*)$", "^[./]"],
   importOrderSeparation: true,
-  importOrderSortSpecifiers: true
+  importOrderSortSpecifiers: true,
+	plugins: ["@trivago/prettier-plugin-sort-imports"]
 }
 
 export default config
