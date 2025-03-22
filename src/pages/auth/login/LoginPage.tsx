@@ -1,8 +1,9 @@
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import { useNavigate } from "react-router";
-import useLogin from "../shared/hooks/useLogin";
+import { Box, Button, Container, TextField, Typography } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
+
+import useLogin from '../shared/hooks/useLogin'
 
 const LoginPage = () => {
 	const { login } = useLogin()
@@ -13,19 +14,19 @@ const LoginPage = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm();
+	} = useForm()
 
 	const mutation = useMutation({
 		mutationFn: login,
 		onSuccess: () => navigate('/'),
 		onError: (error) => {
-			alert("Error en login: " + error.message);
+			alert('Error en login: ' + error.message)
 		},
-	});
+	})
 
 	const onSubmit = (data) => {
-		mutation.mutate(data);
-	};
+		mutation.mutate(data)
+	}
 
 	return (
 		<Container maxWidth="xs">
@@ -38,7 +39,7 @@ const LoginPage = () => {
 						label="Email"
 						fullWidth
 						margin="normal"
-						{...register("email", { required: "El email es obligatorio" })}
+						{...register('email', { required: 'El email es obligatorio' })}
 						error={!!errors.email}
 						helperText={errors.email?.message?.toString()}
 					/>
@@ -47,7 +48,9 @@ const LoginPage = () => {
 						type="password"
 						fullWidth
 						margin="normal"
-						{...register("password", { required: "La contraseña es obligatoria" })}
+						{...register('password', {
+							required: 'La contraseña es obligatoria',
+						})}
 						error={!!errors.password}
 						helperText={errors.password?.message?.toString()}
 					/>
@@ -59,12 +62,12 @@ const LoginPage = () => {
 						sx={{ mt: 2 }}
 						disabled={mutation.isPending}
 					>
-						{mutation.isPending ? "Cargando..." : "Iniciar Sesión"}
+						{mutation.isPending ? 'Cargando...' : 'Iniciar Sesión'}
 					</Button>
 				</form>
 			</Box>
 		</Container>
-	);
-};
+	)
+}
 
-export default LoginPage;
+export default LoginPage

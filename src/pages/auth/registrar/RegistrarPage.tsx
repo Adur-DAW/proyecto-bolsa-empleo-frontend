@@ -1,8 +1,9 @@
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import { AuthRepositoryHttp } from "@/shared/repositories/auth/auth.repository.http";
-import { useNavigate } from "react-router";
+import { Box, Button, Container, TextField, Typography } from '@mui/material'
+import { useMutation } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
+
+import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
 
 const RegistroPage = () => {
 	const authRepository = AuthRepositoryHttp
@@ -13,19 +14,23 @@ const RegistroPage = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm();
+	} = useForm()
 
 	const mutation = useMutation({
 		mutationFn: authRepository.registrar,
 		onSuccess: () => navigate('/login'),
 		onError: (error) => {
-			alert("Error en login: " + error.message);
+			alert('Error en login: ' + error.message)
 		},
-	});
+	})
 
 	const onSubmit = (data) => {
-		mutation.mutate({ email: data.email, password: data.password, password_confirmation: data.verificarPassword });
-	};
+		mutation.mutate({
+			email: data.email,
+			password: data.password,
+			password_confirmation: data.verificarPassword,
+		})
+	}
 
 	return (
 		<Container maxWidth="xs">
@@ -38,7 +43,7 @@ const RegistroPage = () => {
 						label="Email"
 						fullWidth
 						margin="normal"
-						{...register("email", { required: "El email es obligatorio" })}
+						{...register('email', { required: 'El email es obligatorio' })}
 						error={!!errors.email}
 						helperText={errors.email?.message?.toString()}
 					/>
@@ -47,7 +52,9 @@ const RegistroPage = () => {
 						type="password"
 						fullWidth
 						margin="normal"
-						{...register("password", { required: "La contraseña es obligatoria" })}
+						{...register('password', {
+							required: 'La contraseña es obligatoria',
+						})}
 						error={!!errors.password}
 						helperText={errors.password?.message?.toString()}
 					/>
@@ -56,7 +63,9 @@ const RegistroPage = () => {
 						type="password"
 						fullWidth
 						margin="normal"
-						{...register("verificarPassword", { required: "La confirmación de contraseña es obligatoria" })}
+						{...register('verificarPassword', {
+							required: 'La confirmación de contraseña es obligatoria',
+						})}
 						error={!!errors.verificarPassword}
 						helperText={errors.verificarPassword?.message?.toString()}
 					/>
@@ -68,12 +77,12 @@ const RegistroPage = () => {
 						sx={{ mt: 2 }}
 						disabled={mutation.isPending}
 					>
-						{mutation.isPending ? "Cargando..." : "Registrar"}
+						{mutation.isPending ? 'Cargando...' : 'Registrar'}
 					</Button>
 				</form>
 			</Box>
 		</Container>
-	);
-};
+	)
+}
 
-export default RegistroPage;
+export default RegistroPage

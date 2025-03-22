@@ -1,5 +1,5 @@
-import { useAppStore } from "../store/store"
-import { limpiarLocalStorage } from "../utils/localStorage.utils"
+import { useAppStore } from '../store/store'
+import { limpiarLocalStorage } from '../utils/localStorage.utils'
 
 export default function useLogout() {
 	const logout = useAppStore((x) => x.logout)
@@ -10,6 +10,6 @@ export default function useLogout() {
 	}
 
 	return {
-		onLogout
+		onLogout,
 	}
 }

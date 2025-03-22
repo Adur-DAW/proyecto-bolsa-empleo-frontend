@@ -1,52 +1,52 @@
 import { StateCreator } from 'zustand'
 
-import { defaultState } from './store'
 import { Usuario } from '../models'
+import { defaultState } from './store'
 
 export type GeneralState = {
-  titulo: string
-  token?: string
-  usuario?: Usuario
+	titulo: string
+	token?: string
+	usuario?: Usuario
 }
 
 export const defaultGeneralState: GeneralState = {
-  titulo: 'Bolsa de Empleo - Inicio',
-  token: localStorage.getItem('token') || undefined,
-  usuario: (() => {
-    const usuario = localStorage.getItem('usuario')
-    return usuario !== null ? JSON.parse(usuario) : undefined
-  })()
+	titulo: 'Bolsa de Empleo - Inicio',
+	token: localStorage.getItem('token') || undefined,
+	usuario: (() => {
+		const usuario = localStorage.getItem('usuario')
+		return usuario !== null ? JSON.parse(usuario) : undefined
+	})(),
 }
 
 export type GeneralActions = {
-  setTitulo: (titulo: string) => void
-  setUsuario: (usuario: Usuario) => void
-  login: (usuario: Usuario) => void
-  logout: () => void
+	setTitulo: (titulo: string) => void
+	setUsuario: (usuario: Usuario) => void
+	login: (usuario: Usuario) => void
+	logout: () => void
 }
 
-export const createGeneralSlice: StateCreator<GeneralState & GeneralActions> = (set) => ({
-  ...defaultGeneralState,
+export const createGeneralSlice: StateCreator = (set) => ({
+	...defaultGeneralState,
 
-  reset: () => set(defaultState),
+	reset: () => set(defaultState),
 
-  setTitulo: (titulo: string) => set(() => ({ titulo })),
+	setTitulo: (titulo: string) => set(() => ({ titulo })),
 
-  setUsuario: (usuario: Usuario) =>
-    set(() => {
-      localStorage.setItem('usuario', JSON.stringify(usuario))
-      return { usuario }
-    }),
+	setUsuario: (usuario: Usuario) =>
+		set(() => {
+			localStorage.setItem('usuario', JSON.stringify(usuario))
+			return { usuario }
+		}),
 
-  login: (usuario: Usuario) =>
-    set(() => {
-      localStorage.setItem('usuario', JSON.stringify(usuario))
-      return { usuario }
-    }),
+	login: (usuario: Usuario) =>
+		set(() => {
+			localStorage.setItem('usuario', JSON.stringify(usuario))
+			return { usuario }
+		}),
 
-  logout: () =>
-    set(() => {
-      localStorage.removeItem('usuario')
-      return { usuario: undefined }
-    }),
+	logout: () =>
+		set(() => {
+			localStorage.removeItem('usuario')
+			return { usuario: undefined }
+		}),
 })

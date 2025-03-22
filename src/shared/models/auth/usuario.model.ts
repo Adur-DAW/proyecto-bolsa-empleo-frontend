@@ -1,4 +1,4 @@
-import { TiposUsuario } from "@/shared/enums/tipos-usuario.enum"
+import { TiposUsuario } from '@/shared/enums/tipos-usuario.enum'
 
 export type Usuario = {
 	id: number

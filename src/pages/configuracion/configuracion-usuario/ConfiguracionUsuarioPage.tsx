@@ -1,5 +1,5 @@
-import ConfiguracionUsuarioDatos from "./components/ConfiguracionUsuarioDatos";
+import ConfiguracionUsuarioTitulos from './components/ConfiguracionUsuarioTitulos'
 
 export default function ConfiguracionUsuarioPage() {
-	return <ConfiguracionUsuarioDatos />;
+	return <ConfiguracionUsuarioTitulos />
 }

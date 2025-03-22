@@ -1,15 +1,15 @@
-import { defineConfig } from '@rsbuild/core';
-import { pluginReact } from '@rsbuild/plugin-react';
+import { defineConfig } from '@rsbuild/core'
+import { pluginReact } from '@rsbuild/plugin-react'
 
 export default defineConfig({
 	html: {
-    title: 'Bolsa Empleo',
+		title: 'Bolsa Empleo',
 		favicon: './src/assets/icon.svg',
-  },
-  plugins: [pluginReact()],
+	},
+	plugins: [pluginReact()],
 	resolve: {
-    alias: {
-      '@': './src',
-    },
-  },
-});
+		alias: {
+			'@': './src',
+		},
+	},
+})

@@ -1,17 +1,17 @@
-import { getEntity, postEntity } from "@/shared/http/api.service"
-import { EmpresasRepository } from "./empresas.repository"
-import { Empresa } from "@/shared/models"
+import { getEntity, postEntity } from '@/shared/http/api.service'
+import { Empresa } from '@/shared/models'
 
-export const EmpresasRepositoryHttp: EmpresasRepository  = {
-	obtener: async (): Promise<Empresa[]> => {
-		const empresas = await getEntity('/empresas') as any[]
+import { EmpresasRepository } from './empresas.repository'
+
+export const EmpresasRepositoryHttp: EmpresasRepository = {
+	obtener: async (): Promise => {
+		const empresas = (await getEntity('/empresas')) as any[]
 
 		return empresas.map((x: any) => ({
-				...x,
-			}
-		))
+			...x,
+		}))
 	},
 	registrar: async (datos: { empresa: Empresa }) => {
 		postEntity('/empresas/', datos)
-	}
+	},
 }
