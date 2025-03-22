@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { Empresa } from '../empresa/empresa.model'
+import { Empresa } from '../empresas/empresa.model'
 
 export type Oferta = {
 	nombre: string

@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import AppLayout from "./AppLayout";
 import { useAppStore } from "./shared/store/store";
 import { getAbsolutePath } from "./shared/routes";
+import EmpresasPage from "./pages/empresas/empresas/EmpresasPage";
 
 const InicioPage = lazy(() => import("@/pages/inicio/InicioPage"));
 const OfertaEditarPage = lazy(() => import("@/pages/ofertas/oferta-editar/OfertaEditar"));
@@ -33,6 +34,10 @@ export default function AppRouter() {
 							>
 								<Route path={getAbsolutePath("ofertas_editar")} element={<OfertaEditarPage />} />
 							</Route>
+						</Route>
+
+						<Route path={getAbsolutePath("empresas")}>
+							<Route index element={<EmpresasPage />} />
 						</Route>
 					</Route>
 				</Routes>

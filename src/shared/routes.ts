@@ -33,7 +33,11 @@ const routing = createRouting({
 	ofertas_editar: {
 		relativePath: ':id',
 		absolutePath: '/ofertas/:id/editar',
-	}
+	},
+	empresas: {
+		relativePath: 'empresas',
+		absolutePath: '/empresas',
+	},
 })
 
 export const getRelativePath = (name: keyof typeof routing): string => routing[name].relativePath
