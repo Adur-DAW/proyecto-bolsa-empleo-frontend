@@ -40,9 +40,7 @@ export default function AppRouter() {
 						<Route
 							element={usuario ? <Outlet /> : <Navigate to={getAbsolutePath("login")} />}
 						>
-							{
-								usuario!.rol == 'demandante' && <Route path={getAbsolutePath("configuracion")} element={<ConfiguracionUsuarioPage />} />
-							}
+							<Route path={getAbsolutePath("configuracion")} element={usuario?.rol == 'demandante' && <ConfiguracionUsuarioPage />} />
 						</Route>
 
 						<Route path={getAbsolutePath("empresas")}>

@@ -4,8 +4,7 @@ import { TituloDemandante } from "@/shared/models"
 
 export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository  = {
 	obtenerJWT: async (): Promise<TituloDemandante[]> => {
-		const titulosDemandante = await getEntity('/titulos/demandante/JWT') as any[]
-
+		const titulosDemandante = await getEntity('/titulos/demandante/jwt') as any[]
 		return titulosDemandante.map((x: any) => ({
 				...x,
 			}
