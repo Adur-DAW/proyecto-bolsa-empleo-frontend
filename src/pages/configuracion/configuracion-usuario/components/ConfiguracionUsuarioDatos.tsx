@@ -32,10 +32,9 @@ const ConfiguracionUsuarioDatosInterno = () => {
 				<div key={titulo.id}>{titulo.nombre}</div>
 			))}
 
-			{titulosDemandante?.map(({ idTitulo, idDemandante, titulo, centro,  }) => (
+			{titulosDemandante?.map(({ idTitulo, idDemandante, centro,  }) => (
 				<div key={idTitulo + idDemandante}>
 					{centro}
-					{titulo.nombre}
 				</div>
 			))}
 		</div>
