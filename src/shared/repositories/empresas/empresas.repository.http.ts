@@ -4,8 +4,8 @@ import { Empresa } from '@/shared/models'
 import { EmpresasRepository } from './empresas.repository'
 
 export const EmpresasRepositoryHttp: EmpresasRepository = {
-	obtener: async (): Promise => {
-		const empresas = (await getEntity('/empresas')) as any[]
+	obtener: async (): Promise<Empresa[]> => {
+		const empresas = await getEntity('/empresas') as any[]
 
 		return empresas.map((x: any) => ({
 			...x,

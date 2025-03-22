@@ -4,8 +4,8 @@ import ConfiguracionUsuarioTitulos from './components/ConfiguracionUsuarioTitulo
 export default function ConfiguracionUsuarioPage() {
 	return (
 		<>
-			<ConfiguracionUsuarioTitulos />
 			<ConfiguracionUsuarioDatosPersonales />
+			<ConfiguracionUsuarioTitulos />
 		</>
 	)
 }

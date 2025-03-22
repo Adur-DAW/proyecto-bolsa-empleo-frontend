@@ -4,7 +4,7 @@ import { TituloDemandante } from '@/shared/models'
 import { TitulosDemandanteRepository } from './titulos-demandante.repository'
 
 export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository = {
-	obtenerJWT: async (): Promise => {
+	obtenerJWT: async (): Promise<TituloDemandante[]> => {
 		const titulosDemandante = (await getEntity(
 			'/titulos/demandante/jwt'
 		)) as any[]

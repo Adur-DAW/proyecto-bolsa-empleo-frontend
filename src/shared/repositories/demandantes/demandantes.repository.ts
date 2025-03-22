@@ -1,6 +1,6 @@
-import { Demandante } from '@/shared/models'
+import { Demandante } from "@/shared/models"
 
-export type DemandanteRepository = {
-	obtenerJWT: () => Promise
-	actualizar: (datos: Demandante) => Promise
+export type DemandantesRepository = {
+	obtenerJWT: () => Promise<Demandante>
+	actualizar: (datos: Demandante) => Promise<void>
 }

@@ -1,8 +1,16 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import {
+	Box,
+	Button,
+	Paper,
+	Stack,
+	TextField,
+	Typography,
+} from '@mui/material'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 
-import { TitulosDemandanteRepositoryHttp } from '@/shared/repositories/titulos-demandante/titulos-demandante.repository.http'
-import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.repository.http'
+import { DemandantesRepositoryHttp } from '@/shared/repositories/demandantes/demandantes.repository.http'
 
 export default function ConfiguracionUsuarioDatosPersonales() {
 	return (
@@ -13,27 +21,117 @@ export default function ConfiguracionUsuarioDatosPersonales() {
 }
 
 const ConfiguracionUsuarioDatosPersonalesInterno = () => {
-	const titulosRepository = TitulosRepositoryHttp
-	const titulosDemandanteRepository = TitulosDemandanteRepositoryHttp
+	const demandantesRepository = DemandantesRepositoryHttp
 
-	const { data: titulos } = useSuspenseQuery({
-		queryKey: ['titulos'],
-		queryFn: () => titulosRepository.obtener(),
+	const { data: demandante } = useSuspenseQuery({
+		queryKey: ['demandante'],
+		queryFn: () => demandantesRepository.obtenerJWT(),
 	})
 
-	const { data: titulosDemandante } = useSuspenseQuery({
-		queryKey: ['titulos-demandante'],
-		queryFn: () => titulosDemandanteRepository.obtenerJWT(),
+	const { control, handleSubmit } = useForm({
+		defaultValues: {
+			...demandante
+		},
 	})
+
+	const mutation = useMutation({
+		mutationFn: demandantesRepository.actualizar,
+		onSuccess: () => console.log('Datos actualizados correctamente'),
+	})
+
+	const onSubmit = (data) => {
+		mutation.mutate(data, {
+			onSuccess: () => {
+				alert('Datos actualizados correctamente')
+			},
+			onError: () => {
+				alert('Hubo un error al actualizar los datos')
+			},
+		})
+	}
 
 	return (
-		<div>
-			<h1>ConfiguracionUsuarioDatos</h1>
-			{titulos?.map((titulo) => <div key={titulo.id}>{titulo.nombre}</div>)}
+		<Box sx={{ padding: 4 }}>
+			<Typography variant="h5" gutterBottom>
+				Actualizar Datos Personales
+			</Typography>
+			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<Stack spacing={3}>
+						<Box>
+							<Controller
+								name="nombre"
+								control={control}
+								render={({ field }) => (
+									<TextField {...field} fullWidth label="Nombre completo" />
+								)}
+							/>
+						</Box>
 
-			{titulosDemandante?.map(({ idTitulo, idDemandante, centro }) => (
-				<div key={idTitulo + idDemandante}>{centro}</div>
-			))}
-		</div>
+						<Box>
+							<Controller
+								name="apellido1"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Primer apellido"
+										type="text"
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="apellido2"
+								control={control}
+								render={({ field }) => (
+									<TextField {...field} fullWidth label="Segundo apellido" />
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="email"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Correo electrónico"
+										type="email"
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="telefonoMovil"
+								control={control}
+								render={({ field }) => (
+									<TextField {...field} fullWidth label="Teléfono" type="tel" />
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Button
+								type="submit"
+								variant="contained"
+								color="primary"
+								fullWidth
+								disabled={mutation.isPending}
+							>
+								{mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
+							</Button>
+						</Box>
+					</Stack>
+				</form>
+			</Paper>
+		</Box>
 	)
 }

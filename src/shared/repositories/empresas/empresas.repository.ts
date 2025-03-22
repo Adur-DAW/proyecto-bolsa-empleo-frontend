@@ -1,6 +1,6 @@
 import { Empresa } from '@/shared/models'
 
 export type EmpresasRepository = {
-	obtener: () => Promise
-	registrar: (datos: { empresa: Empresa }) => Promise
+	obtener: () => Promise<Empresa[]>
+	registrar: (datos: { empresa: Empresa }) => Promise<void>
 }

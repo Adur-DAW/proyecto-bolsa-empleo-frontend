@@ -6,7 +6,7 @@ import { Oferta } from '@/shared/models'
 import { OfertasRepository } from './ofertas.repository'
 
 export const OfertasRepositoryHttp: OfertasRepository = {
-	obtener: async (): Promise => {
+	obtener: async (): Promise<Oferta[]> => {
 		const ofertas = (await getEntity('/ofertas')) as any[]
 
 		return ofertas.map((x: any) => ({

@@ -1,6 +1,6 @@
 import { TituloDemandante } from '@/shared/models'
 
 export type TitulosDemandanteRepository = {
-	obtenerJWT: () => Promise
-	registrar: (datos: { tituloDemandante: TituloDemandante }) => Promise
+	obtenerJWT: () => Promise<TituloDemandante[]>
+	registrar: (datos: { tituloDemandante: TituloDemandante }) => Promise<void>
 }
