@@ -5,6 +5,6 @@ export type TituloDemandante = {
 	idTitulo: number
 	centro: string
 	año: string
-	titulo: Titulo,
+	titulo: Titulo
 	cursando: boolean
 }

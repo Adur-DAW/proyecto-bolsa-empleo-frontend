@@ -16,8 +16,7 @@ export const defaultGeneralState: GeneralState = {
 		try {
 			const usuario = localStorage.getItem('usuario')
 			return usuario !== null ? JSON.parse(usuario) : undefined
-		}
-		catch {
+		} catch {
 			localStorage.removeItem('usuario')
 			return undefined
 		}
@@ -31,7 +30,9 @@ export type GeneralActions = {
 	logout: () => void
 }
 
-export const createGeneralSlice: StateCreator<GeneralState & GeneralActions> = (set) => ({
+export const createGeneralSlice: StateCreator<GeneralState & GeneralActions> = (
+	set
+) => ({
 	...defaultGeneralState,
 
 	reset: () => set(defaultState),

@@ -7,13 +7,11 @@ export const AuthRepositoryHttp: AuthRepository = {
 	login: async (datos: { email: string; password: string }): Promise => {
 		return postEntity('/login', datos)
 	},
-	registrar: async (
-		datos: {
-			email: string
-			password: string
-			password_confirmation: string
-		}
-	) => {
+	registrar: async (datos: {
+		email: string
+		password: string
+		password_confirmation: string
+	}) => {
 		postEntity('/registrar', datos)
 	},
 }

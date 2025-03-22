@@ -5,7 +5,7 @@ import { DemandantesRepository } from './demandantes.repository'
 
 export const DemandantesRepositoryHttp: DemandantesRepository = {
 	obtenerJWT: async (): Promise<Demandante> => {
-		const demandante = await getEntity('/demandantes/jwt') as any
+		const demandante = (await getEntity('/demandantes/jwt')) as any
 
 		return {
 			...demandante,
