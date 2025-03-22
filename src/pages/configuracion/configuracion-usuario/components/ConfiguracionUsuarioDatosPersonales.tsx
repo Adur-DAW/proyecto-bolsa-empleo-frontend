@@ -1,11 +1,4 @@
-import {
-	Box,
-	Button,
-	Paper,
-	Stack,
-	TextField,
-	Typography,
-} from '@mui/material'
+import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -30,7 +23,7 @@ const ConfiguracionUsuarioDatosPersonalesInterno = () => {
 
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
-			...demandante
+			...demandante,
 		},
 	})
 
@@ -52,9 +45,18 @@ const ConfiguracionUsuarioDatosPersonalesInterno = () => {
 
 	return (
 		<Box sx={{ padding: 4 }}>
-			<Typography variant="h5" gutterBottom>
-				Actualizar Datos Personales
-			</Typography>
+			<Box
+				sx={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+				}}
+			>
+				<Typography variant="h5" gutterBottom>
+					Datos personales
+				</Typography>
+			</Box>
+
 			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Stack spacing={3}>

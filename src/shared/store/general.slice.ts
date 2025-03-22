@@ -13,8 +13,14 @@ export const defaultGeneralState: GeneralState = {
 	titulo: 'Bolsa de Empleo - Inicio',
 	token: localStorage.getItem('token') || undefined,
 	usuario: (() => {
-		const usuario = localStorage.getItem('usuario')
-		return usuario !== null ? JSON.parse(usuario) : undefined
+		try {
+			const usuario = localStorage.getItem('usuario')
+			return usuario !== null ? JSON.parse(usuario) : undefined
+		}
+		catch {
+			localStorage.removeItem('usuario')
+			return undefined
+		}
 	})(),
 }
 
@@ -25,7 +31,7 @@ export type GeneralActions = {
 	logout: () => void
 }
 
-export const createGeneralSlice: StateCreator = (set) => ({
+export const createGeneralSlice: StateCreator<GeneralState & GeneralActions> = (set) => ({
 	...defaultGeneralState,
 
 	reset: () => set(defaultState),
