@@ -11,8 +11,8 @@ const routing = createRouting({
     absolutePath: '/',
   },
   inicio: {
-    relativePath: 'inicio',
-    absolutePath: '/inicio',
+    relativePath: '',
+    absolutePath: '/',
   },
   login: {
     relativePath: 'login',

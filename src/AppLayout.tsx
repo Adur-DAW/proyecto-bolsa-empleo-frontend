@@ -1,8 +1,10 @@
 import { Outlet } from "react-router";
+import Navbar from "./shared/components/navbar/Navbar";
 
 export default function AppLayout() {
 
-    return <>
-        <Outlet />
-    </>
+	return <>
+		<Navbar />
+		<Outlet />
+	</>
 }
