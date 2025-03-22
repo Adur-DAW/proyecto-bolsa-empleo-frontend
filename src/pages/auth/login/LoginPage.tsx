@@ -1,7 +1,9 @@
 import { Box, Button, Container, TextField, Typography } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+
+import { getAbsolutePath } from '@/shared/routes'
 
 import useLogin from '../shared/hooks/useLogin'
 
@@ -65,6 +67,16 @@ const LoginPage = () => {
 						{mutation.isPending ? 'Cargando...' : 'Iniciar Sesión'}
 					</Button>
 				</form>
+			</Box>
+
+			<Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+				¿No tienes cuenta? &nbsp;
+				<Link
+					to={getAbsolutePath('registro')}
+					style={{ color: 'black', fontWeight: 'bold' }}
+				>
+					Registrate
+				</Link>
 			</Box>
 		</Container>
 	)

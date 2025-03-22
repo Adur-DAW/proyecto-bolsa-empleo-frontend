@@ -1,9 +1,10 @@
 import { Box, Button, Container, TextField, Typography } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
+import { getAbsolutePath } from '@/shared/routes'
 
 const RegistroPage = () => {
 	const authRepository = AuthRepositoryHttp
@@ -80,6 +81,16 @@ const RegistroPage = () => {
 						{mutation.isPending ? 'Cargando...' : 'Registrar'}
 					</Button>
 				</form>
+			</Box>
+
+			<Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+				¿Ya tienes cuenta? &nbsp;
+				<Link
+					to={getAbsolutePath('login')}
+					style={{ color: 'black', fontWeight: 'bold' }}
+				>
+					Inicia sesión
+				</Link>
 			</Box>
 		</Container>
 	)
