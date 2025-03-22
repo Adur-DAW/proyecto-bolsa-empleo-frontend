@@ -10,6 +10,7 @@ import {
 	Typography,
 } from '@mui/material'
 import {
+	IconBuildingCommunity,
 	IconHome,
 	IconListCheck,
 	IconLogout,
@@ -61,6 +62,11 @@ export default function Navbar() {
 			texto: 'Ofertas',
 			to: getAbsolutePath('ofertas'),
 			icono: <IconListCheck />
+		},
+		{
+			texto: 'Empresas',
+			to: getAbsolutePath('empresas'),
+			icono: <IconBuildingCommunity />
 		}
 	];
 
