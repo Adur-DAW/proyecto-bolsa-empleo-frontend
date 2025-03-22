@@ -7,9 +7,7 @@ export const TitulosRepositoryHttp: TitulosRepository = {
 	obtener: async (): Promise<Titulo[]> => {
 		const titulos = (await getEntity('/titulos')) as any[]
 
-		return titulos.map((x: any) => ({
-			...x,
-		}))
+		return titulos
 	},
 	registrar: async (datos: { titulo: Titulo }) => {
 		postEntity('/titulos', datos)

@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
 	Box,
 	Button,
@@ -11,37 +12,68 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import {
+	QueryClient,
+	useMutation,
+	useSuspenseQuery,
+} from '@tanstack/react-query'
+import { Suspense, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { TituloDemandante } from '@/shared/models'
 import { TitulosDemandanteRepositoryHttp } from '@/shared/repositories/titulos-demandante/titulos-demandante.repository.http'
 import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.repository.http'
 
-export default function ListaTitulosDemandante() {
+const schema = z.object({
+	idTitulo: z.number().min(1, 'Por favor selecciona un título'),
+	centro: z.string().nonempty('Por favor ingresa el centro'),
+	año: z.string().regex(/^[0-9]{4}$/, 'Por favor ingresa un año válido'),
+	cursando: z.boolean(),
+})
+
+export default function ConfiguracionUsuarioTitulos() {
+	return (
+		<Suspense fallback={<div>Cargando titulos...</div>}>
+			<ConfiguracionUsuarioTitulosInterno />
+		</Suspense>
+	)
+}
+
+const ConfiguracionUsuarioTitulosInterno = () => {
 	const titulosDemandanteRepository = TitulosDemandanteRepositoryHttp
 	const titulosRepository = TitulosRepositoryHttp
 
-	const { data: titulosDemandante = [] } = useQuery({
+	const queryClient = new QueryClient()
+
+	const { data: titulosDemandante = [] } = useSuspenseQuery({
 		queryKey: ['titulos-demandante'],
 		queryFn: () => titulosDemandanteRepository.obtenerJWT(),
 	})
 
-	const { data: titulos = [] } = useQuery({
+	const { data: titulosSinFiltrar = [] } = useSuspenseQuery({
 		queryKey: ['titulos'],
 		queryFn: () => titulosRepository.obtener(),
 	})
 
+	const titulosActuales = titulosDemandante.map((x) => x.idTitulo)
+	const titulos = titulosSinFiltrar.filter(
+		({ id }) => !titulosActuales.includes(id)
+	)
+
 	const [open, setOpen] = useState(false)
 
-	const { control, handleSubmit, reset } = useForm<TituloDemandante>({
+	const {
+		control,
+		handleSubmit,
+		reset,
+		formState: { isValid, errors },
+	} = useForm({
+		resolver: zodResolver(schema),
+		mode: 'onChange',
 		defaultValues: {
-			idDemandante: 0,
-			idTitulo: 0,
+			idTitulo: titulos.length > 0 ? titulos[0].id : 0,
 			centro: '',
 			año: '',
-			titulo: null!,
 			cursando: false,
 		},
 	})
@@ -57,8 +89,9 @@ export default function ListaTitulosDemandante() {
 		},
 	})
 
-	const onSubmit = (data: TituloDemandante) => {
+	const onSubmit = (data) => {
 		mutation.mutate(data)
+		queryClient.invalidateQueries({ queryKey: ['titulos-demandante'] })
 	}
 
 	return (
@@ -75,12 +108,13 @@ export default function ListaTitulosDemandante() {
 				</Typography>
 
 				<Button
+					disabled={titulos.length === 0}
 					variant="contained"
 					color="secondary"
 					onClick={() => setOpen(true)}
 					sx={{ mb: 2 }}
 				>
-					Añadir nuevo título
+					Añadir nuevo
 				</Button>
 			</Box>
 
@@ -96,7 +130,7 @@ export default function ListaTitulosDemandante() {
 						}}
 					>
 						<Typography variant="h6">
-							{tituloDemandante.titulo?.nombre}
+							{tituloDemandante.titulo.nombre}
 						</Typography>
 						<Typography>Centro: {tituloDemandante.centro}</Typography>
 						<Typography>Año: {tituloDemandante.año}</Typography>
@@ -121,7 +155,7 @@ export default function ListaTitulosDemandante() {
 					}}
 				>
 					<Typography variant="h6" gutterBottom>
-						Añadir nuevo título
+						Añadir nuevo
 					</Typography>
 
 					<Stack spacing={2}>
@@ -129,7 +163,14 @@ export default function ListaTitulosDemandante() {
 							name="idTitulo"
 							control={control}
 							render={({ field }) => (
-								<TextField {...field} select label="Título" fullWidth>
+								<TextField
+									{...field}
+									select
+									label="Título"
+									fullWidth
+									variant="outlined"
+									error={errors.idTitulo?.message}
+								>
 									{titulos.map((titulo) => (
 										<MenuItem key={titulo.id} value={titulo.id}>
 											{titulo.nombre}
@@ -142,14 +183,26 @@ export default function ListaTitulosDemandante() {
 							name="centro"
 							control={control}
 							render={({ field }) => (
-								<TextField {...field} label="Centro" fullWidth />
+								<TextField
+									{...field}
+									label="Centro"
+									fullWidth
+									error={errors.centro ? true : false}
+									helperText={errors.centro?.message}
+								/>
 							)}
 						/>
 						<Controller
 							name="año"
 							control={control}
 							render={({ field }) => (
-								<TextField {...field} label="Año" fullWidth />
+								<TextField
+									{...field}
+									label="Año"
+									fullWidth
+									error={errors.año ? true : false}
+									helperText={errors.año?.message}
+								/>
 							)}
 						/>
 						<Controller
@@ -182,9 +235,9 @@ export default function ListaTitulosDemandante() {
 							type="submit"
 							variant="contained"
 							color="primary"
-							disabled={mutation.isPending}
+							disabled={!isValid || mutation.isPending}
 						>
-							{mutation.isPending ? 'Añadiendo...' : 'Añadir Título'}
+							{mutation.isPending ? 'Añadiendo...' : 'Añadir'}
 						</Button>
 					</Stack>
 				</Box>

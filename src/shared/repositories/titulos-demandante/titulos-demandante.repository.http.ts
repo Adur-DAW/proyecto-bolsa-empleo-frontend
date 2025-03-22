@@ -10,6 +10,8 @@ export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository = {
 		)) as any[]
 		return titulosDemandante.map((x: any) => ({
 			...x,
+			idTitulo: x.id_titulo,
+			idDemandante: x.id_demandante,
 		}))
 	},
 	registrar: async (tituloDemandante: TituloDemandante) => {

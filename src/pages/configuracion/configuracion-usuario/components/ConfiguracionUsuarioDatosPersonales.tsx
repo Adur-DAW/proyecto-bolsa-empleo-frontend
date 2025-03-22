@@ -7,7 +7,7 @@ import { DemandantesRepositoryHttp } from '@/shared/repositories/demandantes/dem
 
 export default function ConfiguracionUsuarioDatosPersonales() {
 	return (
-		<Suspense fallback={<div>Cargando...</div>}>
+		<Suspense fallback={<div>Cargando datos personales...</div>}>
 			<ConfiguracionUsuarioDatosPersonalesInterno />
 		</Suspense>
 	)
