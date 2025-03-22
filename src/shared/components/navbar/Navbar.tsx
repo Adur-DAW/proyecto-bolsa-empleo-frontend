@@ -41,7 +41,7 @@ export default function Navbar() {
 		{
 			name: 'Configuración',
 			icon: <IconSettings />,
-			action: () => navigate(getAbsolutePath('inicio')),
+			action: () => navigate(getAbsolutePath('configuracion')),
 		},
 		{
 			name: 'Cerrar sesión',

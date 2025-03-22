@@ -4,6 +4,7 @@ import AppLayout from "./AppLayout";
 import { useAppStore } from "./shared/store/store";
 import { getAbsolutePath } from "./shared/routes";
 import EmpresasPage from "./pages/empresas/empresas/EmpresasPage";
+import ConfiguracionUsuarioPage from "./pages/configuracion/configuracion-usuario/ConfiguracionUsuarioPage";
 
 const InicioPage = lazy(() => import("@/pages/inicio/InicioPage"));
 const OfertaEditarPage = lazy(() => import("@/pages/ofertas/oferta-editar/OfertaEditar"));
@@ -34,6 +35,14 @@ export default function AppRouter() {
 							>
 								<Route path={getAbsolutePath("ofertas_editar")} element={<OfertaEditarPage />} />
 							</Route>
+						</Route>
+
+						<Route
+							element={usuario ? <Outlet /> : <Navigate to={getAbsolutePath("login")} />}
+						>
+							{
+								usuario!.rol == 'demandante' && <Route path={getAbsolutePath("configuracion")} element={<ConfiguracionUsuarioPage />} />
+							}
 						</Route>
 
 						<Route path={getAbsolutePath("empresas")}>
