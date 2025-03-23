@@ -88,6 +88,7 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 							justifyContent: 'space-between',
 							alignItems: 'center',
 						}}
+						key={tituloDemandante.idTitulo}
 					>
 						<Box
 							key={`${tituloDemandante.idDemandante}-${tituloDemandante.idTitulo}`}

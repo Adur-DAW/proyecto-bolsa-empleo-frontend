@@ -62,7 +62,7 @@ export default function ModalEditarTitulo({
 			reset()
 		},
 		onError: () => {
-			alert('Hubo un error al añadir el título')
+			alert('Hubo un error al actualizar el título')
 		},
 	})
 
@@ -73,7 +73,7 @@ export default function ModalEditarTitulo({
 	return (
 		<Box component="form" onSubmit={handleSubmit(onSubmit)}>
 			<Typography variant="h6" gutterBottom>
-				Añadir nuevo
+				Actualizar
 			</Typography>
 
 			<Stack spacing={2}>
@@ -87,8 +87,7 @@ export default function ModalEditarTitulo({
 							label="Título"
 							fullWidth
 							variant="outlined"
-							error={!!errors.idTitulo}
-							helperText={errors.idTitulo?.message}
+							disabled={true}
 						>
 							{titulos.map((titulo) => (
 								<MenuItem key={titulo.id} value={titulo.id}>
@@ -152,7 +151,7 @@ export default function ModalEditarTitulo({
 					color="primary"
 					disabled={!isValid || mutation.isPending}
 				>
-					{mutation.isPending ? 'Añadiendo...' : 'Añadir'}
+					{mutation.isPending ? 'Actualizando...' : 'Actualizar'}
 				</Button>
 			</Stack>
 		</Box>
