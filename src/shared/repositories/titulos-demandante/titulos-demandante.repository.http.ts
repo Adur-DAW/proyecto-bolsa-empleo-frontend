@@ -1,4 +1,4 @@
-import { getEntity, postEntity } from '@/shared/http/api.service'
+import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { TituloDemandante } from '@/shared/models'
 
 import { TitulosDemandanteRepository } from './titulos-demandante.repository'
@@ -6,7 +6,7 @@ import { TitulosDemandanteRepository } from './titulos-demandante.repository'
 export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository = {
 	obtenerJWT: async (): Promise<TituloDemandante[]> => {
 		const titulosDemandante = (await getEntity(
-			'/titulos/demandante/jwt'
+			'/demandante/titulos'
 		)) as any[]
 		return titulosDemandante.map((x: any) => ({
 			...x,
@@ -15,7 +15,14 @@ export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository = {
 		}))
 	},
 	registrar: async (tituloDemandante: TituloDemandante) => {
-		return postEntity('/titulos/demandante', {
+		return postEntity('/demandante/titulos', {
+			...tituloDemandante,
+			id_titulo: tituloDemandante.idTitulo,
+			id_demandante: tituloDemandante.idDemandante,
+		})
+	},
+	actualizar: async (tituloDemandante: TituloDemandante) => {
+		return putEntity(`/demandante/titulos/${tituloDemandante.idTitulo}`, {
 			...tituloDemandante,
 			id_titulo: tituloDemandante.idTitulo,
 			id_demandante: tituloDemandante.idDemandante,

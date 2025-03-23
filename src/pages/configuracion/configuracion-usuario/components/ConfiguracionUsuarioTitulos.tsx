@@ -1,35 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-	Box,
-	Button,
-	FormControl,
-	FormControlLabel,
-	MenuItem,
-	Modal,
-	Radio,
-	RadioGroup,
-	Stack,
-	TextField,
-	Typography,
-} from '@mui/material'
-import {
-	QueryClient,
-	useMutation,
-	useSuspenseQuery,
-} from '@tanstack/react-query'
+import { Box, Button, Typography } from '@mui/material'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { z } from 'zod'
 
+import Modal from '@/shared/components/modal/Modal'
+import useModal from '@/shared/components/modal/hooks/useModal'
+import { TituloDemandante } from '@/shared/models'
 import { TitulosDemandanteRepositoryHttp } from '@/shared/repositories/titulos-demandante/titulos-demandante.repository.http'
 import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.repository.http'
 
-const schema = z.object({
-	idTitulo: z.number().min(1, 'Por favor selecciona un título'),
-	centro: z.string().nonempty('Por favor ingresa el centro'),
-	año: z.string().regex(/^[0-9]{4}$/, 'Por favor ingresa un año válido'),
-	cursando: z.boolean(),
-})
+import ModalEditarTitulo from './components/ModalEditarTitulo'
+import ModalNuevoTitulo from './components/ModalNuevoTitulo'
 
 export default function ConfiguracionUsuarioTitulos() {
 	return (
@@ -40,10 +20,8 @@ export default function ConfiguracionUsuarioTitulos() {
 }
 
 const ConfiguracionUsuarioTitulosInterno = () => {
-	const titulosDemandanteRepository = TitulosDemandanteRepositoryHttp
 	const titulosRepository = TitulosRepositoryHttp
-
-	const queryClient = new QueryClient()
+	const titulosDemandanteRepository = TitulosDemandanteRepositoryHttp
 
 	const { data: titulosDemandante = [] } = useSuspenseQuery({
 		queryKey: ['titulos-demandante'],
@@ -60,39 +38,19 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 		({ id }) => !titulosActuales.includes(id)
 	)
 
-	const [open, setOpen] = useState(false)
-
 	const {
-		control,
-		handleSubmit,
-		reset,
-		formState: { isValid, errors },
-	} = useForm({
-		resolver: zodResolver(schema),
-		mode: 'onChange',
-		defaultValues: {
-			idTitulo: titulos.length > 0 ? titulos[0].id : 0,
-			centro: '',
-			año: '',
-			cursando: false,
-		},
-	})
+		abierto: nuevoAbierto,
+		abrirModal: abrirModalNuevo,
+		cerrarModal: cerrarModalNuevo,
+	} = useModal()
+	const {
+		abierto: editarAbierto,
+		abrirModal: abrirModalEditar,
+		cerrarModal: cerrarModalEditar,
+	} = useModal()
 
-	const mutation = useMutation({
-		mutationFn: titulosDemandanteRepository.registrar,
-		onSuccess: () => {
-			setOpen(false)
-			reset()
-		},
-		onError: () => {
-			alert('Hubo un error al añadir el título')
-		},
-	})
-
-	const onSubmit = (data) => {
-		mutation.mutate(data)
-		queryClient.invalidateQueries({ queryKey: ['titulos-demandante'] })
-	}
+	const [tituloDemandanteSelecionado, setTituloDemandanteSelecionado] =
+		useState<TituloDemandante | undefined>()
 
 	return (
 		<Box sx={{ padding: 4 }}>
@@ -111,7 +69,7 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 					disabled={titulos.length === 0}
 					variant="contained"
 					color="secondary"
-					onClick={() => setOpen(true)}
+					onClick={abrirModalNuevo}
 					sx={{ mb: 2 }}
 				>
 					Añadir nuevo
@@ -121,127 +79,62 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 			<Box>
 				{titulosDemandante.map((tituloDemandante) => (
 					<Box
-						key={`${tituloDemandante.idDemandante}-${tituloDemandante.idTitulo}`}
 						sx={{
 							border: '1px solid #ccc',
 							borderRadius: '8px',
 							padding: 2,
 							marginBottom: 2,
+							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
 						}}
 					>
-						<Typography variant="h6">
-							{tituloDemandante.titulo.nombre}
-						</Typography>
-						<Typography>Centro: {tituloDemandante.centro}</Typography>
-						<Typography>Año: {tituloDemandante.año}</Typography>
+						<Box
+							key={`${tituloDemandante.idDemandante}-${tituloDemandante.idTitulo}`}
+							sx={{ textAlign: 'start', flex: 1 }}
+						>
+							<Typography variant="h6">
+								{tituloDemandante.titulo.nombre}
+							</Typography>
+							<Typography>Centro: {tituloDemandante.centro}</Typography>
+							<Typography>Año: {tituloDemandante.año}</Typography>
+							<Typography>Cursando: {tituloDemandante.cursando == true ? 'Si' : 'No'}</Typography>
+						</Box>
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								flexDirection: 'column',
+								gap: 2,
+							}}
+						>
+							<Button
+								variant="outlined"
+								color="secondary"
+								onClick={() => {
+									setTituloDemandanteSelecionado(tituloDemandante)
+									abrirModalEditar()
+								}}
+							>
+								Actualizar
+							</Button>
+						</Box>
 					</Box>
 				))}
 			</Box>
 
-			<Modal open={open} onClose={() => setOpen(false)}>
-				<Box
-					component="form"
-					onSubmit={handleSubmit(onSubmit)}
-					sx={{
-						position: 'absolute',
-						top: '50%',
-						left: '50%',
-						transform: 'translate(-50%, -50%)',
-						width: 400,
-						bgcolor: 'background.paper',
-						boxShadow: 24,
-						p: 4,
-						borderRadius: '8px',
-					}}
-				>
-					<Typography variant="h6" gutterBottom>
-						Añadir nuevo
-					</Typography>
+			<Modal open={nuevoAbierto} onClose={cerrarModalNuevo}>
+				<ModalNuevoTitulo titulos={titulos} cerrarModal={cerrarModalNuevo} />
+			</Modal>
 
-					<Stack spacing={2}>
-						<Controller
-							name="idTitulo"
-							control={control}
-							render={({ field }) => (
-								<TextField
-									{...field}
-									select
-									label="Título"
-									fullWidth
-									variant="outlined"
-									error={errors.idTitulo?.message}
-									helperText={errors.idTitulo?.message}
-								>
-									{titulos.map((titulo) => (
-										<MenuItem key={titulo.id} value={titulo.id}>
-											{titulo.nombre}
-										</MenuItem>
-									))}
-								</TextField>
-							)}
-						/>
-						<Controller
-							name="centro"
-							control={control}
-							render={({ field }) => (
-								<TextField
-									{...field}
-									label="Centro"
-									fullWidth
-									error={!!errors.centro}
-									helperText={errors.centro?.message}
-								/>
-							)}
-						/>
-						<Controller
-							name="año"
-							control={control}
-							render={({ field }) => (
-								<TextField
-									{...field}
-									label="Año"
-									fullWidth
-									error={!!errors.año}
-									helperText={errors.año?.message}
-								/>
-							)}
-						/>
-						<Controller
-							name="cursando"
-							control={control}
-							render={({ field }) => (
-								<FormControl>
-									<Typography variant="subtitle1">¿Cursando?</Typography>
-									<RadioGroup
-										row
-										{...field}
-										onChange={(e) => field.onChange(e.target.value === 'true')}
-									>
-										<FormControlLabel
-											value={true}
-											control={<Radio />}
-											label="Sí"
-										/>
-										<FormControlLabel
-											value={false}
-											control={<Radio />}
-											label="No"
-										/>
-									</RadioGroup>
-								</FormControl>
-							)}
-						/>
-
-						<Button
-							type="submit"
-							variant="contained"
-							color="primary"
-							disabled={!isValid || mutation.isPending}
-						>
-							{mutation.isPending ? 'Añadiendo...' : 'Añadir'}
-						</Button>
-					</Stack>
-				</Box>
+			<Modal open={editarAbierto} onClose={cerrarModalEditar}>
+				{tituloDemandanteSelecionado && (
+					<ModalEditarTitulo
+						titulos={[...titulos, tituloDemandanteSelecionado.titulo]}
+						cerrarModal={cerrarModalEditar}
+						tituloDemandante={tituloDemandanteSelecionado}
+					/>
+				)}
 			</Modal>
 		</Box>
 	)
