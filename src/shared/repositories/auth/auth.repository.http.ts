@@ -4,7 +4,10 @@ import { Usuario } from '@/shared/models'
 import { AuthRepository } from './auth.repository'
 
 export const AuthRepositoryHttp: AuthRepository = {
-	login: async (datos: { email: string; password: string }): Promise => {
+	login: async (datos: {
+		email: string
+		password: string
+	}): Promise<{ usuario: Usuario; token: string }> => {
 		return postEntity('/login', datos)
 	},
 	registrar: async (datos: {
@@ -12,6 +15,6 @@ export const AuthRepositoryHttp: AuthRepository = {
 		password: string
 		password_confirmation: string
 	}) => {
-		postEntity('/registrar', datos)
+		return postEntity('/registrar', datos)
 	},
 }

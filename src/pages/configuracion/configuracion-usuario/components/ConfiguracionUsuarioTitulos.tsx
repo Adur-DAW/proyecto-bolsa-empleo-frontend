@@ -170,6 +170,7 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 									fullWidth
 									variant="outlined"
 									error={errors.idTitulo?.message}
+									helperText={errors.idTitulo?.message}
 								>
 									{titulos.map((titulo) => (
 										<MenuItem key={titulo.id} value={titulo.id}>
@@ -187,7 +188,7 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 									{...field}
 									label="Centro"
 									fullWidth
-									error={errors.centro ? true : false}
+									error={!!errors.centro}
 									helperText={errors.centro?.message}
 								/>
 							)}
@@ -200,7 +201,7 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 									{...field}
 									label="Año"
 									fullWidth
-									error={errors.año ? true : false}
+									error={!!errors.año}
 									helperText={errors.año?.message}
 								/>
 							)}

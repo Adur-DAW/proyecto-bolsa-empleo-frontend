@@ -10,6 +10,6 @@ export const TitulosRepositoryHttp: TitulosRepository = {
 		return titulos
 	},
 	registrar: async (datos: { titulo: Titulo }) => {
-		postEntity('/titulos', datos)
+		return postEntity('/titulos', datos)
 	},
 }

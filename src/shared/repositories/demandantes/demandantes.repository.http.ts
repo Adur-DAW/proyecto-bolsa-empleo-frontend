@@ -13,6 +13,6 @@ export const DemandantesRepositoryHttp: DemandantesRepository = {
 		}
 	},
 	actualizar: async (demandante: Demandante) => {
-		putEntity('/demandantes', demandante)
+		return putEntity('/demandantes', demandante)
 	},
 }

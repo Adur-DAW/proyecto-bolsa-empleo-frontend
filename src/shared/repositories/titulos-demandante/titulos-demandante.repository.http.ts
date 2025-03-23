@@ -15,7 +15,7 @@ export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository = {
 		}))
 	},
 	registrar: async (tituloDemandante: TituloDemandante) => {
-		postEntity('/titulos/demandante', {
+		return postEntity('/titulos/demandante', {
 			...tituloDemandante,
 			id_titulo: tituloDemandante.idTitulo,
 			id_demandante: tituloDemandante.idDemandante,

@@ -12,6 +12,6 @@ export const EmpresasRepositoryHttp: EmpresasRepository = {
 		}))
 	},
 	registrar: async (datos: { empresa: Empresa }) => {
-		postEntity('/empresas/', datos)
+		return postEntity('/empresas/', datos)
 	},
 }
