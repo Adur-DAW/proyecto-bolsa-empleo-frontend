@@ -17,6 +17,7 @@
 		"@tabler/icons": "^3.31.0",
 		"@tabler/icons-react": "^3.31.0",
 		"@tanstack/react-query": "^5.69.0",
+		"@tanstack/react-query-devtools": "5.69.0",
 		"@types/node": "^22.13.11",
 		"axios": "^1.8.4",
 		"dayjs": "^1.11.13",
@@ -29,7 +30,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.23.0",
-		"@rsbuild/core": "^1.2.16",
+		"@rsbuild/core": "^1.2.19",
 		"@rsbuild/plugin-react": "^1.1.1",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/react": "^19.0.12",

@@ -11,7 +11,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
-import { QueryClient, useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -34,7 +34,7 @@ export default function ModalNuevoTitulo({
 }) {
 	const titulosDemandanteRepository = TitulosDemandanteRepositoryHttp
 
-	const queryClient = new QueryClient()
+	const queryClient = useQueryClient()
 
 	const {
 		control,

@@ -11,7 +11,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
-import { QueryClient, useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -36,7 +36,7 @@ export default function ModalEditarTitulo({
 }) {
 	const titulosDemandanteRepository = TitulosDemandanteRepositoryHttp
 
-	const queryClient = new QueryClient()
+	const queryClient = useQueryClient()
 
 	const {
 		control,
@@ -56,8 +56,8 @@ export default function ModalEditarTitulo({
 
 	const mutation = useMutation({
 		mutationFn: titulosDemandanteRepository.actualizar,
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['titulos-demandante'] })
+		onSuccess: async () => {
+			queryClient.invalidateQueries({ queryKey: ['titulos-demandante'] })
 			cerrarModal()
 			reset()
 		},
