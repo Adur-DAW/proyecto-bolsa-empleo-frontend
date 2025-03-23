@@ -10,6 +10,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+import { Link } from 'react-router'
 
 export default function OfertasLista() {
 	return (
@@ -142,6 +143,9 @@ const OfertasListaSuspense = () => {
 							<Button variant="outlined" color="primary" sx={{ marginTop: 2 }}>
 								Inscribirse
 							</Button>
+							<Link color="primary" to={`/ofertas/${oferta.id}/editar`}>
+								Editar
+							</Link>
 						</Box>
 					</Box>
 				</CardContent>

@@ -2,5 +2,7 @@ import { Oferta } from '@/shared/models'
 
 export type OfertasRepository = {
 	obtener: () => Promise<Oferta[]>
-	registrar: (datos: { oferta: Oferta }) => Promise<void>
+	obtenerPorId: (id: number) => Promise<Oferta>
+	registrar: (oferta: Oferta) => Promise<void>
+	actualizar: (oferta: Oferta) => Promise<void>
 }
