@@ -1,1 +1,1 @@
-export type TiposUsuario = 'centro' | 'empresa' | 'demandante'
+export type TiposUsuario = 'centro' | 'empresa' | 'demandante' | 'sinRol'

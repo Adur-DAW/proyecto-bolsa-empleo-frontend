@@ -8,9 +8,10 @@ import {
 } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
-
-import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 import { Link } from 'react-router'
+
+import useRol from '@/shared/hooks/rol.hook'
+import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 
 export default function OfertasLista() {
 	return (
@@ -23,6 +24,8 @@ export default function OfertasLista() {
 }
 
 const OfertasListaSuspense = () => {
+	const { mismoRol } = useRol()
+
 	const ofertasRepository = OfertasRepositoryHttp
 
 	const { data: ofertas = [] } = useSuspenseQuery({
@@ -140,12 +143,28 @@ const OfertasListaSuspense = () => {
 							<Typography variant="caption" color="text.secondary">
 								Publicado el: {oferta.fechaPublicacion.format('DD/MM/YYYY')}
 							</Typography>
-							<Button variant="outlined" color="primary" sx={{ marginTop: 2 }}>
-								Inscribirse
-							</Button>
-							<Link color="primary" to={`/ofertas/${oferta.id}/editar`}>
-								Editar
-							</Link>
+
+							{mismoRol('demandante') && (
+								<Button
+									variant="outlined"
+									color="primary"
+									sx={{ marginTop: 2 }}
+								>
+									Inscribirse
+								</Button>
+							)}
+							{mismoRol('empresa') && (
+								<Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
+									<Button
+										variant="outlined"
+										color="primary"
+										component={Link}
+										to={`/ofertas/${oferta.id}/editar`}
+									>
+										Editar
+									</Button>
+								</Box>
+							)}
 						</Box>
 					</Box>
 				</CardContent>
