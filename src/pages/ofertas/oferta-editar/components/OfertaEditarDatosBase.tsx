@@ -1,5 +1,6 @@
 import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -30,6 +31,8 @@ const OfertaEditarDatosBaseInterno = () => {
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
 			...oferta,
+			numeroPuestos: +oferta.numeroPuestos,
+			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
 		},
 	})
 
@@ -39,14 +42,7 @@ const OfertaEditarDatosBaseInterno = () => {
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate(data, {
-			onSuccess: () => {
-				alert('Datos actualizados correctamente')
-			},
-			onError: () => {
-				alert('Hubo un error al actualizar los datos')
-			},
-		})
+		mutation.mutate(data)
 	}
 
 	return (
@@ -86,6 +82,9 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Fecha publicación"
 										type="date"
+										value={
+											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
+										}
 									/>
 								)}
 							/>
@@ -96,7 +95,12 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="numeroPuestos"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Número de puestos" />
+									<TextField
+										{...field}
+										type="number"
+										fullWidth
+										label="Número de puestos"
+									/>
 								)}
 							/>
 						</Box>

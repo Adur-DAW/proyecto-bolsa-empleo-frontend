@@ -25,7 +25,7 @@ export const TitulosOfertaRepositoryHttp: TitulosOfertaRepository = {
 	},
 	eliminar: async (tituloOferta: TituloOferta) => {
 		return deleteEntity(
-			`/ofertas/${tituloOferta.idOferta}titulos/${tituloOferta.idTitulo}`
+			`/ofertas/${tituloOferta.idOferta}/titulos/${tituloOferta.idTitulo}`
 		)
 	},
 }

@@ -70,6 +70,12 @@ export default function ModalEditarTitulo({
 		mutation.mutate(data)
 	}
 
+	const mutationEliminar = useMutation({
+		mutationFn: titulosDemandanteRepository.eliminar,
+		onSuccess: () =>
+			queryClient.refetchQueries({ queryKey: ['titulos-demandante'] }),
+	})
+
 	return (
 		<Box component="form" onSubmit={handleSubmit(onSubmit)}>
 			<Typography variant="h6" gutterBottom>
@@ -152,6 +158,14 @@ export default function ModalEditarTitulo({
 					disabled={!isValid || mutation.isPending}
 				>
 					{mutation.isPending ? 'Actualizando...' : 'Actualizar'}
+				</Button>
+
+				<Button
+					variant="outlined"
+					color="secondary"
+					onClick={() => mutationEliminar.mutate(tituloDemandante)}
+				>
+					Eliminar
 				</Button>
 			</Stack>
 		</Box>

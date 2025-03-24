@@ -35,9 +35,20 @@ export const OfertasRepositoryHttp: OfertasRepository = {
 		}
 	},
 	registrar: async (oferta: Oferta) => {
-		return postEntity('/ofertas/', oferta)
+		return postEntity('/ofertas/', mapOfertaToBack(oferta))
 	},
 	actualizar: async (oferta: Oferta) => {
-		return putEntity<void>(`/ofertas/${oferta.id}`, oferta)
+		return putEntity<void>(`/ofertas/${oferta.id}`, mapOfertaToBack(oferta))
 	},
 }
+
+const mapOfertaToBack = (oferta: Oferta): any => ({
+	nombre: oferta.nombre,
+	horario: oferta.horario,
+	obs: oferta.obs,
+	abierta: oferta.abierta,
+	tipo_contrato: oferta.tipoContrato,
+	numero_puestos: oferta.numeroPuestos,
+	fecha_publicacion: dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD'),
+	fecha_cierre: dayjs(oferta.fechaCierre).format('YYYY-MM-DD'),
+})

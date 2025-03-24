@@ -1,5 +1,9 @@
 import { Box, Button, Typography } from '@mui/material'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { useParams } from 'react-router'
 
@@ -41,6 +45,14 @@ const OfertaEditarTitulosInterno = () => {
 	const titulos = titulosSinFiltrar.filter(
 		({ id }) => !titulosActuales.includes(id)
 	)
+
+	const queryClient = useQueryClient()
+
+	const mutationEliminar = useMutation({
+		mutationFn: titulosOfertaRepository.eliminar,
+		onSuccess: () =>
+			queryClient.refetchQueries({ queryKey: ['titulos-oferta'] }),
+	})
 
 	const {
 		abierto: nuevoAbierto,
@@ -100,7 +112,11 @@ const OfertaEditarTitulosInterno = () => {
 								gap: 2,
 							}}
 						>
-							<Button variant="outlined" color="secondary">
+							<Button
+								variant="outlined"
+								color="secondary"
+								onClick={() => mutationEliminar.mutate(tituloOferta)}
+							>
 								Eliminar
 							</Button>
 						</Box>

@@ -159,6 +159,7 @@ export default function Navbar() {
 				<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
 					{pages.map((page) => (
 						<Link
+							key={page.to}
 							style={{
 								color: 'white',
 								fontSize: '1rem',

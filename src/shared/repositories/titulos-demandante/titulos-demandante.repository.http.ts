@@ -1,4 +1,4 @@
-import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
+import { deleteEntity, getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { TituloDemandante } from '@/shared/models'
 
 import { TitulosDemandanteRepository } from './titulos-demandante.repository'
@@ -27,5 +27,8 @@ export const TitulosDemandanteRepositoryHttp: TitulosDemandanteRepository = {
 			id_titulo: tituloDemandante.idTitulo,
 			id_demandante: tituloDemandante.idDemandante,
 		})
+	},
+	eliminar: async (tituloDemandante: TituloDemandante) => {
+		return deleteEntity(`/demandante/titulos/${tituloDemandante.idTitulo}`)
 	},
 }
