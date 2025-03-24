@@ -81,8 +81,16 @@ export default function Navbar() {
 	return (
 		<AppBar position="absolute">
 			<Toolbar sx={{ pr: '22px' }}>
-				<Box
-					sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: 1 }}
+				<Link
+					to={getAbsolutePath('inicio')}
+					onClick={handleCloseNavMenu}
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						flexGrow: 1,
+						gap: 1,
+						color: 'white',
+					}}
 				>
 					<img
 						src={logoImage}
@@ -92,6 +100,7 @@ export default function Navbar() {
 							height: '40px',
 						}}
 					/>
+
 					<Typography
 						component="h1"
 						variant="h6"
@@ -100,7 +109,7 @@ export default function Navbar() {
 					>
 						Bolsa Empleo
 					</Typography>
-				</Box>
+				</Link>
 
 				<Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
 					<IconButton
@@ -147,20 +156,24 @@ export default function Navbar() {
 					</Menu>
 				</Box>
 
-				<Box
-					sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 0.5 }}
-				>
+				<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
 					{pages.map((page) => (
-						<MenuItem
-							key={page.to}
+						<Link
+							style={{
+								color: 'white',
+								fontSize: '1rem',
+								padding: '1rem',
+								display: 'flex',
+								alignItems: 'center',
+								gap: '.5rem',
+								fontWeight: location.pathname === page.to ? 'bold' : 'normal',
+							}}
+							to={page.to}
 							onClick={handleCloseNavMenu}
-							sx={{ display: 'flex', gap: 0.5 }}
 						>
 							{page.icono}
-							<Link style={{ color: 'white', fontSize: '1rem' }} to={page.to}>
-								{page.texto}
-							</Link>
-						</MenuItem>
+							{page.texto}
+						</Link>
 					))}
 				</Box>
 
