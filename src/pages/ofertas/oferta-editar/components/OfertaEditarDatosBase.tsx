@@ -24,8 +24,8 @@ const OfertaEditarDatosBaseInterno = () => {
 	const ofertasRepository = OfertasRepositoryHttp
 
 	const { data: oferta } = useSuspenseQuery({
-		queryKey: ['oferta'],
-		queryFn: () => ofertasRepository.obtenerPorId(parseInt(id)),
+		queryKey: ['oferta', +id],
+		queryFn: () => ofertasRepository.obtenerPorId(+id),
 	})
 
 	const { control, handleSubmit } = useForm({

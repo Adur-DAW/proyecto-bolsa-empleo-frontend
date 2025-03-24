@@ -47,7 +47,7 @@ export default function ModalNuevoTitulo({
 	const mutation = useMutation({
 		mutationFn: titulosOfertaRepository.registrar,
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['titulos-oferta'] })
+			queryClient.refetchQueries({ queryKey: ['titulos-oferta', idOferta] })
 			cerrarModal()
 			reset()
 		},

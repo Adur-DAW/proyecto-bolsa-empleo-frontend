@@ -32,7 +32,7 @@ const OfertaEditarTitulosInterno = () => {
 	const titulosOfertaRepository = TitulosOfertaRepositoryHttp
 
 	const { data: titulosOferta = [] } = useSuspenseQuery({
-		queryKey: ['titulos-oferta'],
+		queryKey: ['titulos-oferta', +id],
 		queryFn: () => titulosOfertaRepository.obtenerPorIdOferta(+id),
 	})
 
@@ -51,7 +51,7 @@ const OfertaEditarTitulosInterno = () => {
 	const mutationEliminar = useMutation({
 		mutationFn: titulosOfertaRepository.eliminar,
 		onSuccess: () =>
-			queryClient.refetchQueries({ queryKey: ['titulos-oferta'] }),
+			queryClient.refetchQueries({ queryKey: ['titulos-oferta', +id] }),
 	})
 
 	const {
