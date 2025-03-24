@@ -34,6 +34,10 @@ const routing = createRouting({
 		relativePath: ':id',
 		absolutePath: '/ofertas/:id/editar',
 	},
+	ofertas_crear: {
+		relativePath: 'nueva',
+		absolutePath: '/ofertas/nueva',
+	},
 	empresas: {
 		relativePath: 'empresas',
 		absolutePath: '/empresas',

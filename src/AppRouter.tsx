@@ -1,13 +1,15 @@
 import { Suspense, lazy } from 'react'
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 
 import AppLayout from './AppLayout'
+import PaginaPorRol from './shared/router/PaginaPorRol'
+import ProtectedRoute from './shared/router/ProtectedRoute'
 import { getAbsolutePath } from './shared/routes'
-import { useAppStore } from './shared/store/store'
+import OfertaCrearPage from './pages/ofertas/oferta-crear/OfertaCrearPage'
 
 const InicioPage = lazy(() => import('@/pages/inicio/InicioPage'))
 const OfertaEditarPage = lazy(
-	() => import('@/pages/ofertas/oferta-editar/OfertaEditar')
+	() => import('@/pages/ofertas/oferta-editar/OfertaEditarPage')
 )
 const OfertaPage = lazy(() => import('@/pages/ofertas/oferta/OfertaPage'))
 const OfertasPage = lazy(() => import('@/pages/ofertas/ofertas/OfertasPage'))
@@ -30,14 +32,13 @@ const ConfiguracionEmpresaPage = lazy(
 )
 
 export default function AppRouter() {
-	const usuario = useAppStore((x) => x.usuario)
-
 	return (
 		<BrowserRouter>
 			<Suspense fallback={<div>Cargando...</div>}>
 				<Routes>
 					<Route element={<AppLayout />}>
 						<Route path={getAbsolutePath('login')} element={<LoginPage />} />
+
 						<Route
 							path={getAbsolutePath('registro')}
 							element={<RegistrarPage />}
@@ -54,13 +55,16 @@ export default function AppRouter() {
 
 							<Route
 								element={
-									usuario ? (
-										<Outlet />
-									) : (
-										<Navigate to={getAbsolutePath('login')} />
-									)
+									<ProtectedRoute
+										allowedRoles={['empresa', 'centro']}
+										redirectTo={getAbsolutePath('login')}
+									/>
 								}
 							>
+								<Route
+									path={getAbsolutePath('ofertas_crear')}
+									element={<OfertaCrearPage />}
+								/>
 								<Route
 									path={getAbsolutePath('ofertas_editar')}
 									element={<OfertaEditarPage />}
@@ -71,20 +75,15 @@ export default function AppRouter() {
 						<Route
 							path={getAbsolutePath('configuracion')}
 							element={
-								usuario ? (
-									usuario.rol === 'demandante' ? (
-										<ConfiguracionUsuarioPage />
-									) : usuario.rol === 'empresa' ? (
-										<ConfiguracionEmpresaPage />
-									) : (
-										<Navigate to={getAbsolutePath('root')} />
-									)
-								) : (
-									<Navigate to={getAbsolutePath('login')} />
-								)
+								<PaginaPorRol
+									roles={{
+										demandante: ConfiguracionUsuarioPage,
+										empresa: ConfiguracionEmpresaPage,
+									}}
+									redirectTo={getAbsolutePath('login')}
+								/>
 							}
 						/>
-
 						<Route path={getAbsolutePath('empresas')}>
 							<Route index element={<EmpresasPage />} />
 						</Route>

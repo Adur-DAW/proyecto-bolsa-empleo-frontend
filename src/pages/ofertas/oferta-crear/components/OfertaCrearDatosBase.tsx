@@ -1,13 +1,13 @@
 import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { useParams } from 'react-router'
 
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+import { ofertaDefault } from '@/shared/models'
 
-export default function OfertaEditarDatosBase() {
+export default function OfertaCrearDatosBase() {
 	return (
 		<Suspense fallback={<div>Cargando oferta...</div>}>
 			<OfertaEditarDatosBaseInterno />
@@ -16,29 +16,17 @@ export default function OfertaEditarDatosBase() {
 }
 
 const OfertaEditarDatosBaseInterno = () => {
-	const { id } = useParams()
-	if (!id) {
-		throw new Error('No se ha proporcionado un ID')
-	}
-
 	const ofertasRepository = OfertasRepositoryHttp
-
-	const { data: oferta } = useSuspenseQuery({
-		queryKey: ['oferta'],
-		queryFn: () => ofertasRepository.obtenerPorId(parseInt(id)),
-	})
 
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
-			...oferta,
-			numeroPuestos: +oferta.numeroPuestos,
-			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
+			...ofertaDefault
 		},
 	})
 
 	const mutation = useMutation({
-		mutationFn: ofertasRepository.actualizar,
-		onSuccess: () => console.log('Datos actualizados correctamente'),
+		mutationFn: ofertasRepository.registrar,
+		onSuccess: () => console.log('Oferta registrada correctamente'),
 	})
 
 	const onSubmit = (data) => {

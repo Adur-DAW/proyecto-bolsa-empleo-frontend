@@ -15,3 +15,14 @@ export type Oferta = {
 	empresa: Empresa
 	id: number
 }
+
+export const ofertaDefault = {
+	nombre: '',
+	fechaPublicacion: dayjs(),
+	numeroPuestos: 1,
+	tipoContrato: '',
+	horario: '',
+	obs: '',
+	abierta: true,
+	fechaCierre: dayjs(),
+}
