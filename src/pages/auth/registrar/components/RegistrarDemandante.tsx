@@ -64,9 +64,13 @@ export default function RegistrarDemandante() {
 		onSuccess: () => navigate('/login'),
 		onError: (error) => {
 			try {
-        const errorData = JSON.parse(error.message)
-        if (errorData.email) {
-          setError('email', { type: 'server', message: errorData.email[0] })
+				const { errors } = JSON.parse(error.message)
+
+        if (errors?.email) {
+          setError('email', { type: 'server', message: errors?.email[0] })
+        }
+				if (errors?.dni) {
+          setError('dni', { type: 'server', message: errors?.dni[0] })
         }
       } catch {
         alert('Error inesperado en el servidor')

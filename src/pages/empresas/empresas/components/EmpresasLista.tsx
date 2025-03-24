@@ -9,6 +9,7 @@ import {
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 
+import useRol from '@/shared/hooks/rol.hook'
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 
 export default function EmpresasLista() {
@@ -22,6 +23,8 @@ export default function EmpresasLista() {
 }
 
 const EmpresasListaSuspense = () => {
+	const { mismoRol } = useRol()
+
 	const empresasRepository = EmpresasRepositoryHttp
 
 	const { data: empresas = [] } = useSuspenseQuery({
@@ -88,12 +91,16 @@ const EmpresasListaSuspense = () => {
 								alignItems: 'flex-end',
 							}}
 						>
-							<Typography variant="caption" color="text.secondary">
-								Validado: {empresa.validado ? 'Si' : 'No'}
-							</Typography>
-							<Button variant="outlined" color="primary" sx={{ marginTop: 2 }}>
-								Inscribirse
-							</Button>
+							{mismoRol('empresa') &&
+								(empresa.validado ? (
+									<Button variant="outlined" color="secondary" disabled>
+										Validado
+									</Button>
+								) : (
+									<Button variant="outlined" color="primary">
+										Validar
+									</Button>
+								))}
 						</Box>
 					</Box>
 				</CardContent>

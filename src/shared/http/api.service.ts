@@ -41,7 +41,7 @@ export const postEntity = async <T>(endpoint: string, data) => {
 		return response.data as T
 	} catch (error: any) {
 		if (error.response?.data) {
-			throw new Error(error.response.data)
+			throw new Error(JSON.stringify(error.response.data))
 		}
 		throw new Error()
 	}
@@ -53,7 +53,7 @@ export const putEntity = async <T>(endpoint: string, data) => {
 		return response.data as T
 	} catch (error: any) {
 		if (error.response?.data) {
-			throw new Error(error.response.data)
+			throw new Error(JSON.stringify(error.response.data))
 		}
 		throw new Error()
 	}
@@ -65,7 +65,7 @@ export const deleteEntity = async <T>(endpoint: string) => {
 		return response.data as T
 	} catch (error: any) {
 		if (error.response?.data) {
-			throw new Error(error.response.data)
+			throw new Error(JSON.stringify(error.response.data))
 		}
 		throw new Error()
 	}

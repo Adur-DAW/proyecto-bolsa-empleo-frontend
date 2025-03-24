@@ -57,11 +57,16 @@ export default function RegistrarEmpresa() {
 		onSuccess: () => navigate('/login'),
 		onError: (error) => {
 			try {
-        const errorData = JSON.parse(error.message)
-        if (errorData.email) {
-          setError('email', { type: 'server', message: errorData.email[0] })
+        const { errors } = JSON.parse(error.message)
+
+        if (errors?.email) {
+          setError('email', { type: 'server', message: errors.email[0] })
         }
-      } catch {
+				if (errors?.cif) {
+					setError('cif', { type: 'server', message: errors.cif[0] })
+				}
+      } catch(e) {
+				console.log(e)
         alert('Error inesperado en el servidor')
       }
 		},
