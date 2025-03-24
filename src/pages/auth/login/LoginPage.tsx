@@ -1,4 +1,12 @@
-import { Box, Button, Container, TextField, Typography } from '@mui/material'
+import {
+	Alert,
+	Box,
+	Button,
+	Container,
+	TextField,
+	Typography,
+} from '@mui/material'
+import { IconCheck } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
@@ -6,23 +14,34 @@ import { Link, useNavigate } from 'react-router'
 import { getAbsolutePath } from '@/shared/routes'
 
 import useLogin from '../shared/hooks/useLogin'
+import { useState } from 'react'
 
 const LoginPage = () => {
 	const { login } = useLogin()
 
 	const navigate = useNavigate()
 
+	const [ error, setError ] = useState('')
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		setError: setFormError,
 	} = useForm()
 
 	const mutation = useMutation({
 		mutationFn: login,
 		onSuccess: () => navigate('/'),
-		onError: (error) => {
-			alert('Error en login: ' + error.message)
+		onError: (errorString) => {
+			try {
+				const { error } = JSON.parse(errorString.message)
+				setError(error)
+			} catch {
+				setError('Usuario o contraseña incorrectos')
+				setFormError('email', { type: 'server' })
+				setFormError('password', { type: 'server' })
+			}
 		},
 	})
 
@@ -36,6 +55,11 @@ const LoginPage = () => {
 				<Typography variant="h5" gutterBottom>
 					Iniciar Sesión
 				</Typography>
+
+				{ error && <Alert icon={<IconCheck fontSize="inherit" />} severity="error">
+					{ error }
+				</Alert>}
+
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<TextField
 						label="Email"
