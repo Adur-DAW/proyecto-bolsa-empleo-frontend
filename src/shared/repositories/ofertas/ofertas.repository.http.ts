@@ -9,30 +9,23 @@ export const OfertasRepositoryHttp: OfertasRepository = {
 	obtener: async (): Promise<Oferta[]> => {
 		const ofertas = await getEntity<any>('/ofertas')
 
-		return ofertas.map((x: any) => ({
-			...x,
-			tipoContrato: x.tipo_contrato,
-			numeroPuestos: x.numero_puestos,
-			fechaPublicacion: dayjs(x.fecha_publicacion),
-			fechaCierre: dayjs(x.fecha_cierre),
-			empresa: {
-				...x.empresa,
-			},
-		}))
+		return ofertas.map((x: any) => mapOfertaToFront(x))
 	},
+	obtenerPorDemandante: async (): Promise<Oferta[]> => {
+		const ofertas = await getEntity<any>('/demandantes/jwt/ofertas-por-titulos')
+
+		return ofertas.map((x: any) => mapOfertaToFront(x))
+	},
+	obtenerPorEmpresa: async (): Promise<Oferta[]> => {
+		const ofertas = await getEntity<any>('/empresas/jwt/ofertas')
+
+		return ofertas.map((x: any) => mapOfertaToFront(x))
+	},
+
 	obtenerPorId: async (id: number): Promise<Oferta> => {
 		const oferta = await getEntity<any>(`/ofertas/${id}`)
 
-		return {
-			...oferta,
-			tipoContrato: oferta.tipo_contrato,
-			numeroPuestos: oferta.numero_puestos,
-			fechaPublicacion: dayjs(oferta.fecha_publicacion),
-			fechaCierre: dayjs(oferta.fecha_cierre),
-			empresa: {
-				...oferta.empresa,
-			},
-		}
+		return mapOfertaToFront(oferta)
 	},
 	registrar: async (oferta: Oferta) => {
 		return postEntity('/ofertas/', mapOfertaToBack(oferta))
@@ -51,4 +44,15 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 	numero_puestos: oferta.numeroPuestos,
 	fecha_publicacion: dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD'),
 	fecha_cierre: dayjs(oferta.fechaCierre).format('YYYY-MM-DD'),
+})
+
+const mapOfertaToFront = (oferta: any): Oferta => ({
+	...oferta,
+	tipoContrato: oferta.tipo_contrato,
+	numeroPuestos: oferta.numero_puestos,
+	fechaPublicacion: dayjs(oferta.fecha_publicacion),
+	fechaCierre: dayjs(oferta.fecha_cierre),
+	empresa: {
+		...oferta.empresa,
+	},
 })

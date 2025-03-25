@@ -4,34 +4,62 @@ import {
 	Card,
 	CardContent,
 	Stack,
+	Tooltip,
 	Typography,
 } from '@mui/material'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { Link } from 'react-router'
 
 import useRol from '@/shared/hooks/rol.hook'
+import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 
-export default function OfertasLista() {
+export default function OfertasLista({ filtro }) {
 	return (
 		<Stack spacing={3}>
 			<Suspense fallback={<div>Cargando...</div>}>
-				<OfertasListaSuspense />
+				<OfertasListaSuspense filtro={filtro} />
 			</Suspense>
 		</Stack>
 	)
 }
 
-const OfertasListaSuspense = () => {
+const OfertasListaSuspense = ({ filtro }) => {
 	const { mismoRol } = useRol()
 
 	const ofertasRepository = OfertasRepositoryHttp
+	const ofertasDemandanteRepository = OfertasDemandanteRepositoryHttp
 
 	const { data: ofertas = [] } = useSuspenseQuery({
-		queryKey: ['ofertas'],
-		queryFn: () => ofertasRepository.obtener(),
+		queryKey: ['ofertas', filtro],
+		queryFn: () => {
+			if (filtro === 'demandante') {
+				return ofertasRepository.obtenerPorDemandante()
+			} else if (filtro === 'empresa') {
+				return ofertasRepository.obtenerPorEmpresa()
+			} else {
+				return ofertasRepository.obtener()
+			}
+		},
 	})
+
+	const queryClient = useQueryClient()
+
+	const mutate = useMutation({
+		mutationFn: ofertasDemandanteRepository.registrarJWT,
+		onSuccess: () => {
+			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
+		},
+	})
+
+	if (ofertas.length === 0) {
+		return <Typography>No hay ofertas</Typography>
+	}
 
 	return ofertas.map((oferta) => {
 		return (
@@ -144,13 +172,30 @@ const OfertasListaSuspense = () => {
 								Publicado el: {oferta.fechaPublicacion.format('DD/MM/YYYY')}
 							</Typography>
 
+							{mismoRol('sinRol') && (
+								<Tooltip title="Debes iniciar sesión para inscribirte">
+									<Button
+										variant="outlined"
+										color="primary"
+										sx={{ marginTop: 2 }}
+										component={Link}
+										to="/login"
+									>
+										Inscribirme
+									</Button>
+								</Tooltip>
+							)}
 							{mismoRol('demandante') && (
 								<Button
 									variant="outlined"
 									color="primary"
 									sx={{ marginTop: 2 }}
+									disabled={oferta.inscrito}
+									onClick={() => {
+										mutate.mutate(oferta.id)
+									}}
 								>
-									Inscribirse
+									{oferta.inscrito ? 'Inscrito' : 'Inscribirme'}
 								</Button>
 							)}
 							{mismoRol('empresa') && (

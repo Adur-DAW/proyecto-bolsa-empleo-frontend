@@ -17,7 +17,7 @@ export default function useRol() {
 	}
 
 	const mismoRol = (rolNecesario: TiposUsuario) => {
-		return usuario?.rol === rolNecesario
+		return rol === rolNecesario
 	}
 
 	return {

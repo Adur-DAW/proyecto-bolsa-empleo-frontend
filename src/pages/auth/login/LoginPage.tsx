@@ -7,7 +7,7 @@ import {
 	Typography,
 } from '@mui/material'
 import { IconCheck } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 
@@ -23,6 +23,8 @@ const LoginPage = () => {
 
 	const [ error, setError ] = useState('')
 
+	const queryClient = useQueryClient()
+
 	const {
 		register,
 		handleSubmit,
@@ -32,7 +34,10 @@ const LoginPage = () => {
 
 	const mutation = useMutation({
 		mutationFn: login,
-		onSuccess: () => navigate('/'),
+		onSuccess: () => {
+			queryClient.invalidateQueries()
+			navigate('/')
+		},
 		onError: (errorString) => {
 			try {
 				const { error } = JSON.parse(errorString.message)

@@ -14,6 +14,7 @@ export type Oferta = {
 	idEmpresa: number
 	empresa: Empresa
 	id: number
+	inscrito: boolean
 }
 
 export const ofertaDefault = {

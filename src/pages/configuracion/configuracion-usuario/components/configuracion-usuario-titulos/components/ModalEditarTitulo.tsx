@@ -72,8 +72,10 @@ export default function ModalEditarTitulo({
 
 	const mutationEliminar = useMutation({
 		mutationFn: titulosDemandanteRepository.eliminar,
-		onSuccess: () =>
-			queryClient.refetchQueries({ queryKey: ['titulos-demandante'] }),
+		onSuccess: () => {
+			queryClient.refetchQueries({ queryKey: ['titulos-demandante'] })
+			cerrarModal()
+		}
 	})
 
 	return (
