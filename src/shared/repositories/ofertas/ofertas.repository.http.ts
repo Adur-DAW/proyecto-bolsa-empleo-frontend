@@ -52,6 +52,7 @@ const mapOfertaToFront = (oferta: any): Oferta => ({
 	numeroPuestos: oferta.numero_puestos,
 	fechaPublicacion: dayjs(oferta.fecha_publicacion),
 	fechaCierre: dayjs(oferta.fecha_cierre),
+	demandantesInscritos: oferta.demandantes_inscritos,
 	empresa: {
 		...oferta.empresa,
 	},

@@ -28,10 +28,7 @@ export const getEntity = async <T>(
 
 		return response.data as T
 	} catch (error: any) {
-		if (error.response?.data) {
-			throw new Error(error.response.data)
-		}
-		throw new Error()
+		convertirError(error)
 	}
 }
 
@@ -40,10 +37,7 @@ export const postEntity = async <T>(endpoint: string, data) => {
 		const response = await axiosInstance.post(`${endpoint}`, data)
 		return response.data as T
 	} catch (error: any) {
-		if (error.response?.data) {
-			throw new Error(JSON.stringify(error.response.data))
-		}
-		throw new Error()
+		convertirError(error)
 	}
 }
 
@@ -52,10 +46,7 @@ export const putEntity = async <T>(endpoint: string, data) => {
 		const response = await axiosInstance.put(`${endpoint}`, data)
 		return response.data as T
 	} catch (error: any) {
-		if (error.response?.data) {
-			throw new Error(JSON.stringify(error.response.data))
-		}
-		throw new Error()
+		convertirError(error)
 	}
 }
 
@@ -64,10 +55,7 @@ export const deleteEntity = async <T>(endpoint: string) => {
 		const response = await axiosInstance.delete(`${endpoint}`)
 		return response.data as T
 	} catch (error: any) {
-		if (error.response?.data) {
-			throw new Error(JSON.stringify(error.response.data))
-		}
-		throw new Error()
+		convertirError(error)
 	}
 }
 
@@ -83,4 +71,11 @@ export const toQueryString = (params: Record<string, any>) => {
 export interface Pagination {
 	CurrentPage: number
 	TotalPageCount: number
+}
+
+const convertirError = (error: any) => {
+	const backendError = error.response.data
+	throw new Error(
+		backendError.message || 'Ocurrió un error inesperado en el servidor'
+	)
 }

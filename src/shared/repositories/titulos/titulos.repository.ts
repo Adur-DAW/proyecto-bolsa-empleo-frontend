@@ -1,6 +1,8 @@
-import { Titulo } from '@/shared/models'
+import { Titulo, TituloExtra } from '@/shared/models'
 
 export type TitulosRepository = {
-	obtener: () => Promise
-	registrar: (datos: { titulo: Titulo }) => Promise
+	obtener: () => Promise<Titulo[]>
+	obtenerExtra: () => Promise<TituloExtra[]>
+	registrar: (titulo: Titulo) => Promise<void>
+	eliminar: (id: number) => Promise<void>
 }

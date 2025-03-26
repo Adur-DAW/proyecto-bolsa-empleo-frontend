@@ -13,6 +13,7 @@ import {
 import {
 	IconBuildingCommunity,
 	IconHome,
+	IconLetterA,
 	IconListCheck,
 	IconLogout,
 	IconMenu,
@@ -77,6 +78,14 @@ export default function Navbar() {
 			icono: <IconBuildingCommunity />,
 		},
 	]
+
+	if (usuario?.rol === 'centro') {
+		pages.push({
+			texto: 'Titulos',
+			to: getAbsolutePath('titulos'),
+			icono: <IconLetterA />,
+		})
+	}
 
 	return (
 		<AppBar position="absolute">

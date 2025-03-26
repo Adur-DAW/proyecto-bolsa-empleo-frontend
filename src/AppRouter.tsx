@@ -5,7 +5,6 @@ import AppLayout from './AppLayout'
 import PaginaPorRol from './shared/router/PaginaPorRol'
 import ProtectedRoute from './shared/router/ProtectedRoute'
 import { getAbsolutePath } from './shared/routes'
-import OfertaCrearPage from './pages/ofertas/oferta-crear/OfertaCrearPage'
 
 const InicioPage = lazy(() => import('@/pages/inicio/InicioPage'))
 const OfertaEditarPage = lazy(
@@ -29,6 +28,12 @@ const ConfiguracionEmpresaPage = lazy(
 		import(
 			'@/pages/configuracion/configuracion-empresa/ConfiguracionEmpresaPage'
 		)
+)
+
+const TitulosPage = lazy(() => import('./pages/titulos/TitulosPage'))
+
+const OfertaCrearPage = lazy(
+	() => import('./pages/ofertas/oferta-crear/OfertaCrearPage')
 )
 
 export default function AppRouter() {
@@ -70,6 +75,20 @@ export default function AppRouter() {
 									element={<OfertaEditarPage />}
 								/>
 							</Route>
+						</Route>
+
+						<Route
+							element={
+								<ProtectedRoute
+									allowedRoles={['centro']}
+									redirectTo={getAbsolutePath('login')}
+								/>
+							}
+						>
+							<Route
+								path={getAbsolutePath('titulos')}
+								element={<TitulosPage />}
+							/>
 						</Route>
 
 						<Route

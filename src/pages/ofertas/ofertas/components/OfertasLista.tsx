@@ -160,6 +160,19 @@ const OfertasListaSuspense = ({ filtro }) => {
 									{oferta.obs}
 								</Typography>
 							</Box>
+							<Box sx={{ marginBottom: 1 }}>
+								<Typography
+									variant="subtitle2"
+									color="text.secondary"
+									component="span"
+								>
+									Inscritos:{' '}
+								</Typography>
+								<Typography variant="body2" component="span">
+									{oferta.demandantesInscritos} de {oferta.numeroPuestos}{' '}
+									puestos
+								</Typography>
+							</Box>
 						</Box>
 						<Box
 							sx={{
@@ -210,6 +223,15 @@ const OfertasListaSuspense = ({ filtro }) => {
 									</Button>
 								</Box>
 							)}
+							<Link to={`/ofertas/${oferta.id}`}>
+								<Button
+									variant="outlined"
+									color="primary"
+									sx={{ marginTop: 2 }}
+								>
+									Ver detalles
+								</Button>
+							</Link>
 						</Box>
 					</Box>
 				</CardContent>
