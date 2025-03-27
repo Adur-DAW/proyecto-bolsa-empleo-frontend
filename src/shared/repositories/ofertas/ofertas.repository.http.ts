@@ -28,10 +28,10 @@ export const OfertasRepositoryHttp: OfertasRepository = {
 		return mapOfertaToFront(oferta)
 	},
 	registrar: async (oferta: Oferta) => {
-		return postEntity('/ofertas/', mapOfertaToBack(oferta))
+		return await postEntity<any>('/ofertas/', mapOfertaToBack(oferta))
 	},
 	actualizar: async (oferta: Oferta) => {
-		return putEntity<void>(`/ofertas/${oferta.id}`, mapOfertaToBack(oferta))
+		return await putEntity<void>(`/ofertas/${oferta.id}`, mapOfertaToBack(oferta))
 	},
 }
 

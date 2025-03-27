@@ -5,6 +5,6 @@ export type OfertasRepository = {
 	obtenerPorEmpresa: () => Promise<Oferta[]>
 	obtenerPorDemandante: () => Promise<Oferta[]>
 	obtenerPorId: (id: number) => Promise<Oferta>
-	registrar: (oferta: Oferta) => Promise<void>
+	registrar: (oferta: Oferta) => Promise<{ oferta: Oferta }>
 	actualizar: (oferta: Oferta) => Promise<void>
 }

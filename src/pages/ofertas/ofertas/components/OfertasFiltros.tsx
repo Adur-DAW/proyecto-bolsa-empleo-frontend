@@ -10,6 +10,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 
 import useRol from '@/shared/hooks/rol.hook'
+import { IconSearch } from '@tabler/icons-react'
 
 export default function OfertasFiltros({ filtro, onCambiarFiltro }) {
 	const { mismoRol } = useRol()
@@ -108,6 +109,7 @@ export default function OfertasFiltros({ filtro, onCambiarFiltro }) {
 				fullWidth
 				sx={{ marginTop: 2 }}
 				onClick={onAplicarFiltros}
+				startIcon={<IconSearch />}
 			>
 				Buscar
 			</Button>

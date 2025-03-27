@@ -1,11 +1,13 @@
 import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import { IconPlus } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
 
-import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 import { ofertaDefault } from '@/shared/models'
+import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 
 export default function OfertaCrearDatosBase() {
 	return (
@@ -20,13 +22,15 @@ const OfertaEditarDatosBaseInterno = () => {
 
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
-			...ofertaDefault
+			...ofertaDefault,
 		},
 	})
 
+	const navigate = useNavigate()
+
 	const mutation = useMutation({
 		mutationFn: ofertasRepository.registrar,
-		onSuccess: () => console.log('Oferta registrada correctamente'),
+		onSuccess: ({ oferta }) => navigate(`/ofertas/${oferta.id}/editar`),
 	})
 
 	const onSubmit = (data) => {
@@ -140,8 +144,9 @@ const OfertaEditarDatosBaseInterno = () => {
 								color="primary"
 								fullWidth
 								disabled={mutation.isPending}
+								startIcon={<IconPlus />}
 							>
-								{mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
+								{mutation.isPending ? 'Creando...' : 'Crear'}
 							</Button>
 						</Box>
 					</Stack>

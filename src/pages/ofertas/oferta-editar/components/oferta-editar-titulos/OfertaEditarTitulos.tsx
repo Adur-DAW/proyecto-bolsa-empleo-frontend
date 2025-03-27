@@ -13,6 +13,7 @@ import { TitulosOfertaRepositoryHttp } from '@/shared/repositories/titulos-ofert
 import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.repository.http'
 
 import ModalNuevoTitulo from './components/ModalNuevoTitulo'
+import { IconPlus, IconTrash } from '@tabler/icons-react'
 
 export default function OfertaEditarTitulos() {
 	return (
@@ -79,6 +80,7 @@ const OfertaEditarTitulosInterno = () => {
 					color="secondary"
 					onClick={abrirModalNuevo}
 					sx={{ mb: 2 }}
+					startIcon={<IconPlus />}
 				>
 					Añadir nuevo
 				</Button>
@@ -116,6 +118,7 @@ const OfertaEditarTitulosInterno = () => {
 								variant="outlined"
 								color="secondary"
 								onClick={() => mutationEliminar.mutate(tituloOferta)}
+								startIcon={<IconTrash />}
 							>
 								Eliminar
 							</Button>

@@ -10,6 +10,7 @@ import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.rep
 
 import ModalEditarTitulo from './components/ModalEditarTitulo'
 import ModalNuevoTitulo from './components/ModalNuevoTitulo'
+import { IconPlus } from '@tabler/icons-react'
 
 export default function ConfiguracionUsuarioTitulos() {
 	return (
@@ -71,6 +72,7 @@ const ConfiguracionUsuarioTitulosInterno = () => {
 					color="secondary"
 					onClick={abrirModalNuevo}
 					sx={{ mb: 2 }}
+					startIcon={<IconPlus />}
 				>
 					Añadir nuevo
 				</Button>

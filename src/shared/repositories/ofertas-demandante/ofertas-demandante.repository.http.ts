@@ -50,7 +50,7 @@ const ofertasDemandanteToFront = (x: any) => ({
 })
 
 const demandanteToFront = (demandantes: any[]) =>
-	demandantes.map((x) => ({
+	demandantes?.map((x) => ({
 		...x,
 		idDemandante: x.id_demandante,
 	}))

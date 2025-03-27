@@ -1,6 +1,8 @@
+import { TituloDemandante } from "../titulos-demandante/titulo-demandante.model"
+
 export type Demandante = {
-	id: number
-	id_usuario: number
+	idDemandante: number
+	idUsuario: number
 	dni: string
 	nombre: string
 	apellido1: string
@@ -8,4 +10,7 @@ export type Demandante = {
 	telefonoMovil: string
 	email: string
 	situacion: number
+	titulos: TituloDemandante[]
+
+	adjudicado: boolean
 }

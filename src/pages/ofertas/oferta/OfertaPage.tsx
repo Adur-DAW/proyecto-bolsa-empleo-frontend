@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { useParams } from 'react-router'
@@ -9,6 +8,7 @@ import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.rep
 import DemandantesOferta from './components/DemandantesOferta'
 import DemandantesPosiblesOferta from './components/DemandantesPosiblesOferta'
 import DetalleOferta from './components/DetalleOferta'
+import { Box } from '@mui/material'
 
 export default function OfertaPage() {
 	return (
@@ -35,18 +35,14 @@ const OfertaInternoPage = () => {
 	})
 
 	return (
-		<>
-			<Card sx={{ padding: 2, boxShadow: 2 }}>
-				<CardContent>
-					<DetalleOferta oferta={oferta} />
-				</CardContent>
-			</Card>
+		<Box sx={{display: 'flex', flexDirection: 'column', gap: 4, textAlign: 'left'}}>
+			<DetalleOferta oferta={oferta} />
 			{mismoRol('empresa') && (
 				<>
 					<DemandantesOferta id={+id} />
 					<DemandantesPosiblesOferta id={+id} />
 				</>
 			)}
-		</>
+		</Box>
 	)
 }

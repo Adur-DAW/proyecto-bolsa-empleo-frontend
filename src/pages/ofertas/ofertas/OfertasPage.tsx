@@ -7,6 +7,7 @@ import useRol from '@/shared/hooks/rol.hook'
 
 import OfertasFiltros from './components/OfertasFiltros'
 import OfertasLista from './components/OfertasLista'
+import { IconPlus } from '@tabler/icons-react'
 
 export default function OfertasPage() {
 	const { rol, mismoRol } = useRol()
@@ -44,6 +45,7 @@ export default function OfertasPage() {
 								color="secondary"
 								to={'/ofertas/nueva'}
 								component={Link}
+								startIcon={<IconPlus />}
 							>
 								Añadir nueva
 							</Button>

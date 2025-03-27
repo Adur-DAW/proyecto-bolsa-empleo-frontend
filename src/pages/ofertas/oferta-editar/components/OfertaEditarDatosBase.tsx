@@ -1,4 +1,5 @@
 import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import { IconDeviceFloppy, IconEyeCancel, IconTrash } from '@tabler/icons-react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense } from 'react'
@@ -57,6 +58,19 @@ const OfertaEditarDatosBaseInterno = () => {
 				<Typography variant="h5" gutterBottom>
 					Datos oferta
 				</Typography>
+
+				<Stack spacing={2} direction="row" marginBottom={2}>
+					<Button variant="outlined" color="error" startIcon={<IconTrash />}>
+						Eliminar
+					</Button>
+					<Button
+						variant="outlined"
+						color="secondary"
+						startIcon={<IconEyeCancel />}
+					>
+						Cerrar
+					</Button>
+				</Stack>
 			</Box>
 
 			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
@@ -152,6 +166,7 @@ const OfertaEditarDatosBaseInterno = () => {
 								color="primary"
 								fullWidth
 								disabled={mutation.isPending}
+								startIcon={<IconDeviceFloppy />}
 							>
 								{mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
 							</Button>

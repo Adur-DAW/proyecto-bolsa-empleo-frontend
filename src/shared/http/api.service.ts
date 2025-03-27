@@ -74,8 +74,7 @@ export interface Pagination {
 }
 
 const convertirError = (error: any) => {
-	const backendError = error.response.data
-	throw new Error(
-		backendError.message || 'Ocurrió un error inesperado en el servidor'
-	)
+	if (error.response?.data) {
+		throw new Error(JSON.stringify(error.response.data))
+	}
 }

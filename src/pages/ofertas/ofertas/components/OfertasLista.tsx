@@ -18,6 +18,7 @@ import { Link } from 'react-router'
 import useRol from '@/shared/hooks/rol.hook'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+import { IconEdit, IconEye } from '@tabler/icons-react'
 
 export default function OfertasLista({ filtro }) {
 	return (
@@ -218,6 +219,7 @@ const OfertasListaSuspense = ({ filtro }) => {
 										color="primary"
 										component={Link}
 										to={`/ofertas/${oferta.id}/editar`}
+										startIcon={<IconEdit />}
 									>
 										Editar
 									</Button>
@@ -228,6 +230,7 @@ const OfertasListaSuspense = ({ filtro }) => {
 									variant="outlined"
 									color="primary"
 									sx={{ marginTop: 2 }}
+									startIcon={<IconEye />}
 								>
 									Ver detalles
 								</Button>

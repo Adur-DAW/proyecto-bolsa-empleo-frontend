@@ -13,6 +13,7 @@ import { z } from 'zod'
 
 import { Titulo } from '@/shared/models'
 import { TitulosOfertaRepositoryHttp } from '@/shared/repositories/titulos-oferta/titulos-oferta.repository.http'
+import { IconDeviceFloppy } from '@tabler/icons-react'
 
 const schema = z.object({
 	idTitulo: z.number().min(1, 'Por favor selecciona un título'),
@@ -94,6 +95,7 @@ export default function ModalNuevoTitulo({
 					variant="contained"
 					color="primary"
 					disabled={!isValid || mutation.isPending}
+					startIcon={<IconDeviceFloppy />}
 				>
 					{mutation.isPending ? 'Añadiendo...' : 'Añadir'}
 				</Button>
