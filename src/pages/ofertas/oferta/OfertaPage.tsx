@@ -1,3 +1,4 @@
+import { Card, CardContent } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { useParams } from 'react-router'
@@ -35,8 +36,11 @@ const OfertaInternoPage = () => {
 
 	return (
 		<>
-			<DetalleOferta oferta={oferta} />
-
+			<Card sx={{ padding: 2, boxShadow: 2 }}>
+				<CardContent>
+					<DetalleOferta oferta={oferta} />
+				</CardContent>
+			</Card>
 			{mismoRol('empresa') && (
 				<>
 					<DemandantesOferta id={+id} />
