@@ -24,10 +24,10 @@ export const OfertasDemandanteRepositoryHttp: OfertasDemandanteRepository = {
 		return demandanteToFront(demandantes)
 	},
 	registrarJWT: async (id: number) => {
-		return postEntity(`/ofertas/${id}/demandantes/jwt`, {})
+		return postEntity(`/demandantes/jwt/ofertas`, { id_oferta: id })
 	},
 	eliminarJWT: async (id: number) => {
-		return deleteEntity(`/ofertas/${id}/demandantes/jwt`)
+		return deleteEntity(`/demandantes/jwt/ofertas/${id}`)
 	},
 	adjudicarOferta: async (idOferta: number, idDemandante: number) => {
 		return putEntity(
@@ -39,7 +39,10 @@ export const OfertasDemandanteRepositoryHttp: OfertasDemandanteRepository = {
 		idOferta: number,
 		idDemandante: number
 	) => {
-		return postEntity(`/ofertas/${idOferta}/demandantes/${idDemandante}`, {})
+		return postEntity(`/ofertas/demandantes`, {
+			id_oferta: idOferta,
+			id_demandante: idDemandante,
+		})
 	},
 }
 

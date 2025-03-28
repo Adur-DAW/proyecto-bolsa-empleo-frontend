@@ -1,9 +1,16 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { Card, CardContent, Typography } from '@mui/material'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query'
 import { Suspense } from 'react'
 
+import { Demandante } from '@/shared/models'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
-import { GridColDef, DataGrid } from '@mui/x-data-grid'
-import { Card, CardContent, Typography } from '@mui/material'
+
+import AccionesPopover from './AccionesPopover'
 
 export default function DemandantesPosiblesOferta({ id }) {
 	return (
@@ -26,20 +33,51 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 		return <div>Error al cargar los demandantes</div>
 	}
 
+	const queryClient = useQueryClient()
+
+	const mutation = useMutation({
+		mutationFn: (idDemandante: number) =>
+			ofertasDemandantesRepository.registrarDemandanteYAdjudicar(id, idDemandante),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
+		},
+	})
+
+	const onAdjudicarClick = (demandante: Demandante) => {
+		mutation.mutate(demandante.idDemandante)
+		queryClient.invalidateQueries({
+			queryKey: ['oferta', id, 'demandantes', 'posibles'],
+		})
+		queryClient.invalidateQueries({
+			queryKey: ['oferta', id, 'demandantes'],
+		})
+	}
+
 	const columns: GridColDef[] = [
 		{ field: 'nombre', headerName: 'Nombre Completo', width: 300 },
 		{
 			field: 'titulos',
 			headerName: 'Titulos',
 			type: 'number',
-			width: 500,
+			flex: 1,
 		},
 		{ field: 'situacion', headerName: 'Situación', type: 'boolean' },
 		{
 			field: 'adjudicado',
 			headerName: 'Adjudicado',
 			type: 'boolean',
-			width: 90,
+		},
+		{
+			field: 'acciones',
+			headerName: 'Acciones',
+			type: 'actions',
+			align: 'right',
+			renderCell: (params) => (
+				<AccionesPopover
+					demandante={params.row}
+					onAdjudicarClick={onAdjudicarClick}
+				/>
+			),
 		},
 	]
 
@@ -47,6 +85,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 
 	const rows = demandantes.map((demandante) => ({
 		id: demandante.idDemandante,
+		idDemandante: demandante.idDemandante,
 		nombre:
 			demandante.nombre +
 			' ' +

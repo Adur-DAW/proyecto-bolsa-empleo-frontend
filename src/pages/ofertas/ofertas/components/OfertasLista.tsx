@@ -8,6 +8,12 @@ import {
 	Typography,
 } from '@mui/material'
 import {
+	IconClipboard,
+	IconClipboardOff,
+	IconEdit,
+	IconEye,
+} from '@tabler/icons-react'
+import {
 	useMutation,
 	useQueryClient,
 	useSuspenseQuery,
@@ -18,7 +24,6 @@ import { Link } from 'react-router'
 import useRol from '@/shared/hooks/rol.hook'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
-import { IconEdit, IconEye } from '@tabler/icons-react'
 
 export default function OfertasLista({ filtro }) {
 	return (
@@ -51,8 +56,15 @@ const OfertasListaSuspense = ({ filtro }) => {
 
 	const queryClient = useQueryClient()
 
-	const mutate = useMutation({
+	const mutateInscribir = useMutation({
 		mutationFn: ofertasDemandanteRepository.registrarJWT,
+		onSuccess: () => {
+			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
+		},
+	})
+
+	const mutateDesinscribir = useMutation({
+		mutationFn: ofertasDemandanteRepository.eliminarJWT,
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
 		},
@@ -193,25 +205,35 @@ const OfertasListaSuspense = ({ filtro }) => {
 										color="primary"
 										sx={{ marginTop: 2 }}
 										component={Link}
+										startIcon={<IconClipboard />}
 										to="/login"
 									>
 										Inscribirme
 									</Button>
 								</Tooltip>
 							)}
-							{mismoRol('demandante') && (
+							{mismoRol('demandante') && oferta.inscrito ? (
 								<Button
 									variant="outlined"
 									color="primary"
 									sx={{ marginTop: 2 }}
-									disabled={oferta.inscrito}
-									onClick={() => {
-										mutate.mutate(oferta.id)
-									}}
+									startIcon={<IconClipboardOff />}
+									onClick={() => mutateDesinscribir.mutate(oferta.id)}
 								>
-									{oferta.inscrito ? 'Inscrito' : 'Inscribirme'}
+									Desinscribirme
 								</Button>
-							)}
+							) : mismoRol('demandante') ? (
+								<Button
+									variant="outlined"
+									color="primary"
+									sx={{ marginTop: 2 }}
+									startIcon={<IconClipboard />}
+									onClick={() => mutateInscribir.mutate(oferta.id)}
+								>
+									Inscribirme
+								</Button>
+							) : null}
+
 							{mismoRol('empresa') && (
 								<Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
 									<Button
