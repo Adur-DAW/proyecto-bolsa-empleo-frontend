@@ -1,4 +1,5 @@
 export type Empresa = {
+	idEmpresa: number
 	id: number
 	validado: boolean
 	cif: string

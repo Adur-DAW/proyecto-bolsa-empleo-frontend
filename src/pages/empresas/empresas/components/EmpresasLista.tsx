@@ -6,7 +6,11 @@ import {
 	Stack,
 	Typography,
 } from '@mui/material'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from '@tanstack/react-query'
 import { Suspense } from 'react'
 
 import useRol from '@/shared/hooks/rol.hook'
@@ -31,6 +35,17 @@ const EmpresasListaSuspense = () => {
 		queryKey: ['empresas'],
 		queryFn: () => empresasRepository.obtener(),
 	})
+
+	const queryClient = useQueryClient()
+
+	const mutation = useMutation({
+		mutationFn: (idEmpresa: number) => empresasRepository.validar(idEmpresa),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['empresas'] }),
+	})
+
+	const onValidarClick = (idEmpresa: number) => {
+		mutation.mutate(idEmpresa)
+	}
 
 	return empresas.map((empresa) => {
 		return (
@@ -91,13 +106,17 @@ const EmpresasListaSuspense = () => {
 								alignItems: 'flex-end',
 							}}
 						>
-							{mismoRol('empresa') &&
+							{mismoRol('centro') &&
 								(empresa.validado ? (
 									<Button variant="outlined" color="secondary" disabled>
 										Validado
 									</Button>
 								) : (
-									<Button variant="outlined" color="primary">
+									<Button
+										variant="outlined"
+										color="primary"
+										onClick={() => onValidarClick(empresa.idEmpresa)}
+									>
 										Validar
 									</Button>
 								))}

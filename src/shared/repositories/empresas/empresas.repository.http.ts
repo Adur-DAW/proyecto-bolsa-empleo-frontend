@@ -1,4 +1,4 @@
-import { getEntity, postEntity } from '@/shared/http/api.service'
+import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { Empresa } from '@/shared/models'
 
 import { EmpresasRepository } from './empresas.repository'
@@ -9,9 +9,13 @@ export const EmpresasRepositoryHttp: EmpresasRepository = {
 
 		return empresas.map((x: any) => ({
 			...x,
+			idEmpresa: x.id_empresa,
 		}))
 	},
 	registrar: async (datos: { empresa: Empresa }) => {
 		return postEntity('/empresas/', datos)
 	},
+	validar: async (idEmpresa: number) => {
+		return putEntity(`/empresas/${idEmpresa}/validar`, {})
+	}
 }
