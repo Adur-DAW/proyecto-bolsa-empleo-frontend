@@ -38,13 +38,22 @@ const EmpresasListaSuspense = () => {
 
 	const queryClient = useQueryClient()
 
-	const mutation = useMutation({
+	const mutationAceptar = useMutation({
 		mutationFn: (idEmpresa: number) => empresasRepository.validar(idEmpresa),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['empresas'] }),
 	})
 
+	const mutationRechazar = useMutation({
+		mutationFn: (idEmpresa: number) => empresasRepository.eliminar(idEmpresa),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['empresas'] }),
+	})
+
 	const onValidarClick = (idEmpresa: number) => {
-		mutation.mutate(idEmpresa)
+		mutationAceptar.mutate(idEmpresa)
+	}
+
+	const onRechazarClick = (idEmpresa: number) => {
+		mutationRechazar.mutate(idEmpresa)
 	}
 
 	return empresas.map((empresa) => {
@@ -112,13 +121,22 @@ const EmpresasListaSuspense = () => {
 										Validado
 									</Button>
 								) : (
-									<Button
-										variant="outlined"
-										color="primary"
-										onClick={() => onValidarClick(empresa.idEmpresa)}
-									>
-										Validar
-									</Button>
+									<Box sx={{ display: 'flex', gap: 1 }}>
+										<Button
+											variant="outlined"
+											color="error"
+											onClick={() => onRechazarClick(empresa.idEmpresa)}
+										>
+											Rechazar
+										</Button>
+										<Button
+											variant="outlined"
+											color="secondary"
+											onClick={() => onValidarClick(empresa.idEmpresa)}
+										>
+											Aceptar
+										</Button>
+									</Box>
 								))}
 						</Box>
 					</Box>

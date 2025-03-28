@@ -1,4 +1,4 @@
-import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
+import { deleteEntity, getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { Empresa } from '@/shared/models'
 
 import { EmpresasRepository } from './empresas.repository'
@@ -17,5 +17,8 @@ export const EmpresasRepositoryHttp: EmpresasRepository = {
 	},
 	validar: async (idEmpresa: number) => {
 		return putEntity(`/empresas/${idEmpresa}/validar`, {})
-	}
+	},
+	eliminar: async (idEmpresa: number) => {
+		return deleteEntity(`/empresas/${idEmpresa}`)
+	},
 }
