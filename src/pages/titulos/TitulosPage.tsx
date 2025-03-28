@@ -1,25 +1,59 @@
-import { Paper } from '@mui/material'
+import { Box, Button, Card, CardContent, Typography } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { IconPlus } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 
+import Modal from '@/shared/components/modal/Modal'
+import useModal from '@/shared/components/modal/hooks/useModal'
 import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.repository.http'
+
+import AccionesPopover from './components/AccionesPopover'
+import ModalTitulo from './components/ModalTitulo'
 
 export default function TitulosPage() {
 	const columns: GridColDef[] = [
-		{ field: 'id', headerName: 'Id' },
-		{ field: 'nombre', headerName: 'Nombre', width: 200 },
-		{ field: 'enUso', headerName: 'En uso', type: 'boolean' },
+		{
+			field: 'id',
+			headerName: 'Id',
+			headerAlign: 'center',
+			align: 'center',
+		},
+		{
+			field: 'nombre',
+			headerName: 'Nombre',
+			flex: 2,
+			headerAlign: 'center',
+			align: 'center',
+		},
+		{
+			field: 'enUso',
+			headerName: 'En uso',
+			type: 'boolean',
+			headerAlign: 'center',
+			align: 'center',
+		},
 		{
 			field: 'cantidadDemandantes',
-			headerName: 'Cantidad demanantes',
+			flex: 1,
+			headerName: 'Cantidad demandantes',
 			type: 'number',
-			width: 200,
+			headerAlign: 'center',
+			align: 'center',
 		},
 		{
 			field: 'cantidadOfertas',
+			flex: 1,
 			headerName: 'Cantidad ofertas',
 			type: 'number',
-			width: 200,
+			headerAlign: 'center',
+			align: 'center',
+		},
+		{
+			field: 'acciones',
+			headerName: 'Acciones',
+			headerAlign: 'center',
+			align: 'center',
+			renderCell: (params) => <AccionesPopover id={params.row.id} />,
 		},
 	]
 
@@ -31,6 +65,8 @@ export default function TitulosPage() {
 		queryKey: ['titulos'],
 		queryFn: titulosRepository.obtenerExtra,
 	})
+
+	const { abierto, abrirModal, cerrarModal } = useModal()
 
 	if (isLoading) {
 		return <div>Cargando...</div>
@@ -45,17 +81,43 @@ export default function TitulosPage() {
 	}))
 
 	return (
-		<Paper sx={{ height: 400, width: '100%' }}>
-			<h2>Titulos</h2>
+		<>
+			<Box
+				sx={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+				}}
+			>
+				<Typography variant="h4" gutterBottom component="h1">
+					Títulos
+				</Typography>
 
-			<DataGrid
-				rows={rows}
-				columns={columns}
-				initialState={{ pagination: { paginationModel } }}
-				pageSizeOptions={[5, 10]}
-				checkboxSelection
-				sx={{ border: 0 }}
-			/>
-		</Paper>
+				<Button
+					variant="contained"
+					color="secondary"
+					sx={{ marginBottom: 2 }}
+					startIcon={<IconPlus />}
+					onClick={abrirModal}
+				>
+					Agregar
+				</Button>
+			</Box>
+
+			<Card sx={{ padding: 4 }}>
+				<CardContent>
+					<DataGrid
+						rows={rows}
+						columns={columns}
+						initialState={{ pagination: { paginationModel } }}
+						pageSizeOptions={[5, 10]}
+					/>
+				</CardContent>
+			</Card>
+
+			<Modal open={abierto} onClose={cerrarModal}>
+				<ModalTitulo cerrarModal={cerrarModal} />
+			</Modal>
+		</>
 	)
 }
