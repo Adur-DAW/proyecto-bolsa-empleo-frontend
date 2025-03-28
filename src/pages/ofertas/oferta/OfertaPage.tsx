@@ -30,7 +30,7 @@ const OfertaInternoPage = () => {
 	const ofertasRepository = OfertasRepositoryHttp
 
 	const { data: oferta } = useSuspenseQuery({
-		queryKey: ['oferta', id],
+		queryKey: ['oferta', +id],
 		queryFn: () => ofertasRepository.obtenerPorId(+id),
 	})
 

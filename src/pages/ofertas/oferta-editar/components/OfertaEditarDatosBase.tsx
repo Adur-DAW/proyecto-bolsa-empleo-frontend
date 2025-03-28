@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, Checkbox, Paper, Stack, TextField, Typography } from '@mui/material'
 import { IconDeviceFloppy, IconEyeCancel, IconTrash } from '@tabler/icons-react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -155,6 +155,23 @@ const OfertaEditarDatosBaseInterno = () => {
 										label="Observaciones"
 										type="text"
 									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="abierta"
+								control={control}
+								render={({ field }) => (
+									<Stack direction="row" alignItems="center" spacing={1}>
+										<Typography>Activa</Typography>
+										<Checkbox
+											{...field}
+											checked={field.value}
+											onChange={(e) => field.onChange(e.target.checked)}
+										/>
+									</Stack>
 								)}
 							/>
 						</Box>

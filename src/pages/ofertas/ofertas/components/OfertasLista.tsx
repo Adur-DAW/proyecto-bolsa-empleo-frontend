@@ -4,25 +4,16 @@ import {
 	Card,
 	CardContent,
 	Stack,
-	Tooltip,
 	Typography,
 } from '@mui/material'
-import {
-	IconClipboard,
-	IconClipboardOff,
-	IconEdit,
-	IconEye,
-} from '@tabler/icons-react'
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query'
+import { IconEdit, IconEye } from '@tabler/icons-react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { Link } from 'react-router'
 
+import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
+
 import useRol from '@/shared/hooks/rol.hook'
-import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 
 export default function OfertasLista({ filtro }) {
@@ -39,7 +30,6 @@ const OfertasListaSuspense = ({ filtro }) => {
 	const { mismoRol } = useRol()
 
 	const ofertasRepository = OfertasRepositoryHttp
-	const ofertasDemandanteRepository = OfertasDemandanteRepositoryHttp
 
 	const { data: ofertas = [] } = useSuspenseQuery({
 		queryKey: ['ofertas', filtro],
@@ -51,22 +41,6 @@ const OfertasListaSuspense = ({ filtro }) => {
 			} else {
 				return ofertasRepository.obtener()
 			}
-		},
-	})
-
-	const queryClient = useQueryClient()
-
-	const mutateInscribir = useMutation({
-		mutationFn: ofertasDemandanteRepository.registrarJWT,
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
-		},
-	})
-
-	const mutateDesinscribir = useMutation({
-		mutationFn: ofertasDemandanteRepository.eliminarJWT,
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
 		},
 	})
 
@@ -134,7 +108,7 @@ const OfertasListaSuspense = ({ filtro }) => {
 									Activa:{' '}
 								</Typography>
 								<Typography variant="body2" component="span">
-									{oferta.abierta ? 'Yes' : 'No'}
+									{oferta.abierta ? 'Si' : 'No'}
 								</Typography>
 							</Box>
 							<Box sx={{ marginBottom: 1 }}>
@@ -198,47 +172,24 @@ const OfertasListaSuspense = ({ filtro }) => {
 								Publicado el: {oferta.fechaPublicacion.format('DD/MM/YYYY')}
 							</Typography>
 
-							{mismoRol('sinRol') && (
-								<Tooltip title="Debes iniciar sesión para inscribirte">
-									<Button
-										variant="outlined"
-										color="primary"
-										sx={{ marginTop: 2 }}
-										component={Link}
-										startIcon={<IconClipboard />}
-										to="/login"
-									>
-										Inscribirme
-									</Button>
-								</Tooltip>
-							)}
-							{mismoRol('demandante') && oferta.inscrito ? (
+							<Link to={`/ofertas/${oferta.id}`}>
 								<Button
-									variant="outlined"
+									variant="contained"
 									color="primary"
 									sx={{ marginTop: 2 }}
-									startIcon={<IconClipboardOff />}
-									onClick={() => mutateDesinscribir.mutate(oferta.id)}
+									startIcon={<IconEye />}
 								>
-									Desinscribirme
+									Ver detalles
 								</Button>
-							) : mismoRol('demandante') ? (
-								<Button
-									variant="outlined"
-									color="primary"
-									sx={{ marginTop: 2 }}
-									startIcon={<IconClipboard />}
-									onClick={() => mutateInscribir.mutate(oferta.id)}
-								>
-									Inscribirme
-								</Button>
-							) : null}
+							</Link>
+
+							<InscribirseComponent oferta={oferta} filtro={filtro} />
 
 							{mismoRol('empresa') && (
 								<Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
 									<Button
 										variant="outlined"
-										color="primary"
+										color="secondary"
 										component={Link}
 										to={`/ofertas/${oferta.id}/editar`}
 										startIcon={<IconEdit />}
@@ -247,16 +198,6 @@ const OfertasListaSuspense = ({ filtro }) => {
 									</Button>
 								</Box>
 							)}
-							<Link to={`/ofertas/${oferta.id}`}>
-								<Button
-									variant="outlined"
-									color="primary"
-									sx={{ marginTop: 2 }}
-									startIcon={<IconEye />}
-								>
-									Ver detalles
-								</Button>
-							</Link>
 						</Box>
 					</Box>
 				</CardContent>
