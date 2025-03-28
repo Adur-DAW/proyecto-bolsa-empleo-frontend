@@ -1,4 +1,4 @@
-import { deleteEntity, getEntity, postEntity } from '@/shared/http/api.service'
+import { deleteEntity, getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { Titulo, TituloExtra} from '@/shared/models'
 
 import { TitulosRepository } from './titulos.repository'
@@ -18,6 +18,9 @@ export const TitulosRepositoryHttp: TitulosRepository = {
 	},
 	registrar: async (titulo: Titulo) => {
 		return await postEntity('/titulos', titulo)
+	},
+	actualizar: async (titulo: Titulo) => {
+		return await putEntity(`/titulos/${titulo.id}`, titulo)
 	},
 	eliminar: async (id: number) => {
 		return await deleteEntity(`/titulos/${id}`)

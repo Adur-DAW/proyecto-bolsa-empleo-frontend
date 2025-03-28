@@ -1,16 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-	Box,
-	Button,
-	Stack,
-	TextField,
-	Typography,
-} from '@mui/material'
-import { IconDeviceFloppy } from '@tabler/icons-react'
+import { Box, Button, Stack, TextField, Typography } from '@mui/material'
+import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { Titulo } from '@/shared/models'
 import { TitulosRepositoryHttp } from '@/shared/repositories/titulos/titulos.repository.http'
 
 const schema = z.object({
@@ -19,7 +14,9 @@ const schema = z.object({
 
 export default function ModalNuevoTitulo({
 	cerrarModal,
+	titulo,
 }: {
+	titulo: Titulo | undefined
 	cerrarModal: () => void
 }) {
 	const titulosRepository = TitulosRepositoryHttp
@@ -35,12 +32,14 @@ export default function ModalNuevoTitulo({
 		resolver: zodResolver(schema),
 		mode: 'onChange',
 		defaultValues: {
-			nombre: '',
+			nombre: titulo?.nombre || '',
 		},
 	})
 
 	const mutation = useMutation({
-		mutationFn: titulosRepository.registrar,
+		mutationFn: titulo?.id
+			? titulosRepository.actualizar
+			: titulosRepository.registrar,
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['titulos'] })
 			cerrarModal()
@@ -52,7 +51,7 @@ export default function ModalNuevoTitulo({
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate({ ...data })
+		mutation.mutate({ ...data, id: titulo?.id })
 	}
 
 	return (
@@ -82,9 +81,15 @@ export default function ModalNuevoTitulo({
 					variant="contained"
 					color="primary"
 					disabled={!isValid || mutation.isPending}
-					startIcon={<IconDeviceFloppy />}
+					startIcon={titulo?.id ? <IconDeviceFloppy /> : <IconPlus />}
 				>
-					{mutation.isPending ? 'Añadiendo...' : 'Añadir'}
+					{titulo?.id
+						? mutation.isPending
+							? 'Actualizando...'
+							: 'Actualizar'
+						: mutation.isPending
+							? 'Añadiendo...'
+							: 'Añadir'}
 				</Button>
 			</Stack>
 		</Box>

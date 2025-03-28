@@ -2,7 +2,17 @@ import { IconButton, Menu, MenuItem } from '@mui/material'
 import { IconDotsVertical } from '@tabler/icons-react'
 import { useState } from 'react'
 
-export default function AccionesPopover({ id }: { id: number }) {
+import { Titulo } from '@/shared/models'
+
+export default function AccionesPopover({
+	titulo,
+	onEditarClick,
+	onEliminarClick,
+}: {
+	titulo: Titulo
+	onEditarClick: (titulo: Titulo) => void,
+	onEliminarClick: (titulo: Titulo) => void,
+}) {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
 	const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -16,12 +26,12 @@ export default function AccionesPopover({ id }: { id: number }) {
 	}
 
 	const handleEditar = () => {
-		console.log(`Editar título con ID: ${id}`)
+		onEditarClick(titulo)
 		handleClose()
 	}
 
 	const handleEliminar = () => {
-		console.log(`Eliminar título con ID: ${id}`)
+		onEliminarClick(titulo)
 		handleClose()
 	}
 
