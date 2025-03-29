@@ -12,8 +12,18 @@ export const EmpresasRepositoryHttp: EmpresasRepository = {
 			idEmpresa: x.id_empresa,
 		}))
 	},
-	registrar: async (datos: { empresa: Empresa }) => {
-		return postEntity('/empresas/', datos)
+	obtenerJWT: async (): Promise<Empresa> => {
+		const empresa = (await getEntity('/empresas/jwt')) as any
+		return {
+			...empresa,
+			idEmpresa: empresa.id_empresa,
+		}
+	},
+	registrar: async (empresa: Empresa) => {
+		return await postEntity('/empresas/', empresa)
+	},
+	actualizar: async (empresa: Empresa) => {
+		return await putEntity(`/empresas/`, empresa)
 	},
 	validar: async (idEmpresa: number) => {
 		return putEntity(`/empresas/${idEmpresa}/validar`, {})

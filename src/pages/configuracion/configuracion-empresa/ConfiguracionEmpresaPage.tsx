@@ -1,3 +1,9 @@
+import ConfiguracionEmpresaDatos from './components/ConfiguracionEmpresaDatos'
+
 export default function ConfiguracionEmpresaPage() {
-	return <div>ConfiguracionEmpresaPage</div>
+	return (
+		<>
+			<ConfiguracionEmpresaDatos />
+		</>
+	)
 }
