@@ -95,7 +95,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 	}))
 
 	return (
-		<Card sx={{ padding: 2 }}>
+		<Card sx={{ padding: 2, boxShadow: 2 }}>
 			<CardContent>
 				<Typography variant="h5" component="h2" marginBottom={2}>
 					Inscritos en la oferta

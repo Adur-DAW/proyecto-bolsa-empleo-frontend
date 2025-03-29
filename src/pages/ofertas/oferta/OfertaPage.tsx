@@ -9,6 +9,7 @@ import DemandantesOferta from './components/DemandantesOferta'
 import DemandantesPosiblesOferta from './components/DemandantesPosiblesOferta'
 import DetalleOferta from './components/DetalleOferta'
 import { Box } from '@mui/material'
+import TitulosOferta from './components/TitulosOferta'
 
 export default function OfertaPage() {
 	return (
@@ -37,6 +38,7 @@ const OfertaInternoPage = () => {
 	return (
 		<Box sx={{display: 'flex', flexDirection: 'column', gap: 4, textAlign: 'left'}}>
 			<DetalleOferta oferta={oferta} />
+			<TitulosOferta oferta={oferta} />
 			{mismoRol('empresa') && (
 				<>
 					<DemandantesOferta id={+id} />
