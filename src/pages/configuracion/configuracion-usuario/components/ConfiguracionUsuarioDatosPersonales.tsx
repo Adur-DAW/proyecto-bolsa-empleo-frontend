@@ -1,9 +1,10 @@
-import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { DemandantesRepositoryHttp } from '@/shared/repositories/demandantes/demandantes.repository.http'
+import { situacionesDemandante } from '@/shared/models'
 
 export default function ConfiguracionUsuarioDatosPersonales() {
 	return (
@@ -116,6 +117,28 @@ const ConfiguracionUsuarioDatosPersonalesInterno = () => {
 								control={control}
 								render={({ field }) => (
 									<TextField {...field} fullWidth label="Teléfono" type="tel" />
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="situacion"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										select
+										label="Situación"
+										fullWidth
+										variant="outlined"
+									>
+										{situacionesDemandante.map((x) => (
+											<MenuItem key={x.id} value={x.id}>
+												{x.valor}
+											</MenuItem>
+										))}
+									</TextField>
 								)}
 							/>
 						</Box>

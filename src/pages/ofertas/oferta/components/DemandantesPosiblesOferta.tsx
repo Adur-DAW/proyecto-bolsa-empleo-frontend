@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { Suspense } from 'react'
 
-import { Demandante } from '@/shared/models'
+import { Demandante, situacionesDemandante } from '@/shared/models'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 
 import AccionesPopover from './AccionesPopover'
@@ -61,7 +61,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			type: 'number',
 			flex: 1,
 		},
-		{ field: 'situacion', headerName: 'Situación', type: 'boolean' },
+		{ field: 'situacion', headerName: 'Situación' },
 		{
 			field: 'adjudicado',
 			headerName: 'Adjudicado',
@@ -92,7 +92,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			demandante.apellido1 +
 			' ' +
 			demandante.apellido2,
-		situacion: demandante.situacion,
+		situacion: situacionesDemandante.find(x => x.id == demandante.situacion)?.valor ?? 'Sin especificar',
 		titulos: demandante.titulos?.map((x) => x.titulo?.nombre).join(', '),
 		aceptado: demandante.adjudicado,
 	}))

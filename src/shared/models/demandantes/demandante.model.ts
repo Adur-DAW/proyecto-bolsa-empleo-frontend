@@ -14,3 +14,9 @@ export type Demandante = {
 
 	adjudicado: boolean
 }
+
+export const situacionesDemandante = [
+	{ id: 1, valor: 'Buscando empleo' },
+	{ id: 2, valor: 'Trabajando' },
+	{ id: 3, valor: 'Estudiando' }
+];

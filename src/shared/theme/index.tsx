@@ -1,4 +1,4 @@
-import { useMediaQuery } from '@mui/material'
+// import { useMediaQuery } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
 import {
 	ThemeProvider as MUIThemeProvider,
@@ -18,11 +18,10 @@ interface ThemeProviderProps {
 }
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
-	const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+	// const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
 
-	const isLightMode = prefersDarkMode
+	const isLightMode = true
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const memoizedValue: any = useMemo(
 		() => ({
 			palette: isLightMode ? palette() : palette_dark(),
@@ -35,7 +34,6 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
 	)
 
 	const currentTheme = createTheme(memoizedValue)
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	currentTheme.components = overrides(currentTheme) as any
 
 	return (
