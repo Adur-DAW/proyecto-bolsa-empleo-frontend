@@ -40,14 +40,14 @@ const DemandantesOfertaInterno = ({ id }) => {
 			ofertasDemandantesRepository.adjudicarOferta(id, idDemandante),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
+			queryClient.invalidateQueries({
+				queryKey: ['oferta', id, 'demandantes'],
+			})
 		},
 	})
 
 	const onAdjudicarClick = (demandante: Demandante) => {
 		mutation.mutate(demandante.idDemandante)
-		queryClient.invalidateQueries({
-			queryKey: ['oferta', id, 'demandantes'],
-		})
 	}
 
 	const columns: GridColDef[] = [

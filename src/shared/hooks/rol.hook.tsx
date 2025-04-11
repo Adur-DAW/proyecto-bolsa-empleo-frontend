@@ -21,6 +21,7 @@ export default function useRol() {
 	}
 
 	return {
+		usuario,
 		rol,
 		masRol,
 		mismoRol

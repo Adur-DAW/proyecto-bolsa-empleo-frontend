@@ -40,17 +40,17 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			ofertasDemandantesRepository.registrarDemandanteYAdjudicar(id, idDemandante),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
+			queryClient.invalidateQueries({
+				queryKey: ['oferta', id, 'demandantes', 'posibles'],
+			})
+			queryClient.invalidateQueries({
+				queryKey: ['oferta', id, 'demandantes'],
+			})
 		},
 	})
 
 	const onAdjudicarClick = (demandante: Demandante) => {
 		mutation.mutate(demandante.idDemandante)
-		queryClient.invalidateQueries({
-			queryKey: ['oferta', id, 'demandantes', 'posibles'],
-		})
-		queryClient.invalidateQueries({
-			queryKey: ['oferta', id, 'demandantes'],
-		})
 	}
 
 	const columns: GridColDef[] = [

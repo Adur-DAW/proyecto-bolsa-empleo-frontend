@@ -27,7 +27,7 @@ export default function OfertasLista({ filtro }) {
 }
 
 const OfertasListaSuspense = ({ filtro }) => {
-	const { mismoRol } = useRol()
+	const { usuario, mismoRol } = useRol()
 
 	const ofertasRepository = OfertasRepositoryHttp
 
@@ -185,7 +185,7 @@ const OfertasListaSuspense = ({ filtro }) => {
 
 							<InscribirseComponent oferta={oferta} filtro={filtro} />
 
-							{mismoRol('empresa') && (
+							{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
 								<Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
 									<Button
 										variant="outlined"

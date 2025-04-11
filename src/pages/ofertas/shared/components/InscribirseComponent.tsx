@@ -7,6 +7,8 @@ import useRol from '@/shared/hooks/rol.hook'
 import { Oferta } from '@/shared/models'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 
+const validacionesInscribir = (oferta: Oferta) => oferta.abierta && oferta.demandantesInscritos < oferta.numeroPuestos;
+
 export default function InscribirseComponent({
 	oferta,
 	filtro,
@@ -35,7 +37,7 @@ export default function InscribirseComponent({
 		},
 	})
 
-	if (mismoRol('sinRol'))
+	if (mismoRol('sinRol') && validacionesInscribir(oferta))
 		return (
 			<Tooltip title="Debes iniciar sesión para inscribirte">
 				<Button
@@ -51,7 +53,7 @@ export default function InscribirseComponent({
 			</Tooltip>
 		)
 
-	return mismoRol('demandante') && oferta.abierta ? (
+	return mismoRol('demandante') && validacionesInscribir(oferta) ? (
 		oferta.inscrito ? (
 			<Button
 				variant="outlined"
