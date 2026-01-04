@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router'
 import { z } from 'zod'
 
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
-import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales' // Verify path
+import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales'
+import SelectorTitulos from '@/shared/components/SelectorTitulos'
+import { Titulo } from '@/shared/models'
 
 const demandanteSchema = z
 	.object({
@@ -28,6 +30,7 @@ const demandanteSchema = z
 		situacion: z.number(),
 		familiaProfesional: z.string().optional(),
 		cv: z.any().optional(),
+		titulos: z.array(z.any()).min(1, 'Debe seleccionar al menos un título académico'),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -42,6 +45,8 @@ export default function RegistrarDemandante() {
 		handleSubmit,
 		setError,
 		register,
+		watch,
+		setValue,
 		formState: { errors },
 	} = useForm<DemandanteFormData>({
 		resolver: zodResolver(demandanteSchema),
@@ -57,15 +62,17 @@ export default function RegistrarDemandante() {
 			telefonoMovil: '',
 			situacion: 0,
 			familiaProfesional: '',
+			titulos: [],
 		},
 		mode: 'onBlur',
 	})
 
 	const navigate = useNavigate()
 	const authRepository = AuthRepositoryHttp
+	const familiaSeleccionada = watch('familiaProfesional')
 
 	const mutation = useMutation({
-		mutationFn: (data: FormData) => authRepository.registrar(data as any), // Cast to any as repo expects object but axios handles FormData
+		mutationFn: (data: FormData) => authRepository.registrar(data as any),
 		onSuccess: () => navigate('/login'),
 		onError: (error) => {
 			try {
@@ -100,11 +107,16 @@ export default function RegistrarDemandante() {
 			formData.append('familia_profesional', data.familiaProfesional);
 		}
 
+		// Enviar títulos
+		if (data.titulos && data.titulos.length > 0) {
+			data.titulos.forEach((titulo: Titulo, index) => {
+				formData.append(`titulos[${index}]`, titulo.id.toString());
+			});
+		}
+
 		if (data.cv && data.cv.length > 0) {
 			formData.append('cv', data.cv[0]);
 		}
-
-		console.log(formData)
 
 		mutation.mutate(formData)
 	}
@@ -236,11 +248,15 @@ export default function RegistrarDemandante() {
 					<TextField
 						{...field}
 						select
-						label="Familia Profesional"
+						label="Familia Profesional (Filtro)"
 						fullWidth
 						margin="normal"
 						error={!!errors.familiaProfesional}
-						helperText={errors.familiaProfesional?.message}
+						helperText="Selecciona una familia para filtrar los títulos (Opcional)"
+						onChange={(e) => {
+							field.onChange(e)
+							setValue('titulos', [])
+						}}
 					>
 						{FAMILIAS_PROFESIONALES.map((option) => (
 							<MenuItem key={option} value={option}>
@@ -250,6 +266,22 @@ export default function RegistrarDemandante() {
 					</TextField>
 				)}
 			/>
+
+			<Box sx={{ mt: 2, mb: 1 }}>
+				<Controller
+					name="titulos"
+					control={control}
+					render={({ field }) => (
+						<SelectorTitulos
+							valor={field.value}
+							alCambiar={field.onChange}
+							error={!!errors.titulos}
+							textoAyuda={errors.titulos?.message?.toString()}
+							familiaFiltro={familiaSeleccionada}
+						/>
+					)}
+				/>
+			</Box>
 
 			<Box sx={{ mt: 2, mb: 1 }}>
 				<Typography variant="body1" gutterBottom>

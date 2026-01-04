@@ -8,7 +8,9 @@ export const AuthRepositoryHttp: AuthRepository = {
 		email: string
 		password: string
 	}): Promise<{ usuario: Usuario; token: string }> => {
-		return postEntity('/login', datos)
+		const res = await postEntity<{ usuario: Usuario; token: string }>('/login', datos)
+		if (!res) throw new Error('Error al iniciar sesión')
+		return res
 	},
 	registrar: async (datos: {
 		email: string

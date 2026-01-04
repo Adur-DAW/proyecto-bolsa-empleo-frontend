@@ -21,7 +21,7 @@ const empresaSchema = z
 		cif: z.string().regex(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/, 'El CIF no es válido'),
 		localidad: z.string().nonempty('La localidad es obligatoria'),
 		telefono: z.string().regex(/^\d{9}$/, 'El teléfono debe tener 9 dígitos'),
-		familiaProfesional: z.string().optional(),
+		familiaProfesional: z.string().nonempty('La familia profesional es obligatoria'),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
