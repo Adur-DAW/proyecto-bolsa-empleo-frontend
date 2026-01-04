@@ -4,6 +4,7 @@ export type Empresa = {
 	validado: boolean
 	cif: string
 	nombre: string
+	familiaProfesional: string
 	localidad: string
 	telefono: string
 }

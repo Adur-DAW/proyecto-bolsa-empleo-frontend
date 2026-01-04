@@ -8,6 +8,7 @@ export type Oferta = {
 	numeroPuestos: number
 	tipoContrato: string
 	horario: string
+	diasDescanso: string
 	obs: string
 	abierta: boolean
 	fechaCierre: dayjs.Dayjs
@@ -24,6 +25,7 @@ export const ofertaDefault = {
 	numeroPuestos: 1,
 	tipoContrato: '',
 	horario: '',
+	diasDescanso: '',
 	obs: '',
 	abierta: true,
 	fechaCierre: dayjs(),

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button, TextField, MenuItem, Typography } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
 
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
+import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales' // Verify path
 
 const demandanteSchema = z
 	.object({
@@ -25,6 +26,8 @@ const demandanteSchema = z
 			.string()
 			.regex(/^\d{9}$/, 'El teléfono móvil debe tener 9 dígitos'),
 		situacion: z.number(),
+		familiaProfesional: z.string().optional(),
+		cv: z.any().optional(),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -38,7 +41,8 @@ export default function RegistrarDemandante() {
 		control,
 		handleSubmit,
 		setError,
-		formState: { errors, isValid },
+		register,
+		formState: { errors },
 	} = useForm<DemandanteFormData>({
 		resolver: zodResolver(demandanteSchema),
 		defaultValues: {
@@ -52,6 +56,7 @@ export default function RegistrarDemandante() {
 			dni: '',
 			telefonoMovil: '',
 			situacion: 0,
+			familiaProfesional: '',
 		},
 		mode: 'onBlur',
 	})
@@ -60,32 +65,48 @@ export default function RegistrarDemandante() {
 	const authRepository = AuthRepositoryHttp
 
 	const mutation = useMutation({
-		mutationFn: authRepository.registrar,
+		mutationFn: (data: FormData) => authRepository.registrar(data as any), // Cast to any as repo expects object but axios handles FormData
 		onSuccess: () => navigate('/login'),
 		onError: (error) => {
 			try {
 				const { errors } = JSON.parse(error.message)
 
-        if (errors?.email) {
-          setError('email', { type: 'server', message: errors?.email[0] })
-        }
+				if (errors?.email) {
+					setError('email', { type: 'server', message: errors?.email[0] })
+				}
 				if (errors?.dni) {
-          setError('dni', { type: 'server', message: errors?.dni[0] })
-        }
-      } catch {
-        alert('Error inesperado en el servidor')
-      }
+					setError('dni', { type: 'server', message: errors?.dni[0] })
+				}
+			} catch {
+				alert('Error inesperado en el servidor')
+			}
 		},
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate({
-			email: data.email,
-			password: data.password,
-			password_confirmation: data.verificarPassword,
-			telefono_movil: data.telefonoMovil,
-			...data,
-		})
+		const formData = new FormData();
+		formData.append('rol', data.rol);
+		formData.append('email', data.email);
+		formData.append('password', data.password);
+		formData.append('password_confirmation', data.verificarPassword);
+		formData.append('nombre', data.nombre);
+		formData.append('apellido1', data.apellido1);
+		formData.append('apellido2', data.apellido2 || '');
+		formData.append('dni', data.dni);
+		formData.append('telefono_movil', data.telefonoMovil);
+		formData.append('situacion', data.situacion.toString());
+
+		if (data.familiaProfesional) {
+			formData.append('familia_profesional', data.familiaProfesional);
+		}
+
+		if (data.cv && data.cv.length > 0) {
+			formData.append('cv', data.cv[0]);
+		}
+
+		console.log(formData)
+
+		mutation.mutate(formData)
 	}
 
 	return (
@@ -207,13 +228,47 @@ export default function RegistrarDemandante() {
 					/>
 				)}
 			/>
+
+			<Controller
+				name="familiaProfesional"
+				control={control}
+				render={({ field }) => (
+					<TextField
+						{...field}
+						select
+						label="Familia Profesional"
+						fullWidth
+						margin="normal"
+						error={!!errors.familiaProfesional}
+						helperText={errors.familiaProfesional?.message}
+					>
+						{FAMILIAS_PROFESIONALES.map((option) => (
+							<MenuItem key={option} value={option}>
+								{option}
+							</MenuItem>
+						))}
+					</TextField>
+				)}
+			/>
+
+			<Box sx={{ mt: 2, mb: 1 }}>
+				<Typography variant="body1" gutterBottom>
+					Adjuntar Currículum (PDF)
+				</Typography>
+				<input
+					type="file"
+					accept=".pdf"
+					{...register('cv')}
+				/>
+			</Box>
+
 			<Button
 				type="submit"
 				variant="contained"
 				color="primary"
 				fullWidth
 				sx={{ mt: 2 }}
-				disabled={!isValid || mutation.isPending}
+				disabled={mutation.isPending}
 			>
 				{mutation.isPending ? 'Registrando...' : 'Registrar'}
 			</Button>

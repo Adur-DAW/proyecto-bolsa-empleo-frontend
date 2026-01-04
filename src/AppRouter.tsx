@@ -36,6 +36,8 @@ const OfertaCrearPage = lazy(
 	() => import('./pages/ofertas/oferta-crear/OfertaCrearPage')
 )
 
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
+
 export default function AppRouter() {
 	return (
 		<BrowserRouter>
@@ -88,6 +90,10 @@ export default function AppRouter() {
 							<Route
 								path={getAbsolutePath('titulos')}
 								element={<TitulosPage />}
+							/>
+							<Route
+								path={getAbsolutePath('admin')}
+								element={<AdminDashboardPage />}
 							/>
 						</Route>
 

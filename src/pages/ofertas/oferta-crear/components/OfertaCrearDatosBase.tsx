@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, Paper, Stack, TextField, Typography, MenuItem } from '@mui/material'
 import { IconPlus } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -59,7 +59,7 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="nombre"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Nombre" />
+									<TextField {...field} fullWidth label="Título de la oferta" />
 								)}
 							/>
 						</Box>
@@ -105,9 +105,12 @@ const OfertaEditarDatosBaseInterno = () => {
 									<TextField
 										{...field}
 										fullWidth
+										select
 										label="Tipo de contrato"
-										type="text"
-									/>
+									>
+										<MenuItem value="Jornada completa">Jornada completa</MenuItem>
+										<MenuItem value="Jornada parcial">Jornada parcial</MenuItem>
+									</TextField>
 								)}
 							/>
 						</Box>
@@ -118,6 +121,16 @@ const OfertaEditarDatosBaseInterno = () => {
 								control={control}
 								render={({ field }) => (
 									<TextField {...field} fullWidth label="Horario" type="text" />
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="diasDescanso"
+								control={control}
+								render={({ field }) => (
+									<TextField {...field} fullWidth label="Días de descanso semanal" type="text" />
 								)}
 							/>
 						</Box>

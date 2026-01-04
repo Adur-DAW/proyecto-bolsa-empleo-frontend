@@ -1,12 +1,27 @@
-import { Box, Button, Checkbox, Paper, Stack, TextField, Typography } from '@mui/material'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Box, Button, Checkbox, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
 import { IconDeviceFloppy, IconEyeCancel, IconTrash } from '@tabler/icons-react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
+import { z } from 'zod'
 
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+
+const ofertaSchema = z.object({
+	nombre: z.string().nonempty('El título es obligatorio'),
+	fechaPublicacion: z.string(),
+	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
+	tipoContrato: z.string().nonempty('El tipo de contrato es obligatorio'),
+	horario: z.string().optional(),
+	diasDescanso: z.coerce.number().optional(),
+	obs: z.string().optional(),
+	abierta: z.boolean(),
+})
+
+type OfertaFormData = z.infer<typeof ofertaSchema>
 
 export default function OfertaEditarDatosBase() {
 	return (
@@ -29,10 +44,17 @@ const OfertaEditarDatosBaseInterno = () => {
 		queryFn: () => ofertasRepository.obtenerPorId(+id),
 	})
 
-	const { control, handleSubmit } = useForm({
+	const {
+		control,
+		handleSubmit,
+		setError,
+		formState: { errors },
+	} = useForm<OfertaFormData>({
+		resolver: zodResolver(ofertaSchema) as any,
 		defaultValues: {
 			...oferta,
 			numeroPuestos: +oferta.numeroPuestos,
+			diasDescanso: oferta.diasDescanso ? +oferta.diasDescanso : 0,
 			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
 		},
 	})
@@ -40,10 +62,31 @@ const OfertaEditarDatosBaseInterno = () => {
 	const mutation = useMutation({
 		mutationFn: ofertasRepository.actualizar,
 		onSuccess: () => console.log('Datos actualizados correctamente'),
+		onError: (error) => {
+			try {
+				const { errors } = JSON.parse(error.message)
+				if (errors) {
+					Object.keys(errors).forEach((key) => {
+						setError(key as any, { type: 'server', message: errors[key][0] })
+					})
+				} else {
+					alert('Error al actualizar la oferta')
+				}
+			} catch {
+				alert('Error inesperado al actualizar')
+			}
+		},
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate(data)
+		// Ensure correct types for backend
+		const payload = {
+			...oferta,
+			...data,
+			diasDescanso: data.diasDescanso?.toString() || '',
+			fechaPublicacion: dayjs(data.fechaPublicacion)
+		}
+		mutation.mutate(payload)
 	}
 
 	return (
@@ -81,7 +124,13 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="nombre"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Nombre" />
+									<TextField
+										{...field}
+										fullWidth
+										label="Título de la oferta"
+										error={!!errors.nombre}
+										helperText={errors.nombre?.message}
+									/>
 								)}
 							/>
 						</Box>
@@ -99,6 +148,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										value={
 											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
 										}
+										error={!!errors.fechaPublicacion}
+										helperText={errors.fechaPublicacion?.message}
 									/>
 								)}
 							/>
@@ -114,6 +165,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										type="number"
 										fullWidth
 										label="Número de puestos"
+										error={!!errors.numeroPuestos}
+										helperText={errors.numeroPuestos?.message}
 									/>
 								)}
 							/>
@@ -127,9 +180,14 @@ const OfertaEditarDatosBaseInterno = () => {
 									<TextField
 										{...field}
 										fullWidth
+										select
 										label="Tipo de contrato"
-										type="text"
-									/>
+										error={!!errors.tipoContrato}
+										helperText={errors.tipoContrato?.message}
+									>
+										<MenuItem value="Jornada completa">Jornada completa</MenuItem>
+										<MenuItem value="Jornada parcial">Jornada parcial</MenuItem>
+									</TextField>
 								)}
 							/>
 						</Box>
@@ -139,7 +197,31 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="horario"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Horario" type="text" />
+									<TextField
+										{...field}
+										fullWidth
+										label="Horario"
+										type="text"
+										error={!!errors.horario}
+										helperText={errors.horario?.message}
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="diasDescanso"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Días de descanso semanal"
+										type="number"
+										error={!!errors.diasDescanso}
+										helperText={errors.diasDescanso?.message}
+									/>
 								)}
 							/>
 						</Box>
@@ -154,6 +236,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Observaciones"
 										type="text"
+										error={!!errors.obs}
+										helperText={errors.obs?.message}
 									/>
 								)}
 							/>

@@ -1,10 +1,11 @@
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button, TextField, MenuItem } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
+import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales'
 
 const empresaSchema = z
 	.object({
@@ -20,6 +21,7 @@ const empresaSchema = z
 		cif: z.string().regex(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/, 'El CIF no es válido'),
 		localidad: z.string().nonempty('La localidad es obligatoria'),
 		telefono: z.string().regex(/^\d{9}$/, 'El teléfono debe tener 9 dígitos'),
+		familiaProfesional: z.string().optional(),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -45,6 +47,7 @@ export default function RegistrarEmpresa() {
 			cif: '',
 			localidad: '',
 			telefono: '',
+			familiaProfesional: '',
 		},
 		mode: 'onBlur',
 	})
@@ -57,18 +60,18 @@ export default function RegistrarEmpresa() {
 		onSuccess: () => navigate('/login'),
 		onError: (error) => {
 			try {
-        const { errors } = JSON.parse(error.message)
+				const { errors } = JSON.parse(error.message)
 
-        if (errors?.email) {
-          setError('email', { type: 'server', message: errors.email[0] })
-        }
+				if (errors?.email) {
+					setError('email', { type: 'server', message: errors.email[0] })
+				}
 				if (errors?.cif) {
 					setError('cif', { type: 'server', message: errors.cif[0] })
 				}
-      } catch(e) {
+			} catch (e) {
 				console.log(e)
-        alert('Error inesperado en el servidor')
-      }
+				alert('Error inesperado en el servidor')
+			}
 		},
 	})
 
@@ -77,6 +80,7 @@ export default function RegistrarEmpresa() {
 			email: data.email,
 			password: data.password,
 			password_confirmation: data.verificarPassword,
+			familia_profesional: data.familiaProfesional,
 			...data,
 		})
 	}
@@ -136,7 +140,7 @@ export default function RegistrarEmpresa() {
 				render={({ field }) => (
 					<TextField
 						{...field}
-						label="Nombre"
+						label="Nombre Empresa o Establecimiento"
 						fullWidth
 						margin="normal"
 						error={!!errors.nombre}
@@ -184,6 +188,27 @@ export default function RegistrarEmpresa() {
 						error={!!errors.telefono}
 						helperText={errors.telefono?.message}
 					/>
+				)}
+			/>
+			<Controller
+				name="familiaProfesional"
+				control={control}
+				render={({ field }) => (
+					<TextField
+						{...field}
+						select
+						label="Familia Profesional"
+						fullWidth
+						margin="normal"
+						error={!!errors.familiaProfesional}
+						helperText={errors.familiaProfesional?.message}
+					>
+						{FAMILIAS_PROFESIONALES.map((option) => (
+							<MenuItem key={option} value={option}>
+								{option}
+							</MenuItem>
+						))}
+					</TextField>
 				)}
 			/>
 			<Button

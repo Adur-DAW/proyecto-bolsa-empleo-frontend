@@ -10,6 +10,8 @@ export type Demandante = {
 	telefonoMovil: string
 	email: string
 	situacion: number
+	familiaProfesional: string
+	cvPath: string
 	titulos: TituloDemandante[]
 
 	adjudicado: boolean

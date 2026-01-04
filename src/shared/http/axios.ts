@@ -26,9 +26,6 @@ const refrescarTokenYActualizarLocalStorage = async () => {
 
 const axiosInstance = axios.create({
 	baseURL: baseUrl,
-	headers: {
-		'Content-Type': 'application/json',
-	},
 })
 
 let isRefreshing = false

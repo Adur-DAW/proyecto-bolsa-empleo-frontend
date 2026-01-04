@@ -38,6 +38,7 @@ export const OfertasRepositoryHttp: OfertasRepository = {
 const mapOfertaToBack = (oferta: Oferta): any => ({
 	nombre: oferta.nombre,
 	horario: oferta.horario,
+	dias_descanso: oferta.diasDescanso,
 	obs: oferta.obs,
 	abierta: oferta.abierta,
 	tipo_contrato: oferta.tipoContrato,
@@ -49,6 +50,7 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 const mapOfertaToFront = (oferta: any): Oferta => ({
 	...oferta,
 	tipoContrato: oferta.tipo_contrato,
+	diasDescanso: oferta.dias_descanso,
 	numeroPuestos: oferta.numero_puestos,
 	fechaPublicacion: dayjs(oferta.fecha_publicacion),
 	fechaCierre: dayjs(oferta.fecha_cierre),
