@@ -35,7 +35,8 @@ export default function PanelAdminPage() {
     const [filtros, setFiltros] = useState({
         fechaInicio: dayjs().subtract(6, 'month').format('YYYY-MM-DD'),
         fechaFin: dayjs().format('YYYY-MM-DD'),
-        familia: '' // Nuevo filtro
+        familia: '',
+        agrupacion: 'diario'
     })
 
     const manejarCambioFiltro = (campo: string, valor: string) => {
@@ -159,6 +160,19 @@ export default function PanelAdminPage() {
                         Panel de Control
                     </Typography>
                     <Box display="flex" gap={2} flexWrap="wrap">
+                        {/* Selector Agrupación */}
+                        <TextField
+                            select
+                            label="Agrupar Datos"
+                            value={filtros.agrupacion || 'diario'}
+                            onChange={(e) => manejarCambioFiltro('agrupacion', e.target.value)}
+                            sx={{ minWidth: 150 }}
+                        >
+                            <MenuItem value="diario">Diario</MenuItem>
+                            <MenuItem value="mensual">Mensual</MenuItem>
+                            <MenuItem value="familia">Por Familia</MenuItem>
+                            <MenuItem value="localidad">Por Localidad</MenuItem>
+                        </TextField>
                         <TextField
                             select
                             label="Filtrar por Familia"

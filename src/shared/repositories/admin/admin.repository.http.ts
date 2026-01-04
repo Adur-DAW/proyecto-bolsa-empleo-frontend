@@ -47,11 +47,12 @@ interface Estadisticas {
 }
 
 export const AdminRepositoryHttp = {
-  obtenerEstadisticas: async (filtros?: { fechaInicio?: string; fechaFin?: string; familia?: string }) => {
+  obtenerEstadisticas: async (filtros?: { fechaInicio?: string; fechaFin?: string; familia?: string; agrupacion?: string }) => {
     const params = new URLSearchParams()
     if (filtros?.fechaInicio) params.append('fechaInicio', filtros.fechaInicio)
     if (filtros?.fechaFin) params.append('fechaFin', filtros.fechaFin)
     if (filtros?.familia) params.append('familia', filtros.familia)
+    if (filtros?.agrupacion) params.append('agrupacion', filtros.agrupacion)
 
     return await getEntity<Estadisticas>(`/admin/stats?${params.toString()}`)
   }
