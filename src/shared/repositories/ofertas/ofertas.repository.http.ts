@@ -41,7 +41,7 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 	dias_descanso: oferta.diasDescanso,
 	obs: oferta.obs,
 	abierta: oferta.abierta,
-	tipo_contrato: oferta.tipoContrato,
+	tipo_contrato_id: oferta.tipoContratoId,
 	numero_puestos: oferta.numeroPuestos,
 	fecha_publicacion: dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD'),
 	fecha_cierre: dayjs(oferta.fechaCierre).format('YYYY-MM-DD'),
@@ -49,7 +49,8 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 
 const mapOfertaToFront = (oferta: any): Oferta => ({
 	...oferta,
-	tipoContrato: oferta.tipo_contrato,
+	tipoContratoId: oferta.tipo_contrato_id,
+	tipoContrato: oferta.tipo_contrato, // Object from relation
 	diasDescanso: oferta.dias_descanso,
 	numeroPuestos: oferta.numero_puestos,
 	fechaPublicacion: dayjs(oferta.fecha_publicacion),

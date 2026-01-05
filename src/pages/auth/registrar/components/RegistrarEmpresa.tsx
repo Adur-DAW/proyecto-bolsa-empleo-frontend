@@ -5,7 +5,8 @@ import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
-import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales'
+import { useEffect, useState } from 'react'
+import { FamiliaProfesional, MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
 
 const empresaSchema = z
 	.object({
@@ -21,7 +22,7 @@ const empresaSchema = z
 		cif: z.string().regex(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/, 'El CIF no es válido'),
 		localidad: z.string().nonempty('La localidad es obligatoria'),
 		telefono: z.string().regex(/^\d{9}$/, 'El teléfono debe tener 9 dígitos'),
-		familiaProfesional: z.string().nonempty('La familia profesional es obligatoria'),
+		familiaProfesionalId: z.number({ invalid_type_error: 'La familia profesional es obligatoria' }),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -31,6 +32,8 @@ const empresaSchema = z
 type EmpresaFormData = z.infer<typeof empresaSchema>
 
 export default function RegistrarEmpresa() {
+	const [familias, setFamilias] = useState<FamiliaProfesional[]>([])
+
 	const {
 		control,
 		handleSubmit,
@@ -47,13 +50,17 @@ export default function RegistrarEmpresa() {
 			cif: '',
 			localidad: '',
 			telefono: '',
-			familiaProfesional: '',
+			familiaProfesionalId: undefined,
 		},
 		mode: 'onBlur',
 	})
 
 	const navigate = useNavigate()
 	const authRepository = AuthRepositoryHttp
+
+	useEffect(() => {
+		MaestrosRepository.obtenerFamilias().then(setFamilias)
+	}, [])
 
 	const mutation = useMutation({
 		mutationFn: authRepository.registrar,
@@ -80,7 +87,7 @@ export default function RegistrarEmpresa() {
 			email: data.email,
 			password: data.password,
 			password_confirmation: data.verificarPassword,
-			familia_profesional: data.familiaProfesional,
+			familia_profesional_id: data.familiaProfesionalId,
 			...data,
 		})
 	}
@@ -191,7 +198,7 @@ export default function RegistrarEmpresa() {
 				)}
 			/>
 			<Controller
-				name="familiaProfesional"
+				name="familiaProfesionalId"
 				control={control}
 				render={({ field }) => (
 					<TextField
@@ -200,12 +207,13 @@ export default function RegistrarEmpresa() {
 						label="Familia Profesional"
 						fullWidth
 						margin="normal"
-						error={!!errors.familiaProfesional}
-						helperText={errors.familiaProfesional?.message}
+						error={!!errors.familiaProfesionalId}
+						helperText={errors.familiaProfesionalId?.message}
+						value={field.value || ''}
 					>
-						{FAMILIAS_PROFESIONALES.map((option) => (
-							<MenuItem key={option} value={option}>
-								{option}
+						{familias.map((option) => (
+							<MenuItem key={option.id} value={option.id}>
+								{option.nombre}
 							</MenuItem>
 						))}
 					</TextField>

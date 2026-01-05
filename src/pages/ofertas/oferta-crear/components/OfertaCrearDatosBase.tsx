@@ -2,12 +2,13 @@ import { Box, Button, Paper, Stack, TextField, Typography, MenuItem } from '@mui
 import { IconPlus } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
 import { ofertaDefault } from '@/shared/models'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
 
 export default function OfertaCrearDatosBase() {
 	return (
@@ -19,10 +20,16 @@ export default function OfertaCrearDatosBase() {
 
 const OfertaEditarDatosBaseInterno = () => {
 	const ofertasRepository = OfertasRepositoryHttp
+	const [tiposContrato, setTiposContrato] = useState<TipoContrato[]>([])
+
+	useEffect(() => {
+		MaestrosRepository.obtenerTiposContrato().then(setTiposContrato)
+	}, [])
 
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
 			...ofertaDefault,
+			tipoContratoId: undefined, // Force selection
 		},
 	})
 
@@ -34,7 +41,10 @@ const OfertaEditarDatosBaseInterno = () => {
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate(data)
+		mutation.mutate({
+			...data,
+			tipoContratoId: data.tipoContratoId // Ensure ID is passed
+		})
 	}
 
 	return (
@@ -99,7 +109,7 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Controller
-								name="tipoContrato"
+								name="tipoContratoId"
 								control={control}
 								render={({ field }) => (
 									<TextField
@@ -107,9 +117,13 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										select
 										label="Tipo de contrato"
+										value={field.value || ''}
 									>
-										<MenuItem value="Jornada completa">Jornada completa</MenuItem>
-										<MenuItem value="Jornada parcial">Jornada parcial</MenuItem>
+										{tiposContrato.map((option) => (
+											<MenuItem key={option.id} value={option.id}>
+												{option.nombre}
+											</MenuItem>
+										))}
 									</TextField>
 								)}
 							/>

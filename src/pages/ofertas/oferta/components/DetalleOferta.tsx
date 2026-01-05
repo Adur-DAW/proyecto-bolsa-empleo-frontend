@@ -32,7 +32,7 @@ export default function DetalleOferta({ oferta }) {
 								Tipo de contrato:{' '}
 							</Typography>
 							<Typography variant="body2" component="span">
-								{oferta.tipoContrato}
+								{oferta.tipoContrato?.nombre || oferta.tipoContrato || 'N/D'}
 							</Typography>
 						</Box>
 						<Box sx={{ marginBottom: 1 }}>

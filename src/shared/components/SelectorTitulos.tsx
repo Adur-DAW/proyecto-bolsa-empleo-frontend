@@ -10,7 +10,7 @@ interface Props {
   alCambiar: (titulos: Titulo[]) => void
   error?: boolean
   textoAyuda?: string
-  familiaFiltro?: string // Opcional: si queremos filtrar por familia externamente
+  familiaFiltro?: number // Changed to number (ID)
 }
 
 export default function SelectorTitulos({ valor, alCambiar, error, textoAyuda, familiaFiltro }: Props) {
@@ -26,7 +26,7 @@ export default function SelectorTitulos({ valor, alCambiar, error, textoAyuda, f
   // Filtrar opciones
   const opciones = titulos.filter(t => {
     if (familiaFiltro) {
-      return t.familia_profesional === familiaFiltro
+      return t.familia_profesional_id === familiaFiltro
     }
     return true
   })
@@ -38,7 +38,11 @@ export default function SelectorTitulos({ valor, alCambiar, error, textoAyuda, f
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => `[${option.familia_profesional}] ${option.nombre}`}
+      getOptionLabel={(option) => {
+        // Fallback if relation is missing (shouldn't happen if backend correct)
+        const familiaNombre = option.familia_profesional?.nombre || 'General';
+        return `[${familiaNombre}] ${option.nombre}`
+      }}
       options={opciones}
       loading={isLoading}
       value={valor}
@@ -66,7 +70,7 @@ export default function SelectorTitulos({ valor, alCambiar, error, textoAyuda, f
           <li key={key} {...otherProps}>
             <Box>
               <Box component="span" sx={{ fontWeight: 'bold', display: 'block', fontSize: '0.8em', color: 'text.secondary' }}>
-                {option.familia_profesional}
+                {option.familia_profesional?.nombre || 'General'}
               </Box>
               {option.nombre}
             </Box>

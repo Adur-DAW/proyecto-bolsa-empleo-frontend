@@ -3,10 +3,11 @@ import { Box, Button, Checkbox, MenuItem, Paper, Stack, TextField, Typography } 
 import { IconDeviceFloppy, IconEyeCancel, IconTrash } from '@tabler/icons-react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { z } from 'zod'
+import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
 
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 
@@ -14,7 +15,7 @@ const ofertaSchema = z.object({
 	nombre: z.string().nonempty('El título es obligatorio'),
 	fechaPublicacion: z.string(),
 	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
-	tipoContrato: z.string().nonempty('El tipo de contrato es obligatorio'),
+	tipoContratoId: z.number({ invalid_type_error: 'El tipo de contrato es obligatorio' }),
 	horario: z.string().optional(),
 	diasDescanso: z.coerce.number().optional(),
 	obs: z.string().optional(),
@@ -38,6 +39,11 @@ const OfertaEditarDatosBaseInterno = () => {
 	}
 
 	const ofertasRepository = OfertasRepositoryHttp
+	const [tiposContrato, setTiposContrato] = useState<TipoContrato[]>([])
+
+	useEffect(() => {
+		MaestrosRepository.obtenerTiposContrato().then(setTiposContrato)
+	}, [])
 
 	const { data: oferta } = useSuspenseQuery({
 		queryKey: ['oferta', +id],
@@ -56,6 +62,7 @@ const OfertaEditarDatosBaseInterno = () => {
 			numeroPuestos: +oferta.numeroPuestos,
 			diasDescanso: oferta.diasDescanso ? +oferta.diasDescanso : 0,
 			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
+			tipoContratoId: oferta.tipoContratoId
 		},
 	})
 
@@ -174,7 +181,7 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Controller
-								name="tipoContrato"
+								name="tipoContratoId"
 								control={control}
 								render={({ field }) => (
 									<TextField
@@ -182,11 +189,15 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										select
 										label="Tipo de contrato"
-										error={!!errors.tipoContrato}
-										helperText={errors.tipoContrato?.message}
+										error={!!errors.tipoContratoId}
+										helperText={errors.tipoContratoId?.message}
+										value={field.value || ''}
 									>
-										<MenuItem value="Jornada completa">Jornada completa</MenuItem>
-										<MenuItem value="Jornada parcial">Jornada parcial</MenuItem>
+										{tiposContrato.map((option) => (
+											<MenuItem key={option.id} value={option.id}>
+												{option.nombre}
+											</MenuItem>
+										))}
 									</TextField>
 								)}
 							/>

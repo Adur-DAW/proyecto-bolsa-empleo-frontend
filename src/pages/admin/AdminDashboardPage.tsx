@@ -13,11 +13,11 @@ import {
     ArcElement
 } from 'chart.js'
 import { Bar, Line, Doughnut, Pie } from 'react-chartjs-2'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 
 import { AdminRepositoryHttp } from '@/shared/repositories/admin/admin.repository.http'
-import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales'
+import { FamiliaProfesional, MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
 
 ChartJS.register(
     CategoryScale,
@@ -38,6 +38,11 @@ export default function PanelAdminPage() {
         familia: '',
         agrupacion: 'diario'
     })
+    const [familias, setFamilias] = useState<FamiliaProfesional[]>([])
+
+    useEffect(() => {
+        MaestrosRepository.obtenerFamilias().then(setFamilias)
+    }, [])
 
     const manejarCambioFiltro = (campo: string, valor: string) => {
         setFiltros(prev => ({ ...prev, [campo]: valor }))
@@ -53,8 +58,6 @@ export default function PanelAdminPage() {
     if (!estadisticas) return null
 
     // --- Datos Gráficos ---
-
-
 
     // Ratio Funnel
     const conversionRate = estadisticas.funnel.inscritos > 0
@@ -122,8 +125,8 @@ export default function PanelAdminPage() {
                             SelectProps={{ displayEmpty: true }}
                         >
                             <MenuItem value=""><em>Todas</em></MenuItem>
-                            {FAMILIAS_PROFESIONALES.map(f => (
-                                <MenuItem key={f} value={f}>{f}</MenuItem>
+                            {familias.map(f => (
+                                <MenuItem key={f.id} value={f.nombre}>{f.nombre}</MenuItem>
                             ))}
                         </TextField>
                         <TextField

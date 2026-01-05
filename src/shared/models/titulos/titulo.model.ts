@@ -1,7 +1,10 @@
+import { FamiliaProfesional } from '@/shared/repositories/MaestrosRepository'
+
 export type Titulo = {
 	id: number
 	nombre: string
-	familia_profesional: string
+	familia_profesional_id: number
+	familia_profesional?: FamiliaProfesional // Relationship
 }
 
 export type TituloExtra = {

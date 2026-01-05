@@ -4,9 +4,10 @@ import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
+import { useEffect, useState } from 'react'
 
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
-import { FAMILIAS_PROFESIONALES } from '@/shared/constants/familias-profesionales'
+import { FamiliaProfesional, MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
 import SelectorTitulos from '@/shared/components/SelectorTitulos'
 import { Titulo } from '@/shared/models'
 
@@ -28,7 +29,7 @@ const demandanteSchema = z
 			.string()
 			.regex(/^\d{9}$/, 'El teléfono móvil debe tener 9 dígitos'),
 		situacion: z.number(),
-		familiaProfesional: z.string().optional(),
+		familiaProfesionalId: z.number().optional(),
 		cv: z.any().optional(),
 		titulos: z.array(z.any()).min(1, 'Debe seleccionar al menos un título académico'),
 	})
@@ -40,6 +41,8 @@ const demandanteSchema = z
 type DemandanteFormData = z.infer<typeof demandanteSchema>
 
 export default function RegistrarDemandante() {
+	const [familias, setFamilias] = useState<FamiliaProfesional[]>([])
+
 	const {
 		control,
 		handleSubmit,
@@ -47,7 +50,7 @@ export default function RegistrarDemandante() {
 		register,
 		watch,
 		setValue,
-		formState: { errors },
+		formState: { errors, isValid },
 	} = useForm<DemandanteFormData>({
 		resolver: zodResolver(demandanteSchema),
 		defaultValues: {
@@ -61,7 +64,7 @@ export default function RegistrarDemandante() {
 			dni: '',
 			telefonoMovil: '',
 			situacion: 0,
-			familiaProfesional: '',
+			familiaProfesionalId: undefined,
 			titulos: [],
 		},
 		mode: 'onBlur',
@@ -69,7 +72,11 @@ export default function RegistrarDemandante() {
 
 	const navigate = useNavigate()
 	const authRepository = AuthRepositoryHttp
-	const familiaSeleccionada = watch('familiaProfesional')
+	const familiaSeleccionada = watch('familiaProfesionalId')
+
+	useEffect(() => {
+		MaestrosRepository.obtenerFamilias().then(setFamilias)
+	}, [])
 
 	const mutation = useMutation({
 		mutationFn: (data: FormData) => authRepository.registrar(data as any),
@@ -103,8 +110,8 @@ export default function RegistrarDemandante() {
 		formData.append('telefono_movil', data.telefonoMovil);
 		formData.append('situacion', data.situacion.toString());
 
-		if (data.familiaProfesional) {
-			formData.append('familia_profesional', data.familiaProfesional);
+		if (data.familiaProfesionalId) {
+			formData.append('familia_profesional_id', data.familiaProfesionalId.toString());
 		}
 
 		// Enviar títulos
@@ -242,7 +249,7 @@ export default function RegistrarDemandante() {
 			/>
 
 			<Controller
-				name="familiaProfesional"
+				name="familiaProfesionalId"
 				control={control}
 				render={({ field }) => (
 					<TextField
@@ -251,16 +258,17 @@ export default function RegistrarDemandante() {
 						label="Familia Profesional (Filtro)"
 						fullWidth
 						margin="normal"
-						error={!!errors.familiaProfesional}
+						error={!!errors.familiaProfesionalId}
 						helperText="Selecciona una familia para filtrar los títulos (Opcional)"
+						value={field.value || ''}
 						onChange={(e) => {
 							field.onChange(e)
 							setValue('titulos', [])
 						}}
 					>
-						{FAMILIAS_PROFESIONALES.map((option) => (
-							<MenuItem key={option} value={option}>
-								{option}
+						{familias.map((option) => (
+							<MenuItem key={option.id} value={option.id}>
+								{option.nombre}
 							</MenuItem>
 						))}
 					</TextField>

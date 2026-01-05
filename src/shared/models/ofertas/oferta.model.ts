@@ -2,11 +2,14 @@ import dayjs from 'dayjs'
 
 import { Empresa } from '../empresas/empresa.model'
 
+import { TipoContrato } from '@/shared/repositories/MaestrosRepository'
+
 export type Oferta = {
 	nombre: string
 	fechaPublicacion: dayjs.Dayjs
 	numeroPuestos: number
-	tipoContrato: string
+	tipoContratoId: number
+	tipoContrato?: TipoContrato
 	horario: string
 	diasDescanso: string
 	obs: string
@@ -23,7 +26,7 @@ export const ofertaDefault = {
 	nombre: '',
 	fechaPublicacion: dayjs(),
 	numeroPuestos: 1,
-	tipoContrato: '',
+	tipoContratoId: 0,
 	horario: '',
 	diasDescanso: '',
 	obs: '',

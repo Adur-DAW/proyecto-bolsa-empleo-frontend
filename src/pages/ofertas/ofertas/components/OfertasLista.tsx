@@ -87,7 +87,7 @@ const OfertasListaSuspense = ({ filtro }) => {
 									Tipo de contrato:{' '}
 								</Typography>
 								<Typography variant="body2" component="span">
-									{oferta.tipoContrato}
+									{(typeof oferta.tipoContrato === 'object' ? oferta.tipoContrato?.nombre : oferta.tipoContrato) || 'N/D'}
 								</Typography>
 							</Box>
 							<Box sx={{ marginBottom: 1 }}>
