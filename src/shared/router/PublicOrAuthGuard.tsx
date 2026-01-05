@@ -13,15 +13,12 @@ export default function PublicOrAuthGuard() {
     staleTime: 1000 * 60 * 5 // 5 minutes
   })
 
-  console.log('PublicOrAuthGuard Check:', { config, usuario, ofertasPublicas: config?.ofertas_publicas })
-
   if (isLoading) {
     return <div>Cargando configuración...</div> // Or a proper Spinner
   }
 
   // If config is not loaded or ofertas_publicas is false AND user is not logged in, redirect
   if (config && !config.ofertas_publicas && !usuario) {
-    console.log('Redirecting to login...')
     return <Navigate to={getAbsolutePath('login')} replace />
   }
 

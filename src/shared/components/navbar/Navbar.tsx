@@ -27,6 +27,7 @@ import { useNavbar } from '@/shared/hooks/navbar.hook'
 import { getAbsolutePath } from '@/shared/routes'
 import { useAppStore } from '@/shared/store/store'
 import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
+import PanelAdminPage from '@/pages/admin/AdminDashboardPage'
 
 interface Menu {
 	name: string
@@ -44,7 +45,7 @@ export default function Navbar() {
 	const { data: config } = useQuery({
 		queryKey: ['appConfig'],
 		queryFn: ConfigRepository.obtener,
-		initialData: { ofertas_publicas: true } // Default to true to avoid flash
+		initialData: { ofertas_publicas: false } // Default to true to avoid flash
 	})
 
 	const settings = [
@@ -98,6 +99,11 @@ export default function Navbar() {
 			texto: 'Titulos',
 			to: getAbsolutePath('titulos'),
 			icono: <IconLetterA />,
+		})
+		pages.push({
+			texto: 'Admin',
+			to: getAbsolutePath('admin'),
+			icono: <PanelAdminPage />,
 		})
 	}
 
@@ -161,7 +167,7 @@ export default function Navbar() {
 						onClose={handleCloseNavMenu}
 						sx={{ display: { xs: 'block', md: 'none' } }}
 					>
-						{pages.map((page) => (
+						{pages.length > 1 && pages.map((page) => (
 							<MenuItem
 								key={page.to}
 								onClick={handleCloseNavMenu}
@@ -180,7 +186,7 @@ export default function Navbar() {
 				</Box>
 
 				<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-					{pages.map((page) => (
+					{pages.length > 1 && pages.map((page) => (
 						<Link
 							key={page.to}
 							style={{
