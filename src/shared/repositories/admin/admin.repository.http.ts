@@ -6,6 +6,12 @@ interface Estadisticas {
     ofertas_adjudicadas: number
     demandantes: number
     empresas: number
+    variacion?: {
+      ofertas: number
+      ofertas_adjudicadas: number
+      demandantes: number
+      empresas: number
+    }
   }
   registros: {
     periodo: string

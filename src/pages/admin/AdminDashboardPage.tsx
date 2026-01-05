@@ -54,102 +54,41 @@ export default function PanelAdminPage() {
 
     // --- Datos Gráficos ---
 
-    const datosEvolucion = {
-        labels: estadisticas.registros.map(r => r.periodo),
-        datasets: [
-            {
-                label: 'Nuevos Demandantes',
-                data: estadisticas.registros.map(r => r.demandantes),
-                borderColor: 'rgb(53, 162, 235)',
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            },
-            // Si hay filtro familia, empresas vendrá vacío, chart.js lo maneja bien
-            ...(estadisticas.registros.some(r => r.empresas > 0) ? [{
-                label: 'Nuevas Empresas',
-                data: estadisticas.registros.map(r => r.empresas),
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            }] : []),
-        ],
-    }
 
-    const datosOfertas = {
-        labels: estadisticas.ofertas.map(o => o.periodo),
-        datasets: [
-            {
-                label: 'Publicadas',
-                data: estadisticas.ofertas.map(o => o.total_publicadas),
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-            },
-            {
-                label: 'Adjudicadas',
-                data: estadisticas.ofertas.map(o => o.total_adjudicadas),
-                backgroundColor: 'rgba(153, 102, 255, 0.6)',
-            },
-        ],
-    }
-
-    const datosEstadoOfertas = {
-        labels: ['Abiertas', 'Adjudicadas', 'Cerradas (Sin cubrir)'],
-        datasets: [
-            {
-                data: [
-                    estadisticas.estado_ofertas?.abiertas ?? 0,
-                    estadisticas.estado_ofertas?.adjudicadas ?? 0,
-                    estadisticas.estado_ofertas?.cerradas_sin_adjudicar ?? 0
-                ],
-                backgroundColor: [
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(255, 99, 132, 0.6)',
-                ],
-                borderColor: [
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(255, 99, 132, 1)',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    }
-
-    const datosTopFamilias = {
-        labels: estadisticas.top_familias.map(f => f.familia_profesional),
-        datasets: [{
-            label: '# Demandantes',
-            data: estadisticas.top_familias.map(f => f.total),
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.6)',
-                'rgba(54, 162, 235, 0.6)',
-                'rgba(255, 206, 86, 0.6)',
-                'rgba(75, 192, 192, 0.6)',
-                'rgba(153, 102, 255, 0.6)',
-                'rgba(255, 159, 64, 0.6)',
-                'rgba(199, 199, 199, 0.6)',
-                'rgba(83, 102, 255, 0.6)',
-                'rgba(40, 159, 64, 0.6)',
-                'rgba(210, 80, 80, 0.6)',
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(199, 199, 199, 1)',
-                'rgba(83, 102, 255, 1)',
-                'rgba(40, 159, 64, 1)',
-                'rgba(210, 80, 80, 1)',
-            ],
-            borderWidth: 1,
-        }]
-    }
 
     // Ratio Funnel
     const conversionRate = estadisticas.funnel.inscritos > 0
         ? ((estadisticas.funnel.adjudicados / estadisticas.funnel.inscritos) * 100).toFixed(1)
         : 0
+
+    // Exportar CSV
+    const exportarCSV = () => {
+        const rows = [
+            ['Métrica', 'Valor'],
+            ['Ofertas', estadisticas.totales.ofertas],
+            ['Adjudicadas', estadisticas.totales.ofertas_adjudicadas],
+            ['Demandantes', estadisticas.totales.demandantes],
+            [],
+            ['Periodo', 'Demandantes', 'Empresas'],
+            ...estadisticas.registros.map(r => [r.periodo, r.demandantes, r.empresas])
+        ];
+
+        let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "estadisticas_bolsa.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+
+    // Colores Unificados
+    const COLORS = {
+        ofertas: '#4caf50',     // Verde
+        demandantes: '#2196f3', // Azul
+        empresas: '#ff9800',    // Naranja
+        adjudicadas: '#9c27b0'  // Morado
+    }
 
     return (
         <Box p={3}>
@@ -173,6 +112,7 @@ export default function PanelAdminPage() {
                             <MenuItem value="familia">Por Familia</MenuItem>
                             <MenuItem value="localidad">Por Localidad</MenuItem>
                         </TextField>
+
                         <TextField
                             select
                             label="Filtrar por Familia"
@@ -200,6 +140,9 @@ export default function PanelAdminPage() {
                             onChange={(e) => manejarCambioFiltro('fechaFin', e.target.value)}
                             InputLabelProps={{ shrink: true }}
                         />
+                        <Button variant="outlined" onClick={exportarCSV}>
+                            Exportar CSV
+                        </Button>
                         <Button variant="contained" onClick={() => refetch()} size="large">
                             Actualizar
                         </Button>
@@ -210,13 +153,13 @@ export default function PanelAdminPage() {
             {/* KPI Cards (Totales + Nuevas Métricas) */}
             <Box display="flex" flexWrap="wrap" gap={3} mb={4}>
                 <Box flex="1 1 150px">
-                    <TarjetaStat titulo="Ofertas Publicadas" valor={estadisticas.totales.ofertas} color="#4caf50" />
+                    <TarjetaStat titulo="Ofertas Publicadas" valor={estadisticas.totales.ofertas} color={COLORS.ofertas} variacion={estadisticas.totales.variacion?.ofertas} />
                 </Box>
                 <Box flex="1 1 150px">
-                    <TarjetaStat titulo="Ofertas Adjudicadas" valor={estadisticas.totales.ofertas_adjudicadas} color="#2196f3" />
+                    <TarjetaStat titulo="Adjudicadas" valor={estadisticas.totales.ofertas_adjudicadas} color={COLORS.adjudicadas} variacion={estadisticas.totales.variacion?.ofertas_adjudicadas} />
                 </Box>
                 <Box flex="1 1 150px">
-                    <TarjetaStat titulo="Resolución Media (Días)" valor={`${estadisticas.tiempo_resolucion || 0}d`} color="#ff9800" subtext="Tiempo medio en cubrir oferta" />
+                    <TarjetaStat titulo="Demandantes Nuevos" valor={estadisticas.totales.demandantes} color={COLORS.demandantes} variacion={estadisticas.totales.variacion?.demandantes} />
                 </Box>
                 <Box flex="1 1 150px">
                     <TarjetaStat titulo="Tasa de Conversión" valor={`${conversionRate}%`} color="#9c27b0" subtext={`${estadisticas.funnel.adjudicados} de ${estadisticas.funnel.inscritos} inscripciones`} />
@@ -229,7 +172,23 @@ export default function PanelAdminPage() {
                     <Paper sx={{ p: 2, height: '100%' }}>
                         <Typography variant="h6" mb={2} color="text.secondary">Evolución de Actividad</Typography>
                         <Box height={300}>
-                            <Line data={datosEvolucion} options={{ maintainAspectRatio: false }} />
+                            <Line data={{
+                                labels: estadisticas.registros.map(r => r.periodo),
+                                datasets: [
+                                    {
+                                        label: 'Demandantes',
+                                        data: estadisticas.registros.map(r => r.demandantes),
+                                        borderColor: COLORS.demandantes,
+                                        backgroundColor: COLORS.demandantes + '50', // opacidad
+                                    },
+                                    ...(estadisticas.registros.some(r => r.empresas > 0) ? [{
+                                        label: 'Empresas',
+                                        data: estadisticas.registros.map(r => r.empresas),
+                                        borderColor: COLORS.empresas,
+                                        backgroundColor: COLORS.empresas + '50',
+                                    }] : []),
+                                ]
+                            }} options={{ maintainAspectRatio: false }} />
                         </Box>
                     </Paper>
                 </Box>
@@ -237,7 +196,17 @@ export default function PanelAdminPage() {
                     <Paper sx={{ p: 2, height: '100%' }}>
                         <Typography variant="h6" mb={2} color="text.secondary">Estado de Ofertas</Typography>
                         <Box height={300} display="flex" justifyContent="center">
-                            <Pie data={datosEstadoOfertas} options={{ maintainAspectRatio: false }} />
+                            <Pie data={{
+                                labels: ['Abiertas', 'Adjudicadas', 'Cerradas'],
+                                datasets: [{
+                                    data: [
+                                        estadisticas.estado_ofertas.abiertas,
+                                        estadisticas.estado_ofertas.adjudicadas,
+                                        estadisticas.estado_ofertas.cerradas_sin_adjudicar
+                                    ],
+                                    backgroundColor: [COLORS.ofertas, COLORS.adjudicadas, '#e0e0e0']
+                                }]
+                            }} options={{ maintainAspectRatio: false }} />
                         </Box>
                     </Paper>
                 </Box>
@@ -248,13 +217,35 @@ export default function PanelAdminPage() {
                 <Box flex="2 1 500px">
                     <Paper sx={{ p: 2 }}>
                         <Typography variant="h6" mb={2} color="text.secondary">Publicadas vs Adjudicadas</Typography>
-                        <Bar data={datosOfertas} />
+                        <Bar data={{
+                            labels: estadisticas.ofertas.map(o => o.periodo),
+                            datasets: [
+                                {
+                                    label: 'Publicadas',
+                                    data: estadisticas.ofertas.map(o => o.total_publicadas),
+                                    backgroundColor: COLORS.ofertas + '99',
+                                },
+                                {
+                                    label: 'Adjudicadas',
+                                    data: estadisticas.ofertas.map(o => o.total_adjudicadas),
+                                    backgroundColor: COLORS.adjudicadas + '99',
+                                },
+                            ]
+                        }} />
                     </Paper>
                 </Box>
                 <Box flex="1 1 400px">
                     <Paper sx={{ p: 2 }}>
                         <Typography variant="h6" mb={2} color="text.secondary">Top 10 Familias (Global)</Typography>
-                        <Doughnut data={datosTopFamilias} />
+                        <Doughnut data={{
+                            labels: estadisticas.top_familias.map(f => f.familia_profesional),
+                            datasets: [{
+                                label: '# Demandantes',
+                                data: estadisticas.top_familias.map(f => f.total),
+                                backgroundColor: Object.values(COLORS), // Reusar paleta
+                                borderWidth: 1
+                            }]
+                        }} />
                     </Paper>
                 </Box>
             </Box>
@@ -277,8 +268,6 @@ export default function PanelAdminPage() {
                         </Box>
                     </Paper>
                 </Box>
-
-                {/* Ranking Títulos */}
                 <Box flex="1 1 300px">
                     <Paper sx={{ p: 2 }}>
                         <Typography variant="h6" mb={2} color="text.secondary">Títulos Más Solicitados</Typography>
@@ -294,8 +283,6 @@ export default function PanelAdminPage() {
                         </Box>
                     </Paper>
                 </Box>
-
-                {/* Top Localidades */}
                 <Box flex="1 1 300px">
                     <Paper sx={{ p: 2 }}>
                         <Typography variant="h6" mb={2} color="text.secondary">Distribución Geográfica</Typography>
@@ -316,12 +303,19 @@ export default function PanelAdminPage() {
     )
 }
 
-function TarjetaStat({ titulo, valor, color, subtext }: { titulo: string, valor: string | number, color: string, subtext?: string }) {
+function TarjetaStat({ titulo, valor, color, subtext, variacion }: { titulo: string, valor: string | number, color: string, subtext?: string, variacion?: number }) {
     return (
         <Card sx={{ borderTop: `4px solid ${color}`, height: '100%' }}>
             <CardContent>
                 <Typography color="textSecondary" variant="subtitle2" gutterBottom>{titulo}</Typography>
-                <Typography variant="h4" fontWeight="bold">{valor}</Typography>
+                <Box display="flex" alignItems="baseline" gap={1}>
+                    <Typography variant="h4" fontWeight="bold">{valor}</Typography>
+                    {variacion !== undefined && (
+                        <Typography variant="body2" color={variacion >= 0 ? 'success.main' : 'error.main'} fontWeight="bold">
+                            {variacion > 0 ? '+' : ''}{variacion}%
+                        </Typography>
+                    )}
+                </Box>
                 {subtext && <Typography variant="caption" color="text.secondary">{subtext}</Typography>}
             </CardContent>
         </Card>
