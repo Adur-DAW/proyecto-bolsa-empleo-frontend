@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 
 import AppLayout from './AppLayout'
+import PaginaPorRol from './shared/router/PaginaPorRol'
 import ProtectedRoute from './shared/router/ProtectedRoute'
 import PublicOrAuthGuard from './shared/router/PublicOrAuthGuard'
 import { getAbsolutePath } from './shared/routes'
@@ -20,13 +21,27 @@ const EmpresasPage = lazy(
 const DetalleEmpresaPage = lazy(
 	() => import('@/pages/empresas/detalle-empresa/DetalleEmpresaPage')
 )
-const OfertaCrearPage = lazy(
-	() => import('@/pages/ofertas/oferta-crear/OfertaCrearPage')
+
+const ConfiguracionUsuarioPage = lazy(
+	() =>
+		import(
+			'@/pages/configuracion/configuracion-usuario/ConfiguracionUsuarioPage'
+		)
+)
+const ConfiguracionEmpresaPage = lazy(
+	() =>
+		import(
+			'@/pages/configuracion/configuracion-empresa/ConfiguracionEmpresaPage'
+		)
 )
 
+const TitulosPage = lazy(() => import('./pages/titulos/TitulosPage'))
 
+const OfertaCrearPage = lazy(
+	() => import('./pages/ofertas/oferta-crear/OfertaCrearPage')
+)
 
-
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 
 export default function AppRouter() {
 	return (
@@ -75,6 +90,37 @@ export default function AppRouter() {
 								<Route path=":id" element={<DetalleEmpresaPage />} />
 							</Route>
 						</Route>
+
+						<Route
+							element={
+								<ProtectedRoute
+									allowedRoles={['centro']}
+									redirectTo={getAbsolutePath('login')}
+								/>
+							}
+						>
+							<Route
+								path={getAbsolutePath('titulos')}
+								element={<TitulosPage />}
+							/>
+							<Route
+								path={getAbsolutePath('admin')}
+								element={<AdminDashboardPage />}
+							/>
+						</Route>
+
+						<Route
+							path={getAbsolutePath('configuracion')}
+							element={
+								<PaginaPorRol
+									roles={{
+										demandante: ConfiguracionUsuarioPage,
+										empresa: ConfiguracionEmpresaPage,
+									}}
+									redirectTo={getAbsolutePath('login')}
+								/>
+							}
+						/>
 					</Route>
 				</Routes>
 			</Suspense>

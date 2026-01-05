@@ -7,15 +7,21 @@ import { getAbsolutePath } from '@/shared/routes'
 export default function PublicOrAuthGuard() {
   const usuario = useAppStore((state) => state.usuario)
 
-  // Use suspense to block rendering until config is loaded
-  const { data: config } = useQuery({
+  const { data: config, isLoading } = useQuery({
     queryKey: ['appConfig'],
     queryFn: ConfigRepository.obtener,
-    initialData: { ofertas_publicas: true },
     staleTime: 1000 * 60 * 5 // 5 minutes
   })
 
-  if (!config.ofertas_publicas && !usuario) {
+  console.log('PublicOrAuthGuard Check:', { config, usuario, ofertasPublicas: config?.ofertas_publicas })
+
+  if (isLoading) {
+    return <div>Cargando configuración...</div> // Or a proper Spinner
+  }
+
+  // If config is not loaded or ofertas_publicas is false AND user is not logged in, redirect
+  if (config && !config.ofertas_publicas && !usuario) {
+    console.log('Redirecting to login...')
     return <Navigate to={getAbsolutePath('login')} replace />
   }
 
