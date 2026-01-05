@@ -1,4 +1,4 @@
-import { getEntity } from "../http/api.service";
+import { getEntity } from "@/shared/http/api.service";
 
 export interface FamiliaProfesional {
   id: number;

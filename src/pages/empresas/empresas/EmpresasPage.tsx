@@ -1,8 +1,13 @@
 import { Box, Container } from '@mui/material'
+import { useState } from 'react'
 
+import EmpresasFiltros from './components/EmpresasFiltros'
 import EmpresasLista from './components/EmpresasLista'
 
 export default function EmpresasPage() {
+	const [search, setSearch] = useState('')
+	const [familiaProfesionalId, setFamiliaProfesionalId] = useState<number | null>(null)
+
 	return (
 		<Container>
 			<Box
@@ -12,8 +17,15 @@ export default function EmpresasPage() {
 					gap: 4,
 				}}
 			>
+				<EmpresasFiltros
+					search={search}
+					onSearchChange={setSearch}
+					familiaProfesionalId={familiaProfesionalId}
+					onFamiliaChange={setFamiliaProfesionalId}
+				/>
+
 				<Box sx={{ flex: 1 }}>
-					<EmpresasLista />
+					<EmpresasLista search={search} familiaProfesionalId={familiaProfesionalId} />
 				</Box>
 			</Box>
 		</Container>

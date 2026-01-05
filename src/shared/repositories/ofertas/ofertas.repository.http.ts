@@ -3,13 +3,23 @@ import dayjs from 'dayjs'
 import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { Oferta } from '@/shared/models'
 
-import { OfertasRepository } from './ofertas.repository'
+// import { OfertasRepository } from './ofertas.repository'
 
-export const OfertasRepositoryHttp: OfertasRepository = {
-	obtener: async (): Promise<Oferta[]> => {
-		const ofertas = await getEntity<any>('/ofertas')
+export const OfertasRepositoryHttp = {
+	obtener: async (params?: { page: number; limit: number; search?: string; empresa_id?: number; estado?: string }): Promise<{ data: Oferta[]; nextPage: number | null }> => {
+		const queryParams = new URLSearchParams()
+		if (params?.page) queryParams.append('page', params.page.toString())
+		if (params?.limit) queryParams.append('limit', params.limit.toString())
+		if (params?.search) queryParams.append('search', params.search)
+		if (params?.empresa_id) queryParams.append('empresa_id', params.empresa_id.toString())
+		if (params?.estado) queryParams.append('estado', params.estado)
 
-		return ofertas.map((x: any) => mapOfertaToFront(x))
+		const response = await getEntity<any>(`/ofertas?${queryParams.toString()}`)
+
+		return {
+			data: response.data.map((x: any) => mapOfertaToFront(x)),
+			nextPage: response.next_page_url ? response.current_page + 1 : null,
+		}
 	},
 	obtenerPorDemandante: async (): Promise<Oferta[]> => {
 		const ofertas = await getEntity<any>('/demandantes/jwt/ofertas-por-titulos')

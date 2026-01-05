@@ -17,6 +17,9 @@ const RegistrarPage = lazy(() => import('@/pages/auth/registrar/RegistrarPage'))
 const EmpresasPage = lazy(
 	() => import('@/pages/empresas/empresas/EmpresasPage')
 )
+const DetalleEmpresaPage = lazy(
+	() => import('@/pages/empresas/detalle-empresa/DetalleEmpresaPage')
+)
 const ConfiguracionUsuarioPage = lazy(
 	() =>
 		import(
@@ -111,6 +114,7 @@ export default function AppRouter() {
 						/>
 						<Route path={getAbsolutePath('empresas')}>
 							<Route index element={<EmpresasPage />} />
+							<Route path=":id" element={<DetalleEmpresaPage />} />
 						</Route>
 					</Route>
 				</Routes>
