@@ -1,41 +1,50 @@
 import {
 	Box,
 	Button,
-	Card,
-	CardContent,
 	Stack,
-	TextField,
 	Typography,
-	CircularProgress
+	Chip
 } from '@mui/material'
-import { IconEdit, IconEye, IconSearch } from '@tabler/icons-react'
+import { IconEdit, IconEye, IconBuilding, IconClock, IconCalendar } from '@tabler/icons-react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Suspense, useState } from 'react'
 import { Link } from 'react-router'
 import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
 
 import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
-
 import useRol from '@/shared/hooks/rol.hook'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 import { useDebounce } from '@/shared/hooks/useDebounce'
+import PageDataContainer from '@/shared/components/containers/PageDataContainer'
+import EntityCard from '@/shared/components/cards/EntityCard'
+import dayjs from 'dayjs'
 
-export default function OfertasLista({ filtro, empresaId, estado }: { filtro?: string; empresaId?: number; estado?: string }) {
+interface OfertasListaProps {
+	filtro?: string
+	empresaId?: number
+	estado?: string
+	search?: string
+	sortBy?: string
+}
+
+export default function OfertasLista({ filtro, empresaId, estado, search, sortBy }: OfertasListaProps) {
 	return (
 		<Stack spacing={3}>
 			<LimiteAccesoRestringido>
-				<Suspense fallback={<div>Cargando...</div>}>
-					<OfertasListaSuspense filtro={filtro} empresaId={empresaId} estado={estado} />
-				</Suspense>
+				<PageDataContainer skeletonType="list">
+					<OfertasListaSuspense filtro={filtro} empresaId={empresaId} estado={estado} search={search} sortBy={sortBy} />
+				</PageDataContainer>
 			</LimiteAccesoRestringido>
 		</Stack>
 	)
 }
 
-const OfertasListaSuspense = ({ filtro, empresaId, estado }: { filtro?: string; empresaId?: number; estado?: string }) => {
+const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy }: OfertasListaProps) => {
 	const { usuario, mismoRol } = useRol()
-	const [search, setSearch] = useState('')
-	const [debouncedSearch] = useDebounce(search, 500)
+	// Fallback if not provided (e.g. in legacy usage)
+	const effectiveSearch = search || ''
+	const effectiveSortBy = sortBy || 'fecha_publicacion.desc'
+
+	const [debouncedSearch] = useDebounce(effectiveSearch, 500)
 
 	const ofertasRepository = OfertasRepositoryHttp
 
@@ -46,7 +55,7 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado }: { filtro?: string; 
 		isFetchingNextPage,
 		isLoading,
 	} = useInfiniteQuery({
-		queryKey: ['ofertas', filtro, debouncedSearch, empresaId, estado],
+		queryKey: ['ofertas', filtro, debouncedSearch, empresaId, estado, effectiveSortBy],
 		queryFn: async ({ pageParam = 1 }) => {
 			if (filtro === 'demandante') {
 				const res = await ofertasRepository.obtenerPorDemandante()
@@ -60,7 +69,8 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado }: { filtro?: string; 
 					limit: 20,
 					search: debouncedSearch,
 					empresa_id: empresaId,
-					estado: estado
+					estado: estado,
+					sortBy: effectiveSortBy
 				})
 			}
 		},
@@ -70,25 +80,13 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado }: { filtro?: string; 
 
 	const ofertas = data?.pages.flatMap((page) => page.data) || []
 
+	const formatDate = (date: dayjs.Dayjs) => {
+		return date.isValid() ? date.format('DD/MM/YYYY') : 'N/D'
+	}
+
 	return (
 		<Box>
-			{/* Buscador solo para lista general (si no es detalle de empresa) */}
-			{!empresaId && !filtro && (
-				<Box sx={{ mb: 3 }}>
-					<TextField
-						fullWidth
-						label="Buscar ofertas..."
-						placeholder="Puesto, descripción o empresa"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						InputProps={{
-							startAdornment: <IconSearch size={20} style={{ marginRight: 8, opacity: 0.5 }} />,
-						}}
-					/>
-				</Box>
-			)}
-
-			{isLoading && <CircularProgress />}
+			{/* Controls moved to OfertasFiltros */}
 
 			{ofertas.length === 0 && !isLoading && (
 				<Typography align="center" color="text.secondary">No se encontraron ofertas.</Typography>
@@ -96,158 +94,81 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado }: { filtro?: string; 
 
 			<Stack spacing={2}>
 				{ofertas.map((oferta) => (
-					<Card key={oferta.id} sx={{ padding: 2, boxShadow: 2 }}>
-						<CardContent>
-							<Box
-								sx={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									alignItems: 'flex-start',
-								}}
+					<EntityCard
+						key={oferta.id}
+						title={oferta.nombre}
+						badges={
+							<Chip
+								label={oferta.abierta ? 'Activa' : 'Cerrada'}
+								color={oferta.abierta ? 'success' : 'default'}
+								size="small"
+								variant="outlined"
+							/>
+						}
+						subtitle={
+							<Link
+								to={`/empresas/${oferta.idEmpresa}`}
+								style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}
+								onClick={(e) => e.stopPropagation()}
 							>
-								<Box sx={{ textAlign: 'left' }}>
-									<Typography variant="h6" sx={{ marginBottom: 2 }}>
-										{oferta.nombre}
-									</Typography>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Empresa:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.empresa.nombre}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Tipo de contrato:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{(typeof oferta.tipoContrato === 'object' ? oferta.tipoContrato?.nombre : oferta.tipoContrato) || 'N/D'}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Horario:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.horario}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Activa:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.abierta ? 'Si' : 'No'}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Fin de la oferta:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.fechaCierre.format('DD/MM/YYYY')}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Cantidad puestos:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.numeroPuestos}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Observaciones:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.obs}
-										</Typography>
-									</Box>
-									<Box sx={{ marginBottom: 1 }}>
-										<Typography
-											variant="subtitle2"
-											color="text.secondary"
-											component="span"
-										>
-											Inscritos:{' '}
-										</Typography>
-										<Typography variant="body2" component="span">
-											{oferta.demandantesInscritos} de {oferta.numeroPuestos}{' '}
-											puestos
-										</Typography>
-									</Box>
-								</Box>
-								<Box
-									sx={{
-										display: 'flex',
-										flexDirection: 'column',
-										alignItems: 'flex-end',
-									}}
-								>
-									<Typography variant="caption" color="text.secondary">
-										Publicado el: {oferta.fechaPublicacion.format('DD/MM/YYYY')}
-									</Typography>
+								<IconBuilding size={16} />
+								<Typography variant="body2" sx={{ '&:hover': { textDecoration: 'underline', color: 'primary.main' } }}>
+									{oferta.empresa?.nombre || 'Empresa desconocida'}
+								</Typography>
+							</Link>
+						}
+						details={[
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+								<IconClock size={16} color="var(--mui-palette-text-secondary)" />
+								<Typography variant="body2" color="text.secondary">
+									{(oferta.tipoContrato as any)?.nombre || oferta.tipoContrato || 'N/D'} • {oferta.horario}
+								</Typography>
+							</Box>,
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+								<IconCalendar size={16} color="var(--mui-palette-text-secondary)" />
+								<Typography variant="body2" color="text.secondary">
+									Hasta: {formatDate(oferta.fechaCierre)}
+								</Typography>
+							</Box>,
+							<Typography variant="body2" color="text.secondary">
+								{oferta.demandantesInscritos} inscritos / {oferta.numeroPuestos} vacantes
+							</Typography>
+						]}
+						actions={
+							<>
+								<Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
+									Publicado: {formatDate(oferta.fechaPublicacion)}
+								</Typography>
 
-									<Link to={`/ofertas/${oferta.id}`}>
-										<Button
-											variant="contained"
-											color="primary"
-											sx={{ marginTop: 2 }}
-											startIcon={<IconEye />}
-										>
-											Ver detalles
-										</Button>
-									</Link>
+								<Link to={`/ofertas/${oferta.id}`}>
+									<Button
+										variant="contained"
+										color="primary"
+										size="small"
+										startIcon={<IconEye size={18} />}
+									>
+										Ver detalles
+									</Button>
+								</Link>
 
-									<InscribirseComponent oferta={oferta} filtro={filtro} />
+								<InscribirseComponent oferta={oferta} filtro={filtro} />
 
-									{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
-										<Box sx={{ display: 'flex', gap: 1, marginTop: 2 }}>
-											<Button
-												variant="outlined"
-												color="secondary"
-												component={Link}
-												to={`/ofertas/${oferta.id}/editar`}
-												startIcon={<IconEdit />}
-											>
-												Editar
-											</Button>
-										</Box>
-									)}
-								</Box>
-							</Box>
-						</CardContent>
-					</Card>
+								{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
+									<Button
+										variant="outlined"
+										color="secondary"
+										size="small"
+										component={Link}
+										to={`/ofertas/${oferta.id}/editar`}
+										startIcon={<IconEdit size={18} />}
+										sx={{ mt: 1 }}
+									>
+										Editar
+									</Button>
+								)}
+							</>
+						}
+					/>
 				))}
 			</Stack>
 

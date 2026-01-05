@@ -1,46 +1,46 @@
 import {
 	Box,
 	Button,
-	Card,
-	CardContent,
 	Stack,
 	Typography,
+	Chip
 } from '@mui/material'
 import {
 	useMutation,
 	useQueryClient,
 	useSuspenseQuery,
 } from '@tanstack/react-query'
-import { Suspense } from 'react'
-import { useNavigate } from 'react-router'
+import { IconMapPin, IconBriefcase, IconCheck, IconX, IconNews, IconUsers } from '@tabler/icons-react'
 
 import useRol from '@/shared/hooks/rol.hook'
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
+import PageDataContainer from '@/shared/components/containers/PageDataContainer'
+import EntityCard from '@/shared/components/cards/EntityCard'
 
 interface EmpresasListaProps {
 	search?: string
 	familiaProfesionalId?: number | null
+	sortBy?: string
 }
 
-export default function EmpresasLista({ search, familiaProfesionalId }: EmpresasListaProps) {
+export default function EmpresasLista({ search, familiaProfesionalId, sortBy }: EmpresasListaProps) {
 	return (
 		<Stack spacing={3}>
-			<Suspense fallback={<div>Cargando...</div>}>
-				<EmpresasListaSuspense search={search} familiaProfesionalId={familiaProfesionalId} />
-			</Suspense>
+			<PageDataContainer skeletonType="list">
+				<EmpresasListaSuspense search={search} familiaProfesionalId={familiaProfesionalId} sortBy={sortBy} />
+			</PageDataContainer>
 		</Stack>
 	)
 }
 
-const EmpresasListaSuspense = ({ search, familiaProfesionalId }: EmpresasListaProps) => {
+const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy }: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
-	const navigate = useNavigate();
 
 	const empresasRepository = EmpresasRepositoryHttp
 
 	const { data: empresas = [] } = useSuspenseQuery({
-		queryKey: ['empresas', search, familiaProfesionalId],
-		queryFn: () => empresasRepository.obtener(search, familiaProfesionalId ?? undefined),
+		queryKey: ['empresas', search, familiaProfesionalId, sortBy],
+		queryFn: () => empresasRepository.obtener(search, familiaProfesionalId ?? undefined, sortBy),
 	})
 
 	const queryClient = useQueryClient()
@@ -67,6 +67,8 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId }: EmpresasListaPr
 
 	return (
 		<Box>
+			{/* Sort controls moved to EmpresasFiltros */}
+
 			{empresas.length === 0 && (
 				<Typography align="center" color="text.secondary">No se encontraron empresas.</Typography>
 			)}
@@ -74,82 +76,71 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId }: EmpresasListaPr
 			<Stack spacing={2}>
 				{empresas.map((empresa) => {
 					return (
-						<Card
+						<EntityCard
 							key={empresa.idEmpresa}
-							sx={{ padding: 2, boxShadow: 2, cursor: 'pointer', transition: '0.2s', '&:hover': { bgcolor: 'action.hover' } }}
-							onClick={() => navigate(`/empresas/${empresa.idEmpresa}`)}
-						>
-							<CardContent>
-								<Box
-									sx={{
-										display: 'flex',
-										justifyContent: 'space-between',
-										alignItems: 'flex-start',
-									}}
-								>
-									<Box sx={{ textAlign: 'left' }}>
-										<Typography variant="h6" sx={{ marginBottom: 2 }}>
-											{empresa.nombre}
+							title={empresa.nombre}
+							to={`/empresas/${empresa.idEmpresa}`}
+							badges={
+								mismoRol('centro') && (
+									<Chip
+										label={empresa.validado ? 'Validado' : 'Pendiente'}
+										color={empresa.validado ? 'success' : 'warning'}
+										size="small"
+										icon={empresa.validado ? <IconCheck size={14} /> : <IconX size={14} />}
+									/>
+								)
+							}
+							details={[
+								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+									<IconBriefcase size={16} color="var(--mui-palette-text-secondary)" />
+									<Typography variant="body2" color="text.secondary">
+										{empresa.familiaProfesional?.nombre || 'Sin Familia Profesional'}
+									</Typography>
+								</Box>,
+								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+									<IconMapPin size={16} color="var(--mui-palette-text-secondary)" />
+									<Typography variant="body2" color="text.secondary">
+										{empresa.localidad || 'Sin localidad'}
+									</Typography>
+								</Box>,
+								<Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
+									<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+										<IconNews size={16} color="var(--mui-palette-primary-main)" />
+										<Typography variant="body2" fontWeight="medium">
+											{empresa.cantidadOfertas || 0} Ofertas
 										</Typography>
-										<Box sx={{ marginBottom: 1 }}>
-											<Typography
-												variant="subtitle2"
-												color="text.secondary"
-												component="span"
-											>
-												Familia Profesional:{' '}
-											</Typography>
-											<Typography variant="body2" component="span">
-												{empresa.familiaProfesional?.nombre || 'N/D'}
-											</Typography>
-										</Box>
-										<Box sx={{ marginBottom: 1 }}>
-											<Typography
-												variant="subtitle2"
-												color="text.secondary"
-												component="span"
-											>
-												Localidad:{' '}
-											</Typography>
-											<Typography variant="body2" component="span">
-												{empresa.localidad}
-											</Typography>
-										</Box>
 									</Box>
-									<Box
-										sx={{
-											display: 'flex',
-											flexDirection: 'column',
-											alignItems: 'flex-end',
-										}}
-									>
-										{mismoRol('centro') &&
-											(empresa.validado ? (
-												<Button variant="outlined" color="secondary" disabled>
-													Validado
-												</Button>
-											) : (
-												<Box sx={{ display: 'flex', gap: 1 }}>
-													<Button
-														variant="outlined"
-														color="error"
-														onClick={(e) => onRechazarClick(e, empresa.idEmpresa)}
-													>
-														Rechazar
-													</Button>
-													<Button
-														variant="outlined"
-														color="secondary"
-														onClick={(e) => onValidarClick(e, empresa.idEmpresa)}
-													>
-														Aceptar
-													</Button>
-												</Box>
-											))}
+									<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+										<IconUsers size={16} color="var(--mui-palette-secondary-main)" />
+										<Typography variant="body2" fontWeight="medium">
+											{empresa.cantidadVacantes || 0} Vacantes
+										</Typography>
 									</Box>
 								</Box>
-							</CardContent>
-						</Card>
+							]}
+							actions={
+								mismoRol('centro') && !empresa.validado && (
+									<Box sx={{ display: 'flex', gap: 1 }}>
+										<Button
+											variant="outlined"
+											color="error"
+											size="small"
+											onClick={(e) => onRechazarClick(e, empresa.idEmpresa)}
+										>
+											Rechazar
+										</Button>
+										<Button
+											variant="contained"
+											color="success"
+											size="small"
+											onClick={(e) => onValidarClick(e, empresa.idEmpresa)}
+										>
+											Aceptar
+										</Button>
+									</Box>
+								)
+							}
+						/>
 					)
 				})}
 			</Stack>

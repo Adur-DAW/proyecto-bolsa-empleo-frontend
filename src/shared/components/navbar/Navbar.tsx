@@ -20,11 +20,13 @@ import {
 	IconSettings,
 } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router'
+import { useQuery } from '@tanstack/react-query'
 
 import useLogout from '@/shared/hooks/logout.hook'
 import { useNavbar } from '@/shared/hooks/navbar.hook'
 import { getAbsolutePath } from '@/shared/routes'
 import { useAppStore } from '@/shared/store/store'
+import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
 
 interface Menu {
 	name: string
@@ -38,6 +40,12 @@ export default function Navbar() {
 
 	const { onLogout } = useLogout()
 	const usuario = useAppStore((x) => x.usuario)
+
+	const { data: config } = useQuery({
+		queryKey: ['appConfig'],
+		queryFn: ConfigRepository.obtener,
+		initialData: { ofertas_publicas: true } // Default to true to avoid flash
+	})
 
 	const settings = [
 		{
@@ -67,17 +75,23 @@ export default function Navbar() {
 			to: getAbsolutePath('inicio'),
 			icono: <IconHome />,
 		},
-		{
+	]
+
+	// Only show Offers and Companies if:
+	// 1. ofertas_publicas is true OR
+	// 2. User is logged in
+	if (config.ofertas_publicas || usuario) {
+		pages.push({
 			texto: 'Ofertas',
 			to: getAbsolutePath('ofertas'),
 			icono: <IconListCheck />,
-		},
-		{
+		})
+		pages.push({
 			texto: 'Empresas',
 			to: getAbsolutePath('empresas'),
 			icono: <IconBuildingCommunity />,
-		},
-	]
+		})
+	}
 
 	if (usuario?.rol === 'centro') {
 		pages.push({

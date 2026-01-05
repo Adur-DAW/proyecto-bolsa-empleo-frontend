@@ -6,13 +6,14 @@ import { Oferta } from '@/shared/models'
 // import { OfertasRepository } from './ofertas.repository'
 
 export const OfertasRepositoryHttp = {
-	obtener: async (params?: { page: number; limit: number; search?: string; empresa_id?: number; estado?: string }): Promise<{ data: Oferta[]; nextPage: number | null }> => {
+	obtener: async (params?: { page: number; limit: number; search?: string; empresa_id?: number; estado?: string; sortBy?: string }): Promise<{ data: Oferta[]; nextPage: number | null }> => {
 		const queryParams = new URLSearchParams()
 		if (params?.page) queryParams.append('page', params.page.toString())
 		if (params?.limit) queryParams.append('limit', params.limit.toString())
 		if (params?.search) queryParams.append('search', params.search)
 		if (params?.empresa_id) queryParams.append('empresa_id', params.empresa_id.toString())
 		if (params?.estado) queryParams.append('estado', params.estado)
+		if (params?.sortBy) queryParams.append('sort_by', params.sortBy)
 
 		const response = await getEntity<any>(`/ofertas?${queryParams.toString()}`)
 

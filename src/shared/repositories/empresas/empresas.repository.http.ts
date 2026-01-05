@@ -4,16 +4,19 @@ import { Empresa } from '@/shared/models'
 // import { EmpresasRepository } from './empresas.repository'
 
 export const EmpresasRepositoryHttp = {
-	obtener: async (search?: string, familiaProfesionalId?: number): Promise<Empresa[]> => {
+	obtener: async (search?: string, familiaProfesionalId?: number, sortBy?: string): Promise<Empresa[]> => {
 		const queryParams = new URLSearchParams()
 		if (search) queryParams.append('search', search)
 		if (familiaProfesionalId) queryParams.append('familia_profesional_id', familiaProfesionalId.toString())
+		if (sortBy) queryParams.append('sort_by', sortBy)
 
 		const empresas = (await getEntity(`/empresas?${queryParams.toString()}`)) as any[]
 
 		return empresas.map((x: any) => ({
 			...x,
 			idEmpresa: x.id_empresa,
+			cantidadOfertas: x.ofertas_count,
+			cantidadVacantes: x.vacantes
 		}))
 	},
 	obtenerPorId: async (id: number): Promise<Empresa> => {

@@ -16,6 +16,9 @@ export default function OfertasPage() {
 		rol == 'sinRol' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'
 	)
 
+	const [search, setSearch] = useState('')
+	const [sortBy, setSortBy] = useState('fecha_publicacion.desc')
+
 	const onCambiarFiltro = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setFiltro(event.target.value as ObtenerOfertas)
 	}
@@ -29,7 +32,14 @@ export default function OfertasPage() {
 					gap: 4,
 				}}
 			>
-				<OfertasFiltros filtro={filtro} onCambiarFiltro={onCambiarFiltro} />
+				<OfertasFiltros
+					filtro={filtro}
+					onCambiarFiltro={onCambiarFiltro}
+					search={search}
+					onSearchChange={setSearch}
+					sortBy={sortBy}
+					onSortChange={setSortBy}
+				/>
 
 				<Box sx={{ flex: 1 }}>
 					{mismoRol('empresa') && (
@@ -51,7 +61,7 @@ export default function OfertasPage() {
 							</Button>
 						</Box>
 					)}
-					<OfertasLista filtro={filtro} />
+					<OfertasLista filtro={filtro} search={search} sortBy={sortBy} />
 				</Box>
 			</Box>
 		</Container>

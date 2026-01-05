@@ -2,8 +2,8 @@ import { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 
 import AppLayout from './AppLayout'
-import PaginaPorRol from './shared/router/PaginaPorRol'
 import ProtectedRoute from './shared/router/ProtectedRoute'
+import PublicOrAuthGuard from './shared/router/PublicOrAuthGuard'
 import { getAbsolutePath } from './shared/routes'
 
 const InicioPage = lazy(() => import('@/pages/inicio/InicioPage'))
@@ -20,26 +20,12 @@ const EmpresasPage = lazy(
 const DetalleEmpresaPage = lazy(
 	() => import('@/pages/empresas/detalle-empresa/DetalleEmpresaPage')
 )
-const ConfiguracionUsuarioPage = lazy(
-	() =>
-		import(
-			'@/pages/configuracion/configuracion-usuario/ConfiguracionUsuarioPage'
-		)
-)
-const ConfiguracionEmpresaPage = lazy(
-	() =>
-		import(
-			'@/pages/configuracion/configuracion-empresa/ConfiguracionEmpresaPage'
-		)
-)
 
-const TitulosPage = lazy(() => import('./pages/titulos/TitulosPage'))
+
 
 const OfertaCrearPage = lazy(
 	() => import('./pages/ofertas/oferta-crear/OfertaCrearPage')
 )
-
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 
 export default function AppRouter() {
 	return (
@@ -56,65 +42,37 @@ export default function AppRouter() {
 
 						<Route path={getAbsolutePath('root')} element={<InicioPage />} />
 
-						<Route path={getAbsolutePath('ofertas')}>
-							<Route index element={<OfertasPage />} />
-							<Route
-								path={getAbsolutePath('ofertas_detalle')}
-								element={<OfertaPage />}
-							/>
+						<Route element={<PublicOrAuthGuard />}>
+							<Route path={getAbsolutePath('ofertas')}>
+								<Route index element={<OfertasPage />} />
+								<Route
+									path={getAbsolutePath('ofertas_detalle')}
+									element={<OfertaPage />}
+								/>
 
-							<Route
-								element={
-									<ProtectedRoute
-										allowedRoles={['empresa', 'centro']}
-										redirectTo={getAbsolutePath('login')}
+								<Route
+									element={
+										<ProtectedRoute
+											allowedRoles={['empresa', 'centro']}
+											redirectTo={getAbsolutePath('login')}
+										/>
+									}
+								>
+									<Route
+										path={getAbsolutePath('ofertas_crear')}
+										element={<OfertaCrearPage />}
 									/>
-								}
-							>
-								<Route
-									path={getAbsolutePath('ofertas_crear')}
-									element={<OfertaCrearPage />}
-								/>
-								<Route
-									path={getAbsolutePath('ofertas_editar')}
-									element={<OfertaEditarPage />}
-								/>
+									<Route
+										path={getAbsolutePath('ofertas_editar')}
+										element={<OfertaEditarPage />}
+									/>
+								</Route>
 							</Route>
-						</Route>
 
-						<Route
-							element={
-								<ProtectedRoute
-									allowedRoles={['centro']}
-									redirectTo={getAbsolutePath('login')}
-								/>
-							}
-						>
-							<Route
-								path={getAbsolutePath('titulos')}
-								element={<TitulosPage />}
-							/>
-							<Route
-								path={getAbsolutePath('admin')}
-								element={<AdminDashboardPage />}
-							/>
-						</Route>
-
-						<Route
-							path={getAbsolutePath('configuracion')}
-							element={
-								<PaginaPorRol
-									roles={{
-										demandante: ConfiguracionUsuarioPage,
-										empresa: ConfiguracionEmpresaPage,
-									}}
-									redirectTo={getAbsolutePath('login')}
-								/>
-							}
-						/>
-						<Route path={getAbsolutePath('empresas')}>
-							<Route index element={<EmpresasPage />} />
-							<Route path=":id" element={<DetalleEmpresaPage />} />
+							<Route path={getAbsolutePath('empresas')}>
+								<Route index element={<EmpresasPage />} />
+								<Route path=":id" element={<DetalleEmpresaPage />} />
+							</Route>
 						</Route>
 					</Route>
 				</Routes>

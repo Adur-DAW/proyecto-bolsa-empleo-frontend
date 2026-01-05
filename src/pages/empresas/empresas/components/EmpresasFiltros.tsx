@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Paper, TextField, Typography } from '@mui/material'
+import { Autocomplete, Box, Paper, TextField, Typography, FormControl, Select, MenuItem } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useDebounce } from '@/shared/hooks/useDebounce'
@@ -9,6 +9,8 @@ interface EmpresasFiltrosProps {
   onSearchChange: (value: string) => void
   familiaProfesionalId: number | null
   onFamiliaChange: (value: number | null) => void
+  sortBy: string
+  onSortChange: (value: string) => void
 }
 
 export default function EmpresasFiltros({
@@ -16,6 +18,8 @@ export default function EmpresasFiltros({
   onSearchChange,
   familiaProfesionalId,
   onFamiliaChange,
+  sortBy,
+  onSortChange
 }: EmpresasFiltrosProps) {
   const [localSearch, setLocalSearch] = useState(search)
   const [debouncedSearch] = useDebounce(localSearch, 500)
@@ -61,6 +65,22 @@ export default function EmpresasFiltros({
             renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
             isOptionEqualToValue={(option, value) => option.id === value.id}
           />
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Ordenar por
+          </Typography>
+          <FormControl fullWidth size="small">
+            <Select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value)}
+            >
+              <MenuItem value="nombre.asc">Nombre (A-Z)</MenuItem>
+              <MenuItem value="ofertas_count.desc">Más ofertas</MenuItem>
+              <MenuItem value="vacantes.desc">Más vacantes</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
       </Paper>
     </Box>

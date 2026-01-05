@@ -7,6 +7,7 @@ import EmpresasLista from './components/EmpresasLista'
 export default function EmpresasPage() {
 	const [search, setSearch] = useState('')
 	const [familiaProfesionalId, setFamiliaProfesionalId] = useState<number | null>(null)
+	const [sortBy, setSortBy] = useState('nombre.asc')
 
 	return (
 		<Container>
@@ -22,10 +23,12 @@ export default function EmpresasPage() {
 					onSearchChange={setSearch}
 					familiaProfesionalId={familiaProfesionalId}
 					onFamiliaChange={setFamiliaProfesionalId}
+					sortBy={sortBy}
+					onSortChange={setSortBy}
 				/>
 
 				<Box sx={{ flex: 1 }}>
-					<EmpresasLista search={search} familiaProfesionalId={familiaProfesionalId} />
+					<EmpresasLista search={search} familiaProfesionalId={familiaProfesionalId} sortBy={sortBy} />
 				</Box>
 			</Box>
 		</Container>

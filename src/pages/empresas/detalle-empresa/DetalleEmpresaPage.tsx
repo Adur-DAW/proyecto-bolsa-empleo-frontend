@@ -7,11 +7,13 @@ import {
   Typography,
 } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Suspense, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router'
 
 import OfertasLista from '@/pages/ofertas/ofertas/components/OfertasLista'
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
+
+import PageDataContainer from '@/shared/components/containers/PageDataContainer'
 
 export default function DetalleEmpresaPage() {
   const { id } = useParams()
@@ -19,9 +21,9 @@ export default function DetalleEmpresaPage() {
 
   return (
     <Stack spacing={3} sx={{ p: 3 }}>
-      <Suspense fallback={<div>Cargando empresa...</div>}>
+      <PageDataContainer skeletonType="detail">
         <DetalleEmpresaHeader idEmpresa={idEmpresa} />
-      </Suspense>
+      </PageDataContainer>
 
       <DetalleEmpresaOfertas idEmpresa={idEmpresa} />
     </Stack>
