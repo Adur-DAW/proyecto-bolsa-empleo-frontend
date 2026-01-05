@@ -10,6 +10,7 @@ import { IconEdit, IconEye } from '@tabler/icons-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { Link } from 'react-router'
+import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
 
 import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
 
@@ -19,9 +20,11 @@ import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.rep
 export default function OfertasLista({ filtro }) {
 	return (
 		<Stack spacing={3}>
-			<Suspense fallback={<div>Cargando...</div>}>
-				<OfertasListaSuspense filtro={filtro} />
-			</Suspense>
+			<LimiteAccesoRestringido>
+				<Suspense fallback={<div>Cargando...</div>}>
+					<OfertasListaSuspense filtro={filtro} />
+				</Suspense>
+			</LimiteAccesoRestringido>
 		</Stack>
 	)
 }
