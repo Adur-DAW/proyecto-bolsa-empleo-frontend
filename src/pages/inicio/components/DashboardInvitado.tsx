@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Container, Grid, Typography } from '@mui/material'
+import { Avatar, Box, Button, Card, CardContent, Container, Grid, Typography } from '@mui/material'
 import { IconArrowRight, IconBriefcase, IconUsers, IconBuildingSkyscraper } from '@tabler/icons-react'
 import { Link } from 'react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -72,10 +72,21 @@ export default function DashboardInvitado() {
               <Grid size={{ xs: 12, md: 4 }} key={oferta.id}>
                 <Card sx={{ height: '100%' }}>
                   <CardContent>
-                    <Typography variant="h6" style={{ marginBottom: '8px', fontWeight: 'bold' }}>{oferta.nombre}</Typography>
-                    <Typography variant="body2" color="text.secondary" style={{ marginBottom: '16px' }}>
-                      {oferta.empresa?.nombre}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Avatar
+                        src={oferta.empresa?.imagen_url || undefined}
+                        sx={{ width: 48, height: 48 }}
+                        variant="rounded"
+                      >
+                        {oferta.empresa?.nombre?.charAt(0)}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" style={{ fontWeight: 'bold', lineHeight: 1.2 }}>{oferta.nombre}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {oferta.empresa?.nombre}
+                        </Typography>
+                      </Box>
+                    </Box>
                     <Button
                       component={Link}
                       to={`/ofertas/${oferta.id}`}

@@ -11,6 +11,7 @@ import { Link } from 'react-router'
 interface EntityCardProps {
   title: string
   subtitle?: ReactNode
+  avatar?: ReactNode
   badges?: ReactNode
   details?: ReactNode[]
   actions?: ReactNode
@@ -21,6 +22,7 @@ interface EntityCardProps {
 export default function EntityCard({
   title,
   subtitle,
+  avatar,
   badges,
   details = [],
   actions,
@@ -54,33 +56,39 @@ export default function EntityCard({
             gap: 2
           }}
         >
-          <Box sx={{ flex: 1, textAlign: 'left' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-              <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                {title}
-              </Typography>
-              {badges}
-            </Box>
-
-            {subtitle && (
-              <Box sx={{ mb: 2, color: 'text.secondary' }}>
-                {subtitle}
+          <Box sx={{ flex: 1, textAlign: 'left', display: 'flex', gap: 2 }}>
+            {avatar && (
+              <Box sx={{ flexShrink: 0 }}>
+                {avatar}
               </Box>
             )}
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                  {title}
+                </Typography>
+                {badges}
+              </Box>
 
-            <Stack spacing={0.5}>
-              {details.map((detail, index) => (
-                <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                  {typeof detail === 'string' ? (
-                    <Typography variant="body2" color="text.secondary">
-                      {detail}
-                    </Typography>
-                  ) : detail}
+              {subtitle && (
+                <Box sx={{ mb: 2, color: 'text.secondary' }}>
+                  {subtitle}
                 </Box>
-              ))}
-            </Stack>
-          </Box>
+              )}
 
+              <Stack spacing={0.5}>
+                {details.map((detail, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                    {typeof detail === 'string' ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {detail}
+                      </Typography>
+                    ) : detail}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          </Box>
           {actions && (
             <Box
               sx={{

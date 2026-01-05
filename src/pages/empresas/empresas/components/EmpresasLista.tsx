@@ -1,9 +1,10 @@
 import {
-	Box,
-	Button,
-	Stack,
 	Typography,
-	Chip
+	Chip,
+	Avatar,
+	Stack,
+	Box,
+	Button
 } from '@mui/material'
 import {
 	useMutation,
@@ -80,6 +81,15 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy }: Empresa
 							key={empresa.idEmpresa}
 							title={empresa.nombre}
 							to={`/empresas/${empresa.idEmpresa}`}
+							avatar={
+								<Avatar
+									src={empresa.imagen_url || undefined}
+									sx={{ width: 48, height: 48 }}
+									variant="rounded"
+								>
+									{empresa.nombre.charAt(0)}
+								</Avatar>
+							}
 							badges={
 								mismoRol('centro') && (
 									<Chip

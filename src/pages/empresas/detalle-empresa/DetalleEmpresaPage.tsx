@@ -5,6 +5,7 @@ import {
   Tab,
   Tabs,
   Typography,
+  Avatar
 } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -38,25 +39,36 @@ const DetalleEmpresaHeader = ({ idEmpresa }: { idEmpresa: number }) => {
 
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        {empresa.nombre}
-      </Typography>
-      <Stack direction="row" spacing={4}>
+      <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+        <Avatar
+          src={empresa.imagen_url || undefined}
+          sx={{ width: 80, height: 80, fontSize: 32 }}
+          variant="rounded"
+        >
+          {empresa.nombre?.charAt(0)}
+        </Avatar>
         <Box>
-          <Typography variant="subtitle2" color="text.secondary">
-            Localidad
+          <Typography variant="h4" gutterBottom>
+            {empresa.nombre}
           </Typography>
-          <Typography variant="body1">{empresa.localidad}</Typography>
+          <Stack direction="row" spacing={4}>
+            <Box>
+              <Typography variant="subtitle2" color="text.secondary">
+                Localidad
+              </Typography>
+              <Typography variant="body1">{empresa.localidad}</Typography>
+            </Box>
+            {empresa.familiaProfesional && (
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Familia Profesional
+                </Typography>
+                <Typography variant="body1">{empresa.familiaProfesional.nombre}</Typography>
+              </Box>
+            )}
+          </Stack>
         </Box>
-        {empresa.familiaProfesional && (
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              Familia Profesional
-            </Typography>
-            <Typography variant="body1">{empresa.familiaProfesional.nombre}</Typography>
-          </Box>
-        )}
-      </Stack>
+      </Box>
     </Paper>
   )
 }

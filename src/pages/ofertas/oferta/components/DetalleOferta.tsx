@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Typography } from '@mui/material'
+import { Avatar, Box, Card, CardContent, Typography } from '@mui/material'
 
 import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
 
@@ -8,9 +8,18 @@ export default function DetalleOferta({ oferta }) {
 			<CardContent>
 				<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
 					<Box sx={{ textAlign: 'left' }}>
-						<Typography variant="h6" sx={{ marginBottom: 2 }}>
-							{oferta.nombre}
-						</Typography>
+						<Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+							<Avatar
+								src={oferta.empresa?.imagen_url || undefined}
+								sx={{ width: 64, height: 64 }}
+								variant="rounded"
+							>
+								{oferta.empresa?.nombre?.charAt(0)}
+							</Avatar>
+							<Typography variant="h6">
+								{oferta.nombre}
+							</Typography>
+						</Box>
 						<Box sx={{ marginBottom: 1 }}>
 							<Typography
 								variant="subtitle2"

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Chip, Container, Grid, Paper, Typography } from '@mui/material'
+import { Avatar, Box, Button, Card, CardContent, Chip, Container, Grid, Paper, Typography } from '@mui/material'
 import { IconClock, IconCheck } from '@tabler/icons-react'
 import { Link } from 'react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -37,13 +37,22 @@ export default function DashboardDemandante() {
               {data.matches.map((oferta: any) => (
                 <Card key={oferta.id} variant="outlined">
                   <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box sx={{ textAlign: 'left' }}>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        {oferta.nombre}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {oferta.empresa?.nombre} • {dayjs(oferta.fecha_publicacion).format('DD/MM/YYYY')}
-                      </Typography>
+                    <Box sx={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar
+                        src={oferta.empresa?.imagen_url || undefined}
+                        sx={{ width: 48, height: 48 }}
+                        variant="rounded"
+                      >
+                        {oferta.empresa?.nombre?.charAt(0)}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          {oferta.nombre}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {oferta.empresa?.nombre} • {dayjs(oferta.fecha_publicacion).format('DD/MM/YYYY')}
+                        </Typography>
+                      </Box>
                     </Box>
                     <Button component={Link} to={`/ofertas/${oferta.id}`} variant="outlined" size="small">
                       Ver

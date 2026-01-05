@@ -3,7 +3,8 @@ import {
 	Button,
 	Stack,
 	Typography,
-	Chip
+	Chip,
+	Avatar
 } from '@mui/material'
 import { IconEdit, IconEye, IconBuilding, IconClock, IconCalendar } from '@tabler/icons-react'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -104,6 +105,15 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy }: Ofe
 								size="small"
 								variant="outlined"
 							/>
+						}
+						avatar={
+							<Avatar
+								src={oferta.empresa?.imagen_url || undefined}
+								sx={{ width: 48, height: 48 }}
+								variant="rounded"
+							>
+								{oferta.empresa?.nombre?.charAt(0)}
+							</Avatar>
 						}
 						subtitle={
 							<Link

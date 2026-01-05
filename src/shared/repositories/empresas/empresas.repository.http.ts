@@ -36,7 +36,7 @@ export const EmpresasRepositoryHttp = {
 	registrar: async (empresa: Empresa) => {
 		return await postEntity('/empresas/', empresa)
 	},
-	actualizar: async (empresa: Empresa) => {
+	actualizar: async (empresa: Empresa | FormData) => {
 		return await putEntity(`/empresas/`, empresa)
 	},
 	validar: async (idEmpresa: number) => {

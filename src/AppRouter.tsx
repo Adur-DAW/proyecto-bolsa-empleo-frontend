@@ -20,12 +20,13 @@ const EmpresasPage = lazy(
 const DetalleEmpresaPage = lazy(
 	() => import('@/pages/empresas/detalle-empresa/DetalleEmpresaPage')
 )
-
-
-
 const OfertaCrearPage = lazy(
-	() => import('./pages/ofertas/oferta-crear/OfertaCrearPage')
+	() => import('@/pages/ofertas/oferta-crear/OfertaCrearPage')
 )
+
+
+
+
 
 export default function AppRouter() {
 	return (
