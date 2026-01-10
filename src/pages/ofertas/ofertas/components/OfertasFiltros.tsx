@@ -110,6 +110,8 @@ export default function OfertasFiltros({
 								value={familias.find((f) => f.id.toString() === field.value) || null}
 								onChange={(_, newValue) => field.onChange(newValue ? newValue.id.toString() : '')}
 								renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
+								isOptionEqualToValue={(option, value) => option.id.toString() === value.id.toString()}
+								noOptionsText="No se encontraron familias"
 							/>
 						)}
 					/>

@@ -3,7 +3,10 @@ import {
   Card,
   CardContent,
   Stack,
-  Typography
+  Typography,
+  Divider,
+  useTheme,
+  alpha
 } from '@mui/material'
 import { ReactNode } from 'react'
 import { Link } from 'react-router'
@@ -29,80 +32,109 @@ export default function EntityCard({
   onClick,
   to
 }: EntityCardProps) {
+  const theme = useTheme();
   const CardWrapper = to ? Link : 'div';
   const wrapperProps = to ? { to, style: { textDecoration: 'none', color: 'inherit' } } : {};
 
   return (
     <Card
       sx={{
-        boxShadow: 2,
-        transition: '0.2s',
-        '&:hover': { bgcolor: 'action.hover', transform: 'translateY(-2px)', boxShadow: 4 },
-        cursor: (onClick || to) ? 'pointer' : 'default',
+        borderRadius: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+        boxShadow: 'none',
+        transition: 'all 0.3s ease',
         position: 'relative',
-        overflow: 'visible'
+        overflow: 'hidden',
+        '&:hover': {
+          borderColor: 'primary.main',
+          boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
+          transform: 'translateY(-2px)'
+        },
+        cursor: (onClick || to) ? 'pointer' : 'default',
+        bgcolor: 'background.paper'
       }}
       onClick={onClick}
       // @ts-ignore
       component={CardWrapper}
       {...wrapperProps}
     >
-      <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: 2
-          }}
-        >
-          <Box sx={{ flex: 1, textAlign: 'left', display: 'flex', gap: 2 }}>
-            {avatar && (
-              <Box sx={{ flexShrink: 0 }}>
-                {avatar}
-              </Box>
-            )}
-            <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-                <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', gap: 2.5, alignItems: 'flex-start' }}>
+          {/* Avatar Section */}
+          {avatar && (
+            <Box
+              sx={{
+                flexShrink: 0,
+                filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.1))'
+              }}
+            >
+              {avatar}
+            </Box>
+          )}
+
+          {/* Main Content */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 1 }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 0.5 }}>
                   {title}
                 </Typography>
-                {badges}
-              </Box>
-
-              {subtitle && (
-                <Box sx={{ mb: 2, color: 'text.secondary' }}>
-                  {subtitle}
-                </Box>
-              )}
-
-              <Stack spacing={0.5}>
-                {details.map((detail, index) => (
-                  <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                    {typeof detail === 'string' ? (
-                      <Typography variant="body2" color="text.secondary">
-                        {detail}
-                      </Typography>
-                    ) : detail}
+                {subtitle && (
+                  <Box sx={{ color: 'text.secondary', typography: 'body2' }}>
+                    {subtitle}
                   </Box>
-                ))}
-              </Stack>
+                )}
+              </Box>
+              {badges && (
+                <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+                  {badges}
+                </Stack>
+              )}
             </Box>
+
+            {/* Details Grid */}
+            {details.length > 0 && (
+              <Box sx={{ mt: 2.5, mb: actions ? 2 : 0 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} flexWrap="wrap" useFlexGap sx={{ rowGap: 1 }}>
+                  {details.map((detail, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: 'text.secondary',
+                        typography: 'body2',
+                        fontWeight: 500
+                      }}
+                    >
+                      {detail}
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            )}
           </Box>
-          {actions && (
+        </Box>
+
+        {/* Actions Footer - Only render if actions exist */}
+        {actions && (
+          <>
+            <Divider sx={{ my: 2, borderStyle: 'dashed' }} />
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                gap: 1
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: 1.5,
+                mt: 1
               }}
-              onClick={(e) => e.stopPropagation()} // Prevent card click when clicking actions
+              onClick={(e) => e.stopPropagation()}
             >
               {actions}
             </Box>
-          )}
-        </Box>
+          </>
+        )}
       </CardContent>
     </Card>
   )

@@ -59,6 +59,7 @@ export default function EmpresasFiltros({
                 onChange={(_, newValue) => field.onChange(newValue ? newValue.id : null)}
                 renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                noOptionsText="No se encontraron familias"
               />
             )}
           />
