@@ -1,7 +1,7 @@
 import { Box, Skeleton, Stack } from '@mui/material'
 
 interface LoadingSkeletonProps {
-  type?: 'list' | 'card' | 'detail'
+  type?: 'list' | 'card' | 'detail' | 'dashboard'
 }
 
 export default function LoadingSkeleton({
@@ -36,6 +36,23 @@ export default function LoadingSkeleton({
           <Skeleton variant="text" />
           <Skeleton variant="text" />
           <Skeleton variant="text" width="80%" />
+        </Stack>
+      </Box>
+    )
+  }
+
+  if (type === 'dashboard') {
+    return (
+      <Box>
+        <Skeleton variant="rectangular" height={100} sx={{ mb: 4, borderRadius: 2 }} />
+        <Stack direction="row" spacing={3} sx={{ mb: 4 }}>
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} variant="rectangular" height={120} width="100%" sx={{ borderRadius: 2 }} />
+          ))}
+        </Stack>
+        <Stack direction="row" spacing={3}>
+          <Skeleton variant="rectangular" height={300} width="60%" sx={{ borderRadius: 2 }} />
+          <Skeleton variant="rectangular" height={300} width="40%" sx={{ borderRadius: 2 }} />
         </Stack>
       </Box>
     )

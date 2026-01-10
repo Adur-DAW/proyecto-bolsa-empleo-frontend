@@ -39,14 +39,16 @@ export function palette() {
 		...base,
 		mode: 'light',
 		primary: {
-			main: '#5b9ad5',
-			dark: '#4878a6',
-			contrastText: '#FFFFFF',
+			main: '#0a2342', // Navy Blue
+			light: '#344b6e',
+			dark: '#00001c',
+			contrastText: '#ffffff',
 		},
 		secondary: {
-			main: '#202020',
-			dark: '#000',
-			contrastText: '#FFFFFF',
+			main: '#009688', // Teal
+			light: '#52c7b8',
+			dark: '#00675b',
+			contrastText: '#ffffff',
 		},
 		text: {
 			primary: grey[800],

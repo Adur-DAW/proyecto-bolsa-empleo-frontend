@@ -1,7 +1,6 @@
 import { StateCreator } from 'zustand'
 
 import { Usuario } from '../models'
-import { defaultState } from './store'
 
 export type GeneralState = {
 	titulo: string
@@ -11,23 +10,16 @@ export type GeneralState = {
 
 export const defaultGeneralState: GeneralState = {
 	titulo: 'Bolsa de Empleo - Inicio',
-	token: localStorage.getItem('token') || undefined,
-	usuario: (() => {
-		try {
-			const usuario = localStorage.getItem('usuario')
-			return usuario !== null ? JSON.parse(usuario) : undefined
-		} catch {
-			localStorage.removeItem('usuario')
-			return undefined
-		}
-	})(),
+	token: undefined,
+	usuario: undefined,
 }
 
 export type GeneralActions = {
 	setTitulo: (titulo: string) => void
 	setUsuario: (usuario: Usuario) => void
-	login: (usuario: Usuario) => void
+	login: (usuario: Usuario, token: string) => void
 	logout: () => void
+	reset: () => void
 }
 
 export const createGeneralSlice: StateCreator<GeneralState & GeneralActions> = (
@@ -35,25 +27,16 @@ export const createGeneralSlice: StateCreator<GeneralState & GeneralActions> = (
 ) => ({
 	...defaultGeneralState,
 
-	reset: () => set(defaultState),
+	reset: () => set(defaultGeneralState),
 
 	setTitulo: (titulo: string) => set(() => ({ titulo })),
 
 	setUsuario: (usuario: Usuario) =>
-		set(() => {
-			localStorage.setItem('usuario', JSON.stringify(usuario))
-			return { usuario }
-		}),
+		set(() => ({ usuario })),
 
-	login: (usuario: Usuario) =>
-		set(() => {
-			localStorage.setItem('usuario', JSON.stringify(usuario))
-			return { usuario }
-		}),
+	login: (usuario: Usuario, token: string) =>
+		set(() => ({ usuario, token })),
 
 	logout: () =>
-		set(() => {
-			localStorage.removeItem('usuario')
-			return { usuario: undefined }
-		}),
+		set(() => ({ usuario: undefined, token: undefined })),
 })

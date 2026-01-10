@@ -1,50 +1,17 @@
-import axios from 'axios'
+import axios, { InternalAxiosRequestConfig } from 'axios'
+import { toast } from 'sonner'
 
 import { useAppStore } from '@/shared/store/store'
 
-import { limpiarLocalStorage } from '../utils/localStorage.utils'
-
 export const baseUrl = 'http://127.0.0.1:8000/api'
-
-export const refrescarToken = async (): Promise<any> => {
-	const respuesta = await fetch(`${baseUrl}/refrescar`, {
-		headers: {
-			Authorization: 'Bearer ' + localStorage.getItem('token'),
-		},
-	})
-	if (!respuesta.ok) throw new Error()
-
-	return respuesta.json()
-}
-
-const refrescarTokenYActualizarLocalStorage = async () => {
-	const response = await refrescarToken()
-	localStorage.setItem('token', response.token)
-
-	return response.token
-}
 
 const axiosInstance = axios.create({
 	baseURL: baseUrl,
 })
 
-let isRefreshing = false
-let failedQueue: any[] = []
-
-const processQueue = (error: any, token: string | null = null) => {
-	failedQueue.forEach((prom) => {
-		if (token) {
-			prom.resolve(token)
-		} else {
-			prom.reject(error)
-		}
-	})
-	failedQueue = []
-}
-
 axiosInstance.interceptors.request.use(
 	(config) => {
-		const token = localStorage.getItem('token')
+		const token = useAppStore.getState().token
 		if (token) {
 			config.headers.Authorization = 'Bearer ' + token
 		}
@@ -55,49 +22,47 @@ axiosInstance.interceptors.request.use(
 	}
 )
 
+import { refreshTokenService } from '@/shared/services/refresh-token.service'
+
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+	_retry?: boolean
+}
+
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	async (error) => {
-		const originalRequest = error.config
+		const originalRequest = error.config as CustomAxiosRequestConfig
 
-		if (
-			error.response &&
-			error.response.status === 401 &&
-			!originalRequest._retry
-		) {
-			if (isRefreshing) {
-				return new Promise((resolve, reject) => {
-					failedQueue.push({ resolve, reject })
-				})
-					.then((token) => {
-						originalRequest.headers['Authorization'] = 'Bearer ' + token
+		if (error.response) {
+			const { status } = error.response
+
+			if (status === 401 && !originalRequest._retry) {
+				originalRequest._retry = true
+				const token = useAppStore.getState().token
+
+				if (token) {
+					try {
+						const newToken = await refreshTokenService(token)
+						useAppStore.getState().login(useAppStore.getState().usuario!, newToken) // Update store
+						axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + newToken
+						originalRequest.headers['Authorization'] = 'Bearer ' + newToken
 						return axiosInstance(originalRequest)
-					})
-					.catch((err) => {
-						return Promise.reject(err)
-					})
+					} catch (refreshError) {
+						useAppStore.getState().logout()
+						toast.error('Tu sesión ha caducado', { description: 'Por favor, inicia sesión de nuevo.' })
+						return Promise.reject(refreshError)
+					}
+				} else {
+					useAppStore.getState().logout() // Ensure logout if no token
+				}
+			} else if (status === 403) {
+				toast.error('Acceso denegado', { description: 'No tienes permisos para realizar esta acción.' })
+			} else if (status >= 500) {
+				toast.error('Error del servidor', { description: 'Inténtalo más tarde.' })
 			}
-
-			originalRequest._retry = true
-			isRefreshing = true
-
-			return refrescarTokenYActualizarLocalStorage()
-				.then((token) => {
-					processQueue(null, token)
-					originalRequest.headers['Authorization'] = 'Bearer ' + token
-					return axiosInstance(originalRequest)
-				})
-				.catch((err) => {
-					processQueue(err, null)
-					useAppStore.getState().logout()
-					limpiarLocalStorage()
-					return Promise.reject(err)
-				})
-				.finally(() => {
-					isRefreshing = false
-				})
+		} else {
+			toast.error('Error de conexión', { description: 'Comprueba tu conexión a internet.' })
 		}
-
 		return Promise.reject(error)
 	}
 )

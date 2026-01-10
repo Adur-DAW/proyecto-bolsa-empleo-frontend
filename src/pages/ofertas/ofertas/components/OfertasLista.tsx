@@ -7,16 +7,16 @@ import {
 	Avatar
 } from '@mui/material'
 import { IconEdit, IconEye, IconBuilding, IconClock, IconCalendar } from '@tabler/icons-react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { Link } from 'react-router'
 import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
+import EmptyState from '@/shared/components/feedback/EmptyState'
 
 import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
 import useRol from '@/shared/hooks/rol.hook'
-import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
 import EntityCard from '@/shared/components/cards/EntityCard'
+import { useOfertasQuery } from '@/shared/hooks/useOfertasQuery'
 import dayjs from 'dayjs'
 
 interface OfertasListaProps {
@@ -25,21 +25,31 @@ interface OfertasListaProps {
 	estado?: string
 	search?: string
 	sortBy?: string
+	familiaId?: string
+	clientFilter?: string
 }
 
-export default function OfertasLista({ filtro, empresaId, estado, search, sortBy }: OfertasListaProps) {
+export default function OfertasLista({ filtro, empresaId, estado, search, sortBy, familiaId, clientFilter }: OfertasListaProps) {
 	return (
 		<Stack spacing={3}>
 			<LimiteAccesoRestringido>
 				<PageDataContainer skeletonType="list">
-					<OfertasListaSuspense filtro={filtro} empresaId={empresaId} estado={estado} search={search} sortBy={sortBy} />
+					<OfertasListaSuspense
+						filtro={filtro}
+						empresaId={empresaId}
+						estado={estado}
+						search={search}
+						sortBy={sortBy}
+						familiaId={familiaId}
+						clientFilter={clientFilter}
+					/>
 				</PageDataContainer>
 			</LimiteAccesoRestringido>
 		</Stack>
 	)
 }
 
-const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy }: OfertasListaProps) => {
+const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy, familiaId, clientFilter }: OfertasListaProps) => {
 	const { usuario, mismoRol } = useRol()
 	// Fallback if not provided (e.g. in legacy usage)
 	const effectiveSearch = search || ''
@@ -47,7 +57,6 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy }: Ofe
 
 	const [debouncedSearch] = useDebounce(effectiveSearch, 500)
 
-	const ofertasRepository = OfertasRepositoryHttp
 
 	const {
 		data,
@@ -55,31 +64,26 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy }: Ofe
 		hasNextPage,
 		isFetchingNextPage,
 		isLoading,
-	} = useInfiniteQuery({
-		queryKey: ['ofertas', filtro, debouncedSearch, empresaId, estado, effectiveSortBy],
-		queryFn: async ({ pageParam = 1 }) => {
-			if (filtro === 'demandante') {
-				const res = await ofertasRepository.obtenerPorDemandante()
-				return { data: res, nextPage: null }
-			} else if (filtro === 'empresa') {
-				const res = await ofertasRepository.obtenerPorEmpresa()
-				return { data: res, nextPage: null }
-			} else {
-				return ofertasRepository.obtener({
-					page: pageParam as number,
-					limit: 20,
-					search: debouncedSearch,
-					empresa_id: empresaId,
-					estado: estado,
-					sortBy: effectiveSortBy
-				})
-			}
-		},
-		initialPageParam: 1,
-		getNextPageParam: (lastPage) => lastPage.nextPage,
+	} = useOfertasQuery({
+		filtro,
+		search: debouncedSearch,
+		empresaId: empresaId?.toString(),
+		estado,
+		sortBy: effectiveSortBy,
+		familiaId
 	})
 
-	const ofertas = data?.pages.flatMap((page) => page.data) || []
+	const allOfertas = data?.pages.flatMap((page) => page.data) || []
+	const ofertasRaw = Array.from(new Map(allOfertas.map(item => [item.id, item])).values())
+
+	// Client-side filtering
+	const ofertas = clientFilter
+		? ofertasRaw.filter(o =>
+			o.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
+			o.empresa?.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
+			o.obs?.toLowerCase().includes(clientFilter.toLowerCase())
+		)
+		: ofertasRaw
 
 	const formatDate = (date: dayjs.Dayjs) => {
 		return date.isValid() ? date.format('DD/MM/YYYY') : 'N/D'
@@ -90,7 +94,10 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy }: Ofe
 			{/* Controls moved to OfertasFiltros */}
 
 			{ofertas.length === 0 && !isLoading && (
-				<Typography align="center" color="text.secondary">No se encontraron ofertas.</Typography>
+				<EmptyState
+					title="No se encontraron ofertas"
+					description="Intenta ajustar tus filtros de búsqueda"
+				/>
 			)}
 
 			<Stack spacing={2}>

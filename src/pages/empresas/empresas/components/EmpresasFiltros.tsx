@@ -1,32 +1,18 @@
-import { Autocomplete, Box, Paper, TextField, Typography, FormControl, Select, MenuItem } from '@mui/material'
+import { Autocomplete, Box, Paper, TextField, Typography, FormControl, Select, MenuItem, Button } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { useDebounce } from '@/shared/hooks/useDebounce'
 import { MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
+import { IconSearch } from '@tabler/icons-react'
+import { Control, Controller } from 'react-hook-form'
 
 interface EmpresasFiltrosProps {
-  search: string
-  onSearchChange: (value: string) => void
-  familiaProfesionalId: number | null
-  onFamiliaChange: (value: number | null) => void
-  sortBy: string
-  onSortChange: (value: string) => void
+  control: Control<any>
+  onBuscar: () => void
 }
 
 export default function EmpresasFiltros({
-  search,
-  onSearchChange,
-  familiaProfesionalId,
-  onFamiliaChange,
-  sortBy,
-  onSortChange
+  control,
+  onBuscar
 }: EmpresasFiltrosProps) {
-  const [localSearch, setLocalSearch] = useState(search)
-  const [debouncedSearch] = useDebounce(localSearch, 500)
-
-  useEffect(() => {
-    onSearchChange(debouncedSearch)
-  }, [debouncedSearch, onSearchChange])
 
   const { data: familias = [] } = useQuery({
     queryKey: ['familias-profesionales'],
@@ -44,12 +30,17 @@ export default function EmpresasFiltros({
           <Typography variant="subtitle2" gutterBottom>
             Palabra clave
           </Typography>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Buscar por nombre..."
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
+          <Controller
+            name="search"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                placeholder="Buscar por nombre..."
+              />
+            )}
           />
         </Box>
 
@@ -57,13 +48,19 @@ export default function EmpresasFiltros({
           <Typography variant="subtitle2" gutterBottom>
             Familia Profesional
           </Typography>
-          <Autocomplete
-            options={familias}
-            getOptionLabel={(option) => option.nombre}
-            value={familias.find((f) => f.id === familiaProfesionalId) || null}
-            onChange={(_, newValue) => onFamiliaChange(newValue ? newValue.id : null)}
-            renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+          <Controller
+            name="familiaProfesionalId"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                options={familias}
+                getOptionLabel={(option) => option.nombre}
+                value={familias.find((f) => f.id === field.value) || null}
+                onChange={(_, newValue) => field.onChange(newValue ? newValue.id : null)}
+                renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+              />
+            )}
           />
         </Box>
 
@@ -71,16 +68,31 @@ export default function EmpresasFiltros({
           <Typography variant="subtitle2" gutterBottom>
             Ordenar por
           </Typography>
-          <FormControl fullWidth size="small">
-            <Select
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value)}
-            >
-              <MenuItem value="nombre.asc">Nombre (A-Z)</MenuItem>
-              <MenuItem value="ofertas_count.desc">Más ofertas</MenuItem>
-              <MenuItem value="vacantes.desc">Más vacantes</MenuItem>
-            </Select>
-          </FormControl>
+          <Controller
+            name="sortBy"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth size="small">
+                <Select {...field}>
+                  <MenuItem value="nombre.asc">Nombre (A-Z)</MenuItem>
+                  <MenuItem value="ofertas_count.desc">Más ofertas</MenuItem>
+                  <MenuItem value="vacantes.desc">Más vacantes</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            startIcon={<IconSearch size={18} />}
+            onClick={onBuscar}
+          >
+            Buscar
+          </Button>
         </Box>
       </Paper>
     </Box>

@@ -22,27 +22,35 @@ interface EmpresasListaProps {
 	search?: string
 	familiaProfesionalId?: number | null
 	sortBy?: string
+	clientFilter?: string
 }
 
-export default function EmpresasLista({ search, familiaProfesionalId, sortBy }: EmpresasListaProps) {
+export default function EmpresasLista({ search, familiaProfesionalId, sortBy, clientFilter }: EmpresasListaProps) {
 	return (
 		<Stack spacing={3}>
 			<PageDataContainer skeletonType="list">
-				<EmpresasListaSuspense search={search} familiaProfesionalId={familiaProfesionalId} sortBy={sortBy} />
+				<EmpresasListaSuspense search={search} familiaProfesionalId={familiaProfesionalId} sortBy={sortBy} clientFilter={clientFilter} />
 			</PageDataContainer>
 		</Stack>
 	)
 }
 
-const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy }: EmpresasListaProps) => {
+const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFilter }: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
 
 	const empresasRepository = EmpresasRepositoryHttp
 
-	const { data: empresas = [] } = useSuspenseQuery({
+	const { data: allEmpresas = [] } = useSuspenseQuery({
 		queryKey: ['empresas', search, familiaProfesionalId, sortBy],
 		queryFn: () => empresasRepository.obtener(search, familiaProfesionalId ?? undefined, sortBy),
 	})
+
+	const empresas = clientFilter
+		? allEmpresas.filter(e =>
+			e.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
+			e.localidad?.toLowerCase().includes(clientFilter.toLowerCase())
+		)
+		: allEmpresas
 
 	const queryClient = useQueryClient()
 

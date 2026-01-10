@@ -7,7 +7,7 @@ export const EmpresasRepositoryHttp = {
 	obtener: async (search?: string, familiaProfesionalId?: number, sortBy?: string): Promise<Empresa[]> => {
 		const queryParams = new URLSearchParams()
 		if (search) queryParams.append('search', search)
-		if (familiaProfesionalId) queryParams.append('familia_profesional_id', familiaProfesionalId.toString())
+		if (familiaProfesionalId) queryParams.append('familia_id', familiaProfesionalId.toString())
 		if (sortBy) queryParams.append('sort_by', sortBy)
 
 		const empresas = (await getEntity(`/empresas?${queryParams.toString()}`)) as any[]

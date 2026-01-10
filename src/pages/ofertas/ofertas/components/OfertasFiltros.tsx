@@ -9,36 +9,31 @@ import {
 	Select,
 	TextField,
 	Typography,
+	Button,
+	Autocomplete
 } from '@mui/material'
-import { ObtenerOfertas } from '@/shared/enums/obtener-ofertas.enum'
+
 import useRol from '@/shared/hooks/rol.hook'
-import { useEffect, useState } from 'react'
-import { useDebounce } from '@/shared/hooks/useDebounce'
+import { MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
+import { IconSearch } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
+import { Control, Controller } from 'react-hook-form'
 
 interface OfertasFiltrosProps {
-	filtro: ObtenerOfertas
-	onCambiarFiltro: (event: React.ChangeEvent<HTMLInputElement>) => void
-	search: string
-	onSearchChange: (value: string) => void
-	sortBy: string
-	onSortChange: (value: string) => void
+	control: Control<any>
+	onBuscar: () => void
 }
 
 export default function OfertasFiltros({
-	filtro,
-	onCambiarFiltro,
-	search,
-	onSearchChange,
-	sortBy,
-	onSortChange
+	control,
+	onBuscar
 }: OfertasFiltrosProps) {
-	const { mismoRol } = useRol()
-	const [localSearch, setLocalSearch] = useState(search)
-	const [debouncedSearch] = useDebounce(localSearch, 500)
+	const { rol } = useRol()
 
-	useEffect(() => {
-		onSearchChange(debouncedSearch)
-	}, [debouncedSearch, onSearchChange])
+	const { data: familias = [] } = useQuery({
+		queryKey: ['familias-profesionales'],
+		queryFn: MaestrosRepository.obtenerFamilias,
+	})
 
 	return (
 		<Box sx={{ width: { xs: '100%', md: 300 } }}>
@@ -47,16 +42,95 @@ export default function OfertasFiltros({
 					Filtros
 				</Typography>
 
+				{/* RADIO GROUP: Filter Mode (My Offers vs All) */}
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Ver ofertas
+					</Typography>
+					<Controller
+						name="filtro"
+						control={control}
+						render={({ field }) => (
+							<RadioGroup {...field}>
+								{rol !== 'empresa' && (
+									<FormControlLabel
+										value="todas"
+										control={<Radio />}
+										label="Todas"
+									/>
+								)}
+								{rol === 'demandante' && (
+									<FormControlLabel
+										value="demandante"
+										control={<Radio />}
+										label="Para mí"
+									/>
+								)}
+								{rol === 'empresa' && (
+									<FormControlLabel
+										value="empresa"
+										control={<Radio />}
+										label="Mis ofertas"
+									/>
+								)}
+							</RadioGroup>
+						)}
+					/>
+				</Box>
+
 				<Box sx={{ mb: 3 }}>
 					<Typography variant="subtitle2" gutterBottom>
 						Palabra clave
 					</Typography>
-					<TextField
-						fullWidth
-						size="small"
-						placeholder="Buscar por nombre..."
-						value={localSearch}
-						onChange={(e) => setLocalSearch(e.target.value)}
+					<Controller
+						name="search"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								fullWidth
+								size="small"
+								placeholder="Buscar..."
+							/>
+						)}
+					/>
+				</Box>
+
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Familia Profesional
+					</Typography>
+					<Controller
+						name="familiaId"
+						control={control}
+						render={({ field }) => (
+							<Autocomplete
+								options={familias}
+								getOptionLabel={(option) => option.nombre}
+								value={familias.find((f) => f.id.toString() === field.value) || null}
+								onChange={(_, newValue) => field.onChange(newValue ? newValue.id.toString() : '')}
+								renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
+							/>
+						)}
+					/>
+				</Box>
+
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Estado
+					</Typography>
+					<Controller
+						name="estado"
+						control={control}
+						render={({ field }) => (
+							<FormControl fullWidth size="small">
+								<Select {...field}>
+									<MenuItem value="">Todas</MenuItem>
+									<MenuItem value="activas">Abiertas</MenuItem>
+									<MenuItem value="cerradas">Cerradas</MenuItem>
+								</Select>
+							</FormControl>
+						)}
 					/>
 				</Box>
 
@@ -64,46 +138,33 @@ export default function OfertasFiltros({
 					<Typography variant="subtitle2" gutterBottom>
 						Ordenar por
 					</Typography>
-					<FormControl fullWidth size="small">
-						<Select
-							value={sortBy}
-							onChange={(e) => onSortChange(e.target.value)}
-						>
-							<MenuItem value="fecha_publicacion.desc">Más recientes</MenuItem>
-							<MenuItem value="fecha_publicacion.asc">Más antiguas</MenuItem>
-							<MenuItem value="fecha_cierre.asc">Cierre próximo</MenuItem>
-							<MenuItem value="numero_puestos.desc">Más vacantes</MenuItem>
-						</Select>
-					</FormControl>
+					<Controller
+						name="sortBy"
+						control={control}
+						render={({ field }) => (
+							<FormControl fullWidth size="small">
+								<Select {...field}>
+									<MenuItem value="fecha_publicacion.desc">Más recientes</MenuItem>
+									<MenuItem value="fecha_publicacion.asc">Más antiguas</MenuItem>
+									<MenuItem value="fecha_cierre.asc">Cierre próximo</MenuItem>
+								</Select>
+							</FormControl>
+						)}
+					/>
 				</Box>
 
 				<Box sx={{ mb: 3 }}>
-					<Typography variant="subtitle2" gutterBottom>
-						Ver Ofertas
-					</Typography>
-					<RadioGroup value={filtro} onChange={onCambiarFiltro}>
-						<FormControlLabel
-							value="todas"
-							control={<Radio />}
-							label="Todas"
-						/>
-						{mismoRol('demandante') && (
-							<FormControlLabel
-								value="demandante"
-								control={<Radio />}
-								label="Para mí"
-							/>
-						)}
-						{mismoRol('empresa') && (
-							<FormControlLabel
-								value="empresa"
-								control={<Radio />}
-								label="Creadas por mí"
-							/>
-						)}
-					</RadioGroup>
+					<Button
+						fullWidth
+						variant="contained"
+						color="primary"
+						startIcon={<IconSearch size={18} />}
+						onClick={onBuscar}
+					>
+						Buscar
+					</Button>
 				</Box>
-			</Paper>
-		</Box>
+			</Paper >
+		</Box >
 	)
 }

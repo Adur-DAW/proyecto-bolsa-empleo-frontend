@@ -24,16 +24,16 @@ export default function InscribirseComponent({
 	const mutateInscribir = useMutation({
 		mutationFn: ofertasDemandanteRepository.registrarJWT,
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
-			queryClient.refetchQueries({ queryKey: ['oferta', oferta.id] })
+			queryClient.invalidateQueries({ queryKey: ['ofertas'] })
+			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id] })
 		},
 	})
 
 	const mutateDesinscribir = useMutation({
 		mutationFn: ofertasDemandanteRepository.eliminarJWT,
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
-			queryClient.refetchQueries({ queryKey: ['oferta', oferta.id] })
+			queryClient.invalidateQueries({ queryKey: ['ofertas'] })
+			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id] })
 		},
 	})
 

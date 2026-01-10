@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, TextField, MenuItem, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
@@ -10,6 +10,8 @@ import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.h
 import { FamiliaProfesional, MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
 import SelectorTitulos from '@/shared/components/SelectorTitulos'
 import { Titulo } from '@/shared/models'
+import { FormInputText } from '@/shared/components/form/FormInputText'
+import { FormInputSelect } from '@/shared/components/form/FormInputSelect'
 
 const demandanteSchema = z
 	.object({
@@ -50,7 +52,7 @@ export default function RegistrarDemandante() {
 		register,
 		watch,
 		setValue,
-		formState: { errors, isValid },
+		formState: { errors },
 	} = useForm<DemandanteFormData>({
 		resolver: zodResolver(demandanteSchema),
 		defaultValues: {
@@ -77,6 +79,10 @@ export default function RegistrarDemandante() {
 	useEffect(() => {
 		MaestrosRepository.obtenerFamilias().then(setFamilias)
 	}, [])
+
+	useEffect(() => {
+		setValue('titulos', [])
+	}, [familiaSeleccionada, setValue])
 
 	const mutation = useMutation({
 		mutationFn: (data: FormData) => authRepository.registrar(data as any),
@@ -130,150 +136,70 @@ export default function RegistrarDemandante() {
 
 	return (
 		<Box component="form" onSubmit={handleSubmit(onSubmit)}>
-			<Controller
+			<FormInputText
 				name="email"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="email"
-						label="Email"
-						fullWidth
-						margin="normal"
-						error={!!errors.email}
-						helperText={errors.email?.message}
-					/>
-				)}
+				label="Email"
+				autoComplete="email"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="password"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="password"
-						label="Contraseña"
-						type="password"
-						fullWidth
-						margin="normal"
-						error={!!errors.password}
-						helperText={errors.password?.message}
-					/>
-				)}
+				label="Contraseña"
+				type="password"
+				autoComplete="new-password"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="verificarPassword"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="password"
-						label="Verificar contraseña"
-						type="password"
-						fullWidth
-						margin="normal"
-						error={!!errors.verificarPassword}
-						helperText={errors.verificarPassword?.message}
-					/>
-				)}
+				label="Verificar contraseña"
+				type="password"
+				autoComplete="new-password"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="nombre"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Nombre"
-						fullWidth
-						margin="normal"
-						error={!!errors.nombre}
-						helperText={errors.nombre?.message}
-					/>
-				)}
+				label="Nombre"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="apellido1"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Primer apellido"
-						fullWidth
-						margin="normal"
-						error={!!errors.apellido1}
-						helperText={errors.apellido1?.message}
-					/>
-				)}
+				label="Primer apellido"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="apellido2"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Segundo apellido"
-						fullWidth
-						margin="normal"
-						error={!!errors.apellido2}
-						helperText={errors.apellido2?.message}
-					/>
-				)}
+				label="Segundo apellido"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="dni"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="DNI"
-						fullWidth
-						margin="normal"
-						error={!!errors.dni}
-						helperText={errors.dni?.message}
-					/>
-				)}
+				label="DNI"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="telefonoMovil"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Teléfono móvil"
-						fullWidth
-						margin="normal"
-						error={!!errors.telefonoMovil}
-						helperText={errors.telefonoMovil?.message}
-					/>
-				)}
+				label="Teléfono móvil"
+				margin="normal"
 			/>
 
-			<Controller
-				name="familiaProfesionalId"
-				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						select
-						label="Familia Profesional (Filtro)"
-						fullWidth
-						margin="normal"
-						error={!!errors.familiaProfesionalId}
-						helperText="Selecciona una familia para filtrar los títulos (Opcional)"
-						value={field.value || ''}
-						onChange={(e) => {
-							field.onChange(e)
-							setValue('titulos', [])
-						}}
-					>
-						{familias.map((option) => (
-							<MenuItem key={option.id} value={option.id}>
-								{option.nombre}
-							</MenuItem>
-						))}
-					</TextField>
-				)}
-			/>
+			<Box sx={{ mt: 2 }}>
+				<FormInputSelect
+					name="familiaProfesionalId"
+					control={control}
+					label="Familia Profesional (Filtro)"
+					options={familias.map(f => ({ id: f.id, label: f.nombre }))}
+					margin="normal"
+				// We need to handle the specialized onChange behavior for clearing titles
+				/>
+			</Box>
 
 			<Box sx={{ mt: 2, mb: 1 }}>
 				<Controller

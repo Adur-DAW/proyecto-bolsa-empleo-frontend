@@ -21,7 +21,8 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"types": ["vitest/globals"]
 	},
 	"include": ["src"],
 	"extends": "./tsconfig.paths.json"
