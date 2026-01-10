@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { OfertasRepositoryHttp as ofertasRepository } from '@/shared/repositories/ofertas/ofertas.repository.http'
 // Define strict types for params if possible, using `any` for now to match repository legacy
 export const useOfertasQuery = (params: {
@@ -8,32 +8,37 @@ export const useOfertasQuery = (params: {
   estado?: string
   sortBy?: string
   familiaId?: string
+  page?: number
 }) => {
-  const { filtro, search, empresaId, estado, sortBy, familiaId } = params
+  const { filtro, search, empresaId, estado, sortBy, familiaId, page = 1 } = params
 
-  return useInfiniteQuery({
-    queryKey: ['ofertas', { filtro, search, empresaId, estado, sortBy, familiaId }],
-    queryFn: async ({ pageParam = 1 }) => {
+  return useQuery({
+    queryKey: ['ofertas', { filtro, search, empresaId, estado, sortBy, familiaId, page }],
+    queryFn: async () => {
       if (filtro === 'demandante') {
         const res = await ofertasRepository.obtenerPorDemandante({
           search,
           estado,
           sortBy,
-          familia_id: familiaId ? Number(familiaId) : undefined
+          familia_id: familiaId ? Number(familiaId) : undefined,
+          page,
+          limit: 10
         })
-        return { data: res, nextPage: null }
+        return res
       } else if (filtro === 'empresa') {
         const res = await ofertasRepository.obtenerPorEmpresa({
           search,
           estado,
           sortBy,
-          familia_id: familiaId ? Number(familiaId) : undefined
+          familia_id: familiaId ? Number(familiaId) : undefined,
+          page,
+          limit: 10
         })
-        return { data: res, nextPage: null }
+        return res
       } else {
         return ofertasRepository.obtener({
-          page: pageParam as number,
-          limit: 20,
+          page,
+          limit: 10,
           search: search,
           empresa_id: empresaId ? Number(empresaId) : undefined,
           estado: estado,
@@ -42,7 +47,5 @@ export const useOfertasQuery = (params: {
         })
       }
     },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => lastPage.nextPage,
   })
 }

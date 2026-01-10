@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 
-import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
+import { getEntity, postEntity, putEntity, PaginatedResponse } from '@/shared/http/api.service'
 import { Oferta } from '@/shared/models'
 
 // import { OfertasRepository } from './ofertas.repository'
 
 export const OfertasRepositoryHttp = {
-	obtener: async (params?: { page: number; limit: number; search?: string; empresa_id?: number; estado?: string; sortBy?: string; familia_id?: number }): Promise<{ data: Oferta[]; nextPage: number | null }> => {
+	obtener: async (params?: { page?: number; limit?: number; search?: string; empresa_id?: number; estado?: string; sortBy?: string; familia_id?: number }): Promise<PaginatedResponse<Oferta>> => {
 		const queryParams = new URLSearchParams()
 		if (params?.page) queryParams.append('page', params.page.toString())
 		if (params?.limit) queryParams.append('limit', params.limit.toString())
@@ -16,32 +16,42 @@ export const OfertasRepositoryHttp = {
 		if (params?.sortBy) queryParams.append('sort_by', params.sortBy)
 		if (params?.familia_id) queryParams.append('familia_id', params.familia_id.toString())
 
-		const response = await getEntity<any>(`/ofertas?${queryParams.toString()}`)
+		const response = await getEntity<PaginatedResponse<any>>(`/ofertas?${queryParams.toString()}`)
 
 		return {
+			...response,
 			data: response.data.map((x: any) => mapOfertaToFront(x)),
-			nextPage: response.next_page_url ? response.current_page + 1 : null,
 		}
 	},
-	obtenerPorDemandante: async (params?: { search?: string; estado?: string; sortBy?: string; familia_id?: number }): Promise<Oferta[]> => {
+	obtenerPorDemandante: async (params?: { page?: number; limit?: number; search?: string; estado?: string; sortBy?: string; familia_id?: number }): Promise<PaginatedResponse<Oferta>> => {
 		const queryParams = new URLSearchParams()
+		if (params?.page) queryParams.append('page', params.page.toString())
+		if (params?.limit) queryParams.append('limit', params.limit.toString())
 		if (params?.search) queryParams.append('search', params.search)
 		if (params?.estado) queryParams.append('estado', params.estado)
 		if (params?.sortBy) queryParams.append('sort_by', params.sortBy)
 		if (params?.familia_id) queryParams.append('familia_id', params.familia_id.toString())
 
-		const ofertas = await getEntity<any>(`/demandantes/jwt/ofertas-por-titulos?${queryParams.toString()}`)
-		return ofertas.map((x: any) => mapOfertaToFront(x))
+		const response = await getEntity<PaginatedResponse<any>>(`/demandantes/jwt/ofertas-por-titulos?${queryParams.toString()}`)
+		return {
+			...response,
+			data: response.data.map((x: any) => mapOfertaToFront(x)),
+		}
 	},
-	obtenerPorEmpresa: async (params?: { search?: string; estado?: string; sortBy?: string; familia_id?: number }): Promise<Oferta[]> => {
+	obtenerPorEmpresa: async (params?: { page?: number; limit?: number; search?: string; estado?: string; sortBy?: string; familia_id?: number }): Promise<PaginatedResponse<Oferta>> => {
 		const queryParams = new URLSearchParams()
+		if (params?.page) queryParams.append('page', params.page.toString())
+		if (params?.limit) queryParams.append('limit', params.limit.toString())
 		if (params?.search) queryParams.append('search', params.search)
 		if (params?.estado) queryParams.append('estado', params.estado)
 		if (params?.sortBy) queryParams.append('sort_by', params.sortBy)
 		if (params?.familia_id) queryParams.append('familia_id', params.familia_id.toString())
 
-		const ofertas = await getEntity<any>(`/empresas/jwt/ofertas?${queryParams.toString()}`)
-		return ofertas.map((x: any) => mapOfertaToFront(x))
+		const response = await getEntity<PaginatedResponse<any>>(`/empresas/jwt/ofertas?${queryParams.toString()}`)
+		return {
+			...response,
+			data: response.data.map((x: any) => mapOfertaToFront(x)),
+		}
 	},
 
 	obtenerPorId: async (id: number): Promise<Oferta> => {

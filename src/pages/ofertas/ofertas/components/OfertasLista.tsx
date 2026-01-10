@@ -4,8 +4,10 @@ import {
 	Stack,
 	Typography,
 	Chip,
-	Avatar
+	Avatar,
+	Pagination
 } from '@mui/material'
+import { useState, useEffect } from 'react'
 import { IconEdit, IconEye, IconBuilding, IconClock, IconCalendar } from '@tabler/icons-react'
 import { Link } from 'react-router'
 import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
@@ -51,18 +53,21 @@ export default function OfertasLista({ filtro, empresaId, estado, search, sortBy
 
 const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy, familiaId, clientFilter }: OfertasListaProps) => {
 	const { usuario, mismoRol } = useRol()
+	const [page, setPage] = useState(1)
+
 	// Fallback if not provided (e.g. in legacy usage)
 	const effectiveSearch = search || ''
 	const effectiveSortBy = sortBy || 'fecha_publicacion.desc'
 
 	const [debouncedSearch] = useDebounce(effectiveSearch, 500)
 
+	// Reset page when filters change
+	useEffect(() => {
+		setPage(1)
+	}, [filtro, empresaId, estado, debouncedSearch, effectiveSortBy, familiaId])
 
 	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
+		data: paginatedData,
 		isLoading,
 	} = useOfertasQuery({
 		filtro,
@@ -70,23 +75,28 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy, famil
 		empresaId: empresaId?.toString(),
 		estado,
 		sortBy: effectiveSortBy,
-		familiaId
+		familiaId,
+		page
 	})
 
-	const allOfertas = data?.pages.flatMap((page) => page.data) || []
-	const ofertasRaw = Array.from(new Map(allOfertas.map(item => [item.id, item])).values())
+	const allOfertas = paginatedData?.data || []
 
-	// Client-side filtering
+	// Client-side filtering (if still needed, though backend search is preferred)
 	const ofertas = clientFilter
-		? ofertasRaw.filter(o =>
+		? allOfertas.filter(o =>
 			o.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
 			o.empresa?.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
 			o.obs?.toLowerCase().includes(clientFilter.toLowerCase())
 		)
-		: ofertasRaw
+		: allOfertas
 
 	const formatDate = (date: dayjs.Dayjs) => {
 		return date.isValid() ? date.format('DD/MM/YYYY') : 'N/D'
+	}
+
+	const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+		setPage(value)
+		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
 
 	return (
@@ -189,15 +199,15 @@ const OfertasListaSuspense = ({ filtro, empresaId, estado, search, sortBy, famil
 				))}
 			</Stack>
 
-			{hasNextPage && (
-				<Box sx={{ mt: 4, textAlign: 'center' }}>
-					<Button
-						variant="outlined"
-						onClick={() => fetchNextPage()}
-						disabled={isFetchingNextPage}
-					>
-						{isFetchingNextPage ? 'Cargando más...' : 'Cargar más ofertas'}
-					</Button>
+			{paginatedData && paginatedData.last_page > 1 && (
+				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+					<Pagination
+						count={paginatedData.last_page}
+						page={page}
+						onChange={handlePageChange}
+						color="primary"
+						size="large"
+					/>
 				</Box>
 			)}
 		</Box>

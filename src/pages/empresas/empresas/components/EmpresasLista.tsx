@@ -4,12 +4,13 @@ import {
 	Avatar,
 	Stack,
 	Box,
-	Button
+	Button,
+	Pagination
 } from '@mui/material'
+import { useState, useEffect } from 'react'
 import {
 	useMutation,
 	useQueryClient,
-	useSuspenseQuery,
 } from '@tanstack/react-query'
 import { IconMapPin, IconBriefcase, IconCheck, IconX, IconNews, IconUsers } from '@tabler/icons-react'
 
@@ -17,6 +18,8 @@ import useRol from '@/shared/hooks/rol.hook'
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
 import EntityCard from '@/shared/components/cards/EntityCard'
+import { useEmpresasQuery } from '@/shared/hooks/useEmpresasQuery'
+import { useDebounce } from '@/shared/hooks/useDebounce'
 
 interface EmpresasListaProps {
 	search?: string
@@ -37,13 +40,22 @@ export default function EmpresasLista({ search, familiaProfesionalId, sortBy, cl
 
 const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFilter }: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
+	const [page, setPage] = useState(1)
 
-	const empresasRepository = EmpresasRepositoryHttp
+	const [debouncedSearch] = useDebounce(search || '', 500)
 
-	const { data: allEmpresas = [] } = useSuspenseQuery({
-		queryKey: ['empresas', search, familiaProfesionalId, sortBy],
-		queryFn: () => empresasRepository.obtener(search, familiaProfesionalId ?? undefined, sortBy),
+	useEffect(() => {
+		setPage(1)
+	}, [search, familiaProfesionalId, sortBy])
+
+	const { data: paginatedData, isLoading } = useEmpresasQuery({
+		search: debouncedSearch,
+		familiaProfesionalId,
+		sortBy,
+		page
 	})
+
+	const allEmpresas = paginatedData?.data || []
 
 	const empresas = clientFilter
 		? allEmpresas.filter(e =>
@@ -53,6 +65,7 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFil
 		: allEmpresas
 
 	const queryClient = useQueryClient()
+	const empresasRepository = EmpresasRepositoryHttp
 
 	const mutationAceptar = useMutation({
 		mutationFn: (idEmpresa: number) => empresasRepository.validar(idEmpresa),
@@ -74,11 +87,16 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFil
 		mutationRechazar.mutate(idEmpresa)
 	}
 
+	const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+		setPage(value)
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	}
+
 	return (
 		<Box>
 			{/* Sort controls moved to EmpresasFiltros */}
 
-			{empresas.length === 0 && (
+			{empresas.length === 0 && !isLoading && (
 				<Typography align="center" color="text.secondary">No se encontraron empresas.</Typography>
 			)}
 
@@ -162,6 +180,18 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFil
 					)
 				})}
 			</Stack>
+
+			{paginatedData && paginatedData.last_page > 1 && (
+				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+					<Pagination
+						count={paginatedData.last_page}
+						page={page}
+						onChange={handlePageChange}
+						color="primary"
+						size="large"
+					/>
+				</Box>
+			)}
 		</Box>
 	)
 }
