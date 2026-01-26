@@ -3,7 +3,7 @@ import { FamiliaProfesional } from '@/shared/repositories/MaestrosRepository'
 export type Titulo = {
 	id: number
 	nombre: string
-	familia_profesional_id: number
+	id_familia_profesional: number
 	familia_profesional?: FamiliaProfesional // Relationship
 }
 

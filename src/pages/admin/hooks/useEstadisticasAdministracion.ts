@@ -8,7 +8,7 @@ interface FiltrosAdmin {
   agrupacion: string
 }
 
-export const useAdminStats = (filtros: FiltrosAdmin) => {
+export const useEstadisticasAdministracion = (filtros: FiltrosAdmin) => {
   const { data: estadisticas, isLoading, error, refetch } = useQuery({
     queryKey: ['estadisticasAdmin', filtros],
     queryFn: () => AdminRepositoryHttp.obtenerEstadisticas(filtros)

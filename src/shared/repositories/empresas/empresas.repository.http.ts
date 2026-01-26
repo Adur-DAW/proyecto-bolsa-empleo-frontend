@@ -1,21 +1,54 @@
-import { deleteEntity, getEntity, postEntity, putEntity, PaginatedResponse } from '@/shared/http/api.service'
+import {
+	RespuestaPaginada,
+	deleteEntity,
+	getEntity,
+	postEntity,
+	putEntity,
+} from '@/shared/http/api.service'
 import { Empresa } from '@/shared/models'
 
-// import { EmpresasRepository } from './empresas.repository'
-
 export const EmpresasRepositoryHttp = {
-	obtener: async (search?: string, familiaProfesionalId?: number, sortBy?: string, page: number = 1, limit: number = 20): Promise<PaginatedResponse<Empresa>> => {
+	obtener: async (
+		search?: string,
+		idFamiliaProfesional?: number,
+		ordenarPor?: string,
+		pagina: number = 1,
+		limit: number = 20
+	): Promise<RespuestaPaginada<Empresa>> => {
+
 		const queryParams = new URLSearchParams()
+
 		if (search) queryParams.append('search', search)
-		if (familiaProfesionalId) queryParams.append('familia_id', familiaProfesionalId.toString())
-		if (sortBy) queryParams.append('sort_by', sortBy)
-		queryParams.append('page', page.toString())
+
+		if (idFamiliaProfesional)
+			queryParams.append('id_familia', idFamiliaProfesional.toString())
+
+		if (ordenarPor)
+			queryParams.append('ordenar_por', ordenarPor)
+
+		queryParams.append('pagina', pagina.toString())
 		queryParams.append('limit', limit.toString())
 
-		const response = (await getEntity<PaginatedResponse<any>>(`/empresas?${queryParams.toString()}`))
+		const response = await getEntity<RespuestaPaginada<any>>(
+			`/empresas?${queryParams.toString()}`
+		)
 
-
-		if (!response) return { current_page: 1, data: [], first_page_url: '', from: 0, last_page: 1, last_page_url: '', links: [], next_page_url: null, path: '', per_page: limit, prev_page_url: null, to: 0, total: 0 }
+		if (!response)
+			return {
+				pagina_actual: 1,
+				data: [],
+				primera_pagina_url: '',
+				desde: 0,
+				ultima_pagina: 1,
+				ultima_pagina_url: '',
+				links: [],
+				siguiente_pagina_url: null,
+				path: '',
+				per_pagina: limit,
+				pagina_anterior_url: null,
+				hasta: 0,
+				total: 0,
+			}
 
 		return {
 			...response,
@@ -23,8 +56,8 @@ export const EmpresasRepositoryHttp = {
 				...x,
 				idEmpresa: x.id_empresa,
 				cantidadOfertas: x.ofertas_count,
-				cantidadVacantes: x.vacantes
-			}))
+				cantidadVacantes: x.vacantes,
+			})),
 		}
 	},
 	obtenerPorId: async (id: number): Promise<Empresa> => {

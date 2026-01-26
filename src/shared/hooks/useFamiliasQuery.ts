@@ -5,6 +5,5 @@ export const useFamiliasQuery = () => {
   return useQuery({
     queryKey: ['familias'],
     queryFn: MaestrosRepository.obtenerFamilias,
-    staleTime: 1000 * 60 * 60 * 24 // 24 hours
   })
 }

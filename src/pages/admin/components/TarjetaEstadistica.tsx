@@ -8,7 +8,7 @@ interface TarjetaStatProps {
   variacion?: number
 }
 
-export default function TarjetaStat({ titulo, valor, color, subtext, variacion }: TarjetaStatProps) {
+export default function TarjetaEstadistica({ titulo, valor, color, subtext, variacion }: TarjetaStatProps) {
   return (
     <Card sx={{ borderTop: `4px solid ${color}`, height: '100%' }}>
       <CardContent>

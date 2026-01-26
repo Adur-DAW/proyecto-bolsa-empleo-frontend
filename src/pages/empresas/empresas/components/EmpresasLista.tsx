@@ -23,44 +23,44 @@ import { useDebounce } from '@/shared/hooks/useDebounce'
 
 interface EmpresasListaProps {
 	search?: string
-	familiaProfesionalId?: number | null
-	sortBy?: string
-	clientFilter?: string
+	idFamiliaProfesional?: number | null
+	ordenarPor?: string
+	query?: string
 }
 
-export default function EmpresasLista({ search, familiaProfesionalId, sortBy, clientFilter }: EmpresasListaProps) {
+export default function EmpresasLista({ search, idFamiliaProfesional, ordenarPor, query }: EmpresasListaProps) {
 	return (
 		<Stack spacing={3}>
 			<PageDataContainer skeletonType="list">
-				<EmpresasListaSuspense search={search} familiaProfesionalId={familiaProfesionalId} sortBy={sortBy} clientFilter={clientFilter} />
+				<EmpresasListaSuspense search={search} idFamiliaProfesional={idFamiliaProfesional} ordenarPor={ordenarPor} query={query} />
 			</PageDataContainer>
 		</Stack>
 	)
 }
 
-const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFilter }: EmpresasListaProps) => {
+const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query }: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
-	const [page, setPage] = useState(1)
+	const [pagina, setPagina] = useState(1)
 
 	const [debouncedSearch] = useDebounce(search || '', 500)
 
 	useEffect(() => {
-		setPage(1)
-	}, [search, familiaProfesionalId, sortBy])
+		setPagina(1)
+	}, [search, idFamiliaProfesional, ordenarPor])
 
 	const { data: paginatedData, isLoading } = useEmpresasQuery({
 		search: debouncedSearch,
-		familiaProfesionalId,
-		sortBy,
-		page
+		idFamiliaProfesional,
+		ordenarPor,
+		pagina
 	})
 
 	const allEmpresas = paginatedData?.data || []
 
-	const empresas = clientFilter
+	const empresas = query
 		? allEmpresas.filter(e =>
-			e.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
-			e.localidad?.toLowerCase().includes(clientFilter.toLowerCase())
+			e.nombre.toLowerCase().includes(query.toLowerCase()) ||
+			e.localidad?.toLowerCase().includes(query.toLowerCase())
 		)
 		: allEmpresas
 
@@ -87,15 +87,13 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFil
 		mutationRechazar.mutate(idEmpresa)
 	}
 
-	const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-		setPage(value)
+	const handlePageChange = (_, value: number) => {
+		setPagina(value)
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
 
 	return (
 		<Box>
-			{/* Sort controls moved to EmpresasFiltros */}
-
 			{empresas.length === 0 && !isLoading && (
 				<Typography align="center" color="text.secondary">No se encontraron empresas.</Typography>
 			)}
@@ -181,11 +179,11 @@ const EmpresasListaSuspense = ({ search, familiaProfesionalId, sortBy, clientFil
 				})}
 			</Stack>
 
-			{paginatedData && paginatedData.last_page > 1 && (
+			{paginatedData && paginatedData.ultima_pagina > 1 && (
 				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
 					<Pagination
-						count={paginatedData.last_page}
-						page={page}
+						count={paginatedData.ultima_pagina}
+						page={pagina}
 						onChange={handlePageChange}
 						color="primary"
 						size="large"

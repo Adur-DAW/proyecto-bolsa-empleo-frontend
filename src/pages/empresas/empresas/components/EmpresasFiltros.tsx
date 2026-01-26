@@ -49,7 +49,7 @@ export default function EmpresasFiltros({
             Familia Profesional
           </Typography>
           <Controller
-            name="familiaProfesionalId"
+            name="idFamiliaProfesional"
             control={control}
             render={({ field }) => (
               <Autocomplete

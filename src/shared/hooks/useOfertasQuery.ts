@@ -1,51 +1,63 @@
 import { useQuery } from '@tanstack/react-query'
-import { OfertasRepositoryHttp as ofertasRepository } from '@/shared/repositories/ofertas/ofertas.repository.http'
-// Define strict types for params if possible, using `any` for now to match repository legacy
-export const useOfertasQuery = (params: {
-  filtro?: string
-  search?: string
-  empresaId?: string
-  estado?: string
-  sortBy?: string
-  familiaId?: string
-  page?: number
-}) => {
-  const { filtro, search, empresaId, estado, sortBy, familiaId, page = 1 } = params
 
-  return useQuery({
-    queryKey: ['ofertas', { filtro, search, empresaId, estado, sortBy, familiaId, page }],
-    queryFn: async () => {
-      if (filtro === 'demandante') {
-        const res = await ofertasRepository.obtenerPorDemandante({
-          search,
-          estado,
-          sortBy,
-          familia_id: familiaId ? Number(familiaId) : undefined,
-          page,
-          limit: 10
-        })
-        return res
-      } else if (filtro === 'empresa') {
-        const res = await ofertasRepository.obtenerPorEmpresa({
-          search,
-          estado,
-          sortBy,
-          familia_id: familiaId ? Number(familiaId) : undefined,
-          page,
-          limit: 10
-        })
-        return res
-      } else {
-        return ofertasRepository.obtener({
-          page,
-          limit: 10,
-          search: search,
-          empresa_id: empresaId ? Number(empresaId) : undefined,
-          estado: estado,
-          sortBy: sortBy,
-          familia_id: familiaId ? Number(familiaId) : undefined
-        })
-      }
-    },
-  })
+import { OfertasRepositoryHttp as ofertasRepository } from '@/shared/repositories/ofertas/ofertas.repository.http'
+
+export const useOfertasQuery = (params: {
+	filtro?: string
+	search?: string
+	idEmpresa?: string
+	idFamilia?: string
+	estado?: string
+	ordenarPor?: string
+	pagina?: number
+}) => {
+	const {
+		filtro,
+		search,
+		idEmpresa,
+		estado,
+		ordenarPor,
+		idFamilia,
+		pagina = 1,
+	} = params
+
+	return useQuery({
+		queryKey: [
+			'ofertas',
+			{ filtro, search, idEmpresa, estado, ordenarPor, idFamilia, pagina },
+		],
+		queryFn: async () => {
+			if (filtro === 'demandante') {
+				const res = await ofertasRepository.obtenerPorDemandante({
+					search,
+					estado,
+					ordenarPor,
+					idFamilia: idFamilia ? Number(idFamilia) : undefined,
+					pagina,
+					limite: 10,
+				})
+				return res
+			} else if (filtro === 'empresa') {
+				const res = await ofertasRepository.obtenerPorEmpresa({
+					search,
+					estado,
+					ordenarPor,
+					idFamilia: idFamilia ? Number(idFamilia) : undefined,
+					pagina,
+					limite: 10,
+				})
+				return res
+			} else {
+				return ofertasRepository.obtener({
+					pagina,
+					limite: 10,
+					search: search,
+					idEmpresa: idEmpresa ? Number(idEmpresa) : undefined,
+					idFamilia: idFamilia ? Number(idFamilia) : undefined,
+					estado: estado,
+					ordenarPor: ordenarPor,
+				})
+			}
+		},
+	})
 }

@@ -1,4 +1,12 @@
-import { Box, Button, Paper, Stack, TextField, Typography, MenuItem } from '@mui/material'
+import {
+	Box,
+	Button,
+	MenuItem,
+	Paper,
+	Stack,
+	TextField,
+	Typography,
+} from '@mui/material'
 import { IconPlus } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -7,8 +15,11 @@ import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
 import { ofertaDefault } from '@/shared/models'
+import {
+	MaestrosRepository,
+	TipoContrato,
+} from '@/shared/repositories/MaestrosRepository'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
-import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
 
 export default function OfertaCrearDatosBase() {
 	return (
@@ -29,7 +40,7 @@ const OfertaEditarDatosBaseInterno = () => {
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
 			...ofertaDefault,
-			tipoContratoId: undefined, // Force selection
+			idTipoContrato: undefined,
 		},
 	})
 
@@ -43,7 +54,7 @@ const OfertaEditarDatosBaseInterno = () => {
 	const onSubmit = (data) => {
 		mutation.mutate({
 			...data,
-			tipoContratoId: data.tipoContratoId // Ensure ID is passed
+			idTipoContrato: data.idTipoContrato,
 		})
 	}
 
@@ -109,7 +120,7 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Controller
-								name="tipoContratoId"
+								name="idTipoContrato"
 								control={control}
 								render={({ field }) => (
 									<TextField
@@ -144,7 +155,12 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="diasDescanso"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Días de descanso semanal" type="text" />
+									<TextField
+										{...field}
+										fullWidth
+										label="Días de descanso semanal"
+										type="text"
+									/>
 								)}
 							/>
 						</Box>

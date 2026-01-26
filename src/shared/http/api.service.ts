@@ -69,23 +69,23 @@ export const toQueryString = (params: Record<string, any>) => {
 }
 
 export interface Pagination {
-	CurrentPage: number
-	TotalPageCount: number
+	PaginaActual: number
+	TotalPaginas: number
 }
 
-export interface PaginatedResponse<T> {
-	current_page: number
+export interface RespuestaPaginada<T> {
+	pagina_actual: number
 	data: T[]
-	first_page_url: string
-	from: number
-	last_page: number
-	last_page_url: string
+	primera_pagina_url: string
+	desde: number
+	ultima_pagina: number
+	ultima_pagina_url: string
 	links: any[]
-	next_page_url: string | null
+	siguiente_pagina_url: string | null
 	path: string
-	per_page: number
-	prev_page_url: string | null
-	to: number
+	per_pagina: number
+	pagina_anterior_url: string | null
+	hasta: number
 	total: number
 }
 

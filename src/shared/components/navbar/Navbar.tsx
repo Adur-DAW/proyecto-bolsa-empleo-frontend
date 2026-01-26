@@ -19,15 +19,15 @@ import {
 	IconMenu,
 	IconSettings,
 } from '@tabler/icons-react'
-import { Link, useNavigate } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from 'react-router'
 
 import useLogout from '@/shared/hooks/logout.hook'
 import { useNavbar } from '@/shared/hooks/navbar.hook'
+import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
 import { getAbsolutePath } from '@/shared/routes'
 import { useAppStore } from '@/shared/store/store'
-import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
-import PanelAdminPage from '@/pages/admin/AdminDashboardPage'
+import EstadisticasPage from '@/pages/admin/EstadisticasPage'
 
 interface Menu {
 	name: string
@@ -45,7 +45,7 @@ export default function Navbar() {
 	const { data: config } = useQuery({
 		queryKey: ['appConfig'],
 		queryFn: ConfigRepository.obtener,
-		initialData: { ofertas_publicas: false } // Default to true to avoid flash
+		initialData: { ofertas_publicas: false },
 	})
 
 	const settings = [
@@ -70,7 +70,7 @@ export default function Navbar() {
 		handleOpenNavMenu,
 	} = useNavbar()
 
-	const pages = [
+	const paginas = [
 		{
 			texto: 'Inicio',
 			to: getAbsolutePath('inicio'),
@@ -78,16 +78,13 @@ export default function Navbar() {
 		},
 	]
 
-	// Only show Offers and Companies if:
-	// 1. ofertas_publicas is true OR
-	// 2. User is logged in
 	if (config.ofertas_publicas || usuario) {
-		pages.push({
+		paginas.push({
 			texto: 'Ofertas',
 			to: getAbsolutePath('ofertas'),
 			icono: <IconListCheck />,
 		})
-		pages.push({
+		paginas.push({
 			texto: 'Empresas',
 			to: getAbsolutePath('empresas'),
 			icono: <IconBuildingCommunity />,
@@ -95,15 +92,15 @@ export default function Navbar() {
 	}
 
 	if (usuario?.rol === 'centro') {
-		pages.push({
+		paginas.push({
 			texto: 'Titulos',
 			to: getAbsolutePath('titulos'),
 			icono: <IconLetterA />,
 		})
-		pages.push({
+		paginas.push({
 			texto: 'Admin',
 			to: getAbsolutePath('admin'),
-			icono: <PanelAdminPage />,
+			icono: <EstadisticasPage />,
 		})
 	}
 
@@ -167,44 +164,46 @@ export default function Navbar() {
 						onClose={handleCloseNavMenu}
 						sx={{ display: { xs: 'block', md: 'none' } }}
 					>
-						{pages.length > 1 && pages.map((page) => (
-							<MenuItem
-								key={page.to}
-								onClick={handleCloseNavMenu}
-								sx={{ display: 'flex', gap: 1 }}
-							>
-								{page.icono}
-								<Link
-									style={{ textAlign: 'center', color: 'black' }}
-									to={page.to}
+						{paginas.length > 1 &&
+							paginas.map((page) => (
+								<MenuItem
+									key={page.to}
+									onClick={handleCloseNavMenu}
+									sx={{ display: 'flex', gap: 1 }}
 								>
-									{page.texto}
-								</Link>
-							</MenuItem>
-						))}
+									{page.icono}
+									<Link
+										style={{ textAlign: 'center', color: 'black' }}
+										to={page.to}
+									>
+										{page.texto}
+									</Link>
+								</MenuItem>
+							))}
 					</Menu>
 				</Box>
 
 				<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-					{pages.length > 1 && pages.map((page) => (
-						<Link
-							key={page.to}
-							style={{
-								color: 'white',
-								fontSize: '1rem',
-								padding: '1rem',
-								display: 'flex',
-								alignItems: 'center',
-								gap: '.5rem',
-								fontWeight: location.pathname === page.to ? 'bold' : 'normal',
-							}}
-							to={page.to}
-							onClick={handleCloseNavMenu}
-						>
-							{page.icono}
-							{page.texto}
-						</Link>
-					))}
+					{paginas.length > 1 &&
+						paginas.map((page) => (
+							<Link
+								key={page.to}
+								style={{
+									color: 'white',
+									fontSize: '1rem',
+									padding: '1rem',
+									display: 'flex',
+									alignItems: 'center',
+									gap: '.5rem',
+									fontWeight: location.pathname === page.to ? 'bold' : 'normal',
+								}}
+								to={page.to}
+								onClick={handleCloseNavMenu}
+							>
+								{page.icono}
+								{page.texto}
+							</Link>
+						))}
 				</Box>
 
 				{usuario && (

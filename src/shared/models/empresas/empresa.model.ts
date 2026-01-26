@@ -9,5 +9,5 @@ export type Empresa = {
 	telefono: string
 	cif?: string
 	imagen_url?: string
-	familia_profesional_id?: number
+	id_familia_profesional?: number
 }

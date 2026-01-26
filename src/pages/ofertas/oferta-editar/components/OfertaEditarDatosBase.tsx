@@ -15,7 +15,7 @@ const ofertaSchema = z.object({
 	nombre: z.string().nonempty('El título es obligatorio'),
 	fechaPublicacion: z.string(),
 	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
-	tipoContratoId: z.number({ invalid_type_error: 'El tipo de contrato es obligatorio' }),
+	idTipoContrato: z.number('El tipo de contrato es obligatorio'),
 	horario: z.string().optional(),
 	diasDescanso: z.coerce.number().optional(),
 	obs: z.string().optional(),
@@ -62,7 +62,7 @@ const OfertaEditarDatosBaseInterno = () => {
 			numeroPuestos: +oferta.numeroPuestos,
 			diasDescanso: oferta.diasDescanso ? +oferta.diasDescanso : 0,
 			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
-			tipoContratoId: oferta.tipoContratoId
+			idTipoContrato: oferta.idTipoContrato
 		},
 	})
 
@@ -181,7 +181,7 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Controller
-								name="tipoContratoId"
+								name="idTipoContrato"
 								control={control}
 								render={({ field }) => (
 									<TextField
@@ -189,8 +189,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										select
 										label="Tipo de contrato"
-										error={!!errors.tipoContratoId}
-										helperText={errors.tipoContratoId?.message}
+										error={!!errors.idTipoContrato}
+										helperText={errors.idTipoContrato?.message}
 										value={field.value || ''}
 									>
 										{tiposContrato.map((option) => (

@@ -31,7 +31,7 @@ const demandanteSchema = z
 			.string()
 			.regex(/^\d{9}$/, 'El teléfono móvil debe tener 9 dígitos'),
 		situacion: z.number(),
-		familiaProfesionalId: z.number().optional(),
+		idFamiliaProfesional: z.number().optional(),
 		cv: z.any().optional(),
 		titulos: z.array(z.any()).min(1, 'Debe seleccionar al menos un título académico'),
 	})
@@ -66,7 +66,7 @@ export default function RegistrarDemandante() {
 			dni: '',
 			telefonoMovil: '',
 			situacion: 0,
-			familiaProfesionalId: undefined,
+			idFamiliaProfesional: undefined,
 			titulos: [],
 		},
 		mode: 'onBlur',
@@ -74,7 +74,7 @@ export default function RegistrarDemandante() {
 
 	const navigate = useNavigate()
 	const authRepository = AuthRepositoryHttp
-	const familiaSeleccionada = watch('familiaProfesionalId')
+	const familiaSeleccionada = watch('idFamiliaProfesional')
 
 	useEffect(() => {
 		MaestrosRepository.obtenerFamilias().then(setFamilias)
@@ -116,11 +116,10 @@ export default function RegistrarDemandante() {
 		formData.append('telefono_movil', data.telefonoMovil);
 		formData.append('situacion', data.situacion.toString());
 
-		if (data.familiaProfesionalId) {
-			formData.append('familia_profesional_id', data.familiaProfesionalId.toString());
+		if (data.idFamiliaProfesional) {
+			formData.append('id_familia_profesional', data.idFamiliaProfesional.toString());
 		}
 
-		// Enviar títulos
 		if (data.titulos && data.titulos.length > 0) {
 			data.titulos.forEach((titulo: Titulo, index) => {
 				formData.append(`titulos[${index}]`, titulo.id.toString());
@@ -192,12 +191,11 @@ export default function RegistrarDemandante() {
 
 			<Box sx={{ mt: 2 }}>
 				<FormInputSelect
-					name="familiaProfesionalId"
+					name="idFamiliaProfesional"
 					control={control}
 					label="Familia Profesional (Filtro)"
 					options={familias.map(f => ({ id: f.id, label: f.nombre }))}
 					margin="normal"
-				// We need to handle the specialized onChange behavior for clearing titles
 				/>
 			</Box>
 

@@ -24,7 +24,7 @@ const empresaSchema = z
 		cif: z.string().regex(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/, 'El CIF no es válido'),
 		localidad: z.string().nonempty('La localidad es obligatoria'),
 		telefono: z.string().regex(/^\d{9}$/, 'El teléfono debe tener 9 dígitos'),
-		familiaProfesionalId: z.number(),
+		idFamiliaProfesional: z.number(),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -52,7 +52,7 @@ export default function RegistrarEmpresa() {
 			cif: '',
 			localidad: '',
 			telefono: '',
-			familiaProfesionalId: undefined,
+			idFamiliaProfesional: undefined,
 		},
 		mode: 'onBlur',
 	})
@@ -89,7 +89,7 @@ export default function RegistrarEmpresa() {
 			email: data.email,
 			password: data.password,
 			password_confirmation: data.verificarPassword,
-			familia_profesional_id: data.familiaProfesionalId,
+			id_familia_profesional: data.idFamiliaProfesional,
 			...data,
 		})
 	}
@@ -145,7 +145,7 @@ export default function RegistrarEmpresa() {
 			/>
 			<Box sx={{ mt: 2 }}>
 				<FormInputSelect
-					name="familiaProfesionalId"
+					name="idFamiliaProfesional"
 					control={control}
 					label="Familia Profesional"
 					options={familias.map(f => ({ id: f.id, label: f.nombre }))}

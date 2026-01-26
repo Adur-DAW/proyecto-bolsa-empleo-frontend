@@ -3,19 +3,19 @@ import { EmpresasRepositoryHttp as empresasRepository } from '@/shared/repositor
 
 interface UseEmpresasQueryProps {
   search?: string
-  familiaProfesionalId?: number | null
-  sortBy?: string
-  page?: number
+  idFamiliaProfesional?: number | null
+  ordenarPor?: string
+  pagina?: number
 }
 
-export const useEmpresasQuery = ({ search, familiaProfesionalId, sortBy, page = 1 }: UseEmpresasQueryProps) => {
+export const useEmpresasQuery = ({ search, idFamiliaProfesional, ordenarPor, pagina = 1 }: UseEmpresasQueryProps) => {
   return useQuery({
-    queryKey: ['empresas', { search, familiaProfesionalId, sortBy, page }],
+    queryKey: ['empresas', { search, idFamiliaProfesional, ordenarPor, pagina }],
     queryFn: () => empresasRepository.obtener(
       search,
-      familiaProfesionalId ?? undefined,
-      sortBy,
-      page
+      idFamiliaProfesional ?? undefined,
+      ordenarPor,
+      pagina
     ),
   })
 }
