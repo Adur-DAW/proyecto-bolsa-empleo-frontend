@@ -90,11 +90,11 @@ const DetalleEmpresaOfertas = ({ idEmpresa }: { idEmpresa: number }) => {
       </Box>
 
       {tab === 0 && (
-        <OfertasLista empresaId={idEmpresa} estado="activas" />
+        <OfertasLista idEmpresa={idEmpresa} estado="activas" />
       )}
 
       {tab === 1 && (
-        <OfertasLista empresaId={idEmpresa} estado="cerradas" />
+        <OfertasLista idEmpresa={idEmpresa} estado="cerradas" />
       )}
     </Box>
   )

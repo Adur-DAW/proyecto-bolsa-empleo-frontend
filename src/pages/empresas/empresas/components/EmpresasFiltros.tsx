@@ -70,7 +70,7 @@ export default function EmpresasFiltros({
             Ordenar por
           </Typography>
           <Controller
-            name="sortBy"
+            name="ordenarPor"
             control={control}
             render={({ field }) => (
               <FormControl fullWidth size="small">

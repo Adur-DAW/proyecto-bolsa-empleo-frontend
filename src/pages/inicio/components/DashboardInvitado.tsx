@@ -12,7 +12,6 @@ export default function DashboardInvitado() {
 
   return (
     <Container sx={{ display: 'flex', flexDirection: 'column', gap: 6, py: 4 }}>
-      {/* Hero Section */}
       <Box sx={{ textAlign: 'center', py: 4 }}>
         <Typography variant="h3" fontWeight="bold" gutterBottom>
           Conecta con tu Futuro Profesional
@@ -42,7 +41,6 @@ export default function DashboardInvitado() {
         </Box>
       </Box>
 
-      {/* Live Stats */}
       <Grid container spacing={3} justifyContent="center">
         <StatCard
           icon={<IconBriefcase size={40} />}
@@ -61,7 +59,6 @@ export default function DashboardInvitado() {
         />
       </Grid>
 
-      {/* Latest Public Offers (if enabled) */}
       {stats.ultimas_ofertas && stats.ultimas_ofertas.length > 0 && (
         <Box>
           <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>

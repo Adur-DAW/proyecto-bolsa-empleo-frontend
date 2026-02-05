@@ -21,7 +21,7 @@ import EntityCard from '@/shared/components/cards/EntityCard'
 import { useEmpresasQuery } from '@/shared/hooks/useEmpresasQuery'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 
-interface EmpresasListaProps {
+type EmpresasListaProps = {
 	search?: string
 	idFamiliaProfesional?: number | null
 	ordenarPor?: string
@@ -42,14 +42,14 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 	const { mismoRol } = useRol()
 	const [pagina, setPagina] = useState(1)
 
-	const [debouncedSearch] = useDebounce(search || '', 500)
+	const [busquedaDebounce] = useDebounce(search || '', 500)
 
 	useEffect(() => {
 		setPagina(1)
 	}, [search, idFamiliaProfesional, ordenarPor])
 
 	const { data: paginatedData, isLoading } = useEmpresasQuery({
-		search: debouncedSearch,
+		search: busquedaDebounce,
 		idFamiliaProfesional,
 		ordenarPor,
 		pagina
@@ -87,7 +87,7 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 		mutationRechazar.mutate(idEmpresa)
 	}
 
-	const handlePageChange = (_, value: number) => {
+	const handleCambioPagina = (_, value: number) => {
 		setPagina(value)
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
@@ -184,7 +184,7 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 					<Pagination
 						count={paginatedData.ultima_pagina}
 						page={pagina}
-						onChange={handlePageChange}
+						onChange={handleCambioPagina}
 						color="primary"
 						size="large"
 					/>

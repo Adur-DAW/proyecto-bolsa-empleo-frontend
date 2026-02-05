@@ -17,7 +17,6 @@ export default function DashboardAdmin() {
         Panel de Administración
       </Typography>
 
-      {/* Critical Alerts */}
       {data.validaciones_pendientes > 0 && (
         <Paper
           component={Link}
@@ -38,7 +37,6 @@ export default function DashboardAdmin() {
       )}
 
       <Grid container spacing={4}>
-        {/* KPIs */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -73,7 +71,6 @@ export default function DashboardAdmin() {
           </Card>
         </Grid>
 
-        {/* Recent Activity Feed */}
         <Grid size={{ xs: 12, md: 8 }}>
           <Card>
             <CardContent>
@@ -82,7 +79,7 @@ export default function DashboardAdmin() {
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {data.actividad_reciente.empresas.map((empresa: any, index: number) => (
-                  <ActivityItem
+                  <ElementoActividad
                     key={`emp-${index}`}
                     icon={<IconBuildingStore size={18} />}
                     text={`Nueva empresa registrada: ${empresa.nombre}`}
@@ -90,7 +87,7 @@ export default function DashboardAdmin() {
                   />
                 ))}
                 {data.actividad_reciente.demandantes.map((dem: any, index: number) => (
-                  <ActivityItem
+                  <ElementoActividad
                     key={`dem-${index}`}
                     icon={<IconUsers size={18} />}
                     text={`Nuevo candidato: ${dem.nombre} ${dem.apellido1}`}
@@ -106,7 +103,7 @@ export default function DashboardAdmin() {
   )
 }
 
-function ActivityItem({ icon, text, date }: { icon: any, text: string, date: string }) {
+function ElementoActividad({ icon, text, date }: { icon: any, text: string, date: string }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5, borderBottom: '1px solid #f0f0f0' }}>
       <Box sx={{ color: 'text.secondary' }}>{icon}</Box>

@@ -101,7 +101,7 @@ export default function OfertasFiltros({
 						Familia Profesional
 					</Typography>
 					<Controller
-						name="familiaId"
+						name="idFamilia"
 						control={control}
 						render={({ field }) => (
 							<Autocomplete
@@ -141,7 +141,7 @@ export default function OfertasFiltros({
 						Ordenar por
 					</Typography>
 					<Controller
-						name="sortBy"
+						name="ordenarPor"
 						control={control}
 						render={({ field }) => (
 							<FormControl fullWidth size="small">

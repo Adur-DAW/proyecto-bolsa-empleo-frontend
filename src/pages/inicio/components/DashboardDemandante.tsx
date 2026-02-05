@@ -18,7 +18,7 @@ export default function DashboardDemandante() {
       </Typography>
 
       <Grid container spacing={4}>
-        {/* Left Column: Matches */}
+
         <Grid size={{ xs: 12, md: 8 }}>
           <Typography variant="h6" gutterBottom>
             Ofertas que encajan contigo ({data.matches.length})
@@ -64,7 +64,6 @@ export default function DashboardDemandante() {
           )}
         </Grid>
 
-        {/* Right Column: Status & Activity */}
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ mb: 3 }}>
             <CardContent>
@@ -116,7 +115,5 @@ function StatusChip({ adjudicada }: { adjudicada: number }) {
   if (adjudicada) {
     return <Chip icon={<IconCheck size={16} />} label="Adjudicada" color="success" size="small" />
   }
-  // Simplificación: si no está adjudicada, asumimos "En proceso" o "Pendiente" 
-  // visualmente, aunque podría haber sido rechazada si tuviéramos ese estado explícito separado.
   return <Chip icon={<IconClock size={16} />} label="En proceso" color="warning" size="small" />
 }

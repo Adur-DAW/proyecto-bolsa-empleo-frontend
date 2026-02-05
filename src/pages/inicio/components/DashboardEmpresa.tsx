@@ -28,7 +28,7 @@ export default function DashboardEmpresa() {
       </Box>
 
       <Grid container spacing={4}>
-        {/* Insights Cards */}
+
         <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ bgcolor: 'secondary.light', color: 'secondary.contrastText' }}>
             <CardContent>
@@ -46,7 +46,6 @@ export default function DashboardEmpresa() {
           </Card>
         </Grid>
 
-        {/* Active Offers List */}
         <Grid size={{ xs: 12, md: 8 }}>
           <Typography variant="h6" gutterBottom>
             Estado de Ofertas Activas

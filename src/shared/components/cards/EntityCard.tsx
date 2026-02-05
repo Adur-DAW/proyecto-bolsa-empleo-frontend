@@ -55,13 +55,11 @@ export default function EntityCard({
         bgcolor: 'background.paper'
       }}
       onClick={onClick}
-      // @ts-ignore
       component={CardWrapper}
       {...wrapperProps}
     >
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', gap: 2.5, alignItems: 'flex-start' }}>
-          {/* Avatar Section */}
           {avatar && (
             <Box
               sx={{
@@ -73,7 +71,6 @@ export default function EntityCard({
             </Box>
           )}
 
-          {/* Main Content */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 1 }}>
               <Box>
@@ -93,7 +90,6 @@ export default function EntityCard({
               )}
             </Box>
 
-            {/* Details Grid */}
             {details.length > 0 && (
               <Box sx={{ mt: 2.5, mb: actions ? 2 : 0 }}>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} flexWrap="wrap" useFlexGap sx={{ rowGap: 1 }}>
@@ -117,7 +113,6 @@ export default function EntityCard({
           </Box>
         </Box>
 
-        {/* Actions Footer - Only render if actions exist */}
         {actions && (
           <>
             <Divider sx={{ my: 2, borderStyle: 'dashed' }} />

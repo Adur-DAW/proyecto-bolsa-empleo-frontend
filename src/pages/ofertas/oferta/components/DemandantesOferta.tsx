@@ -78,7 +78,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 		},
 	]
 
-	const paginationModel = { page: 0, pageSize: 5 }
+	const paginationModel = { pagina: 0, tamanoPagina: 5 }
 
 	const rows = demandantes.map((demandante) => ({
 		id: demandante.idDemandante,

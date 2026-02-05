@@ -165,18 +165,18 @@ export default function Navbar() {
 						sx={{ display: { xs: 'block', md: 'none' } }}
 					>
 						{paginas.length > 1 &&
-							paginas.map((page) => (
+							paginas.map((pagina) => (
 								<MenuItem
-									key={page.to}
+									key={pagina.to}
 									onClick={handleCloseNavMenu}
 									sx={{ display: 'flex', gap: 1 }}
 								>
-									{page.icono}
+									{pagina.icono}
 									<Link
 										style={{ textAlign: 'center', color: 'black' }}
-										to={page.to}
+										to={pagina.to}
 									>
-										{page.texto}
+										{pagina.texto}
 									</Link>
 								</MenuItem>
 							))}
@@ -185,9 +185,9 @@ export default function Navbar() {
 
 				<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
 					{paginas.length > 1 &&
-						paginas.map((page) => (
+						paginas.map((pagina) => (
 							<Link
-								key={page.to}
+								key={pagina.to}
 								style={{
 									color: 'white',
 									fontSize: '1rem',
@@ -195,13 +195,13 @@ export default function Navbar() {
 									display: 'flex',
 									alignItems: 'center',
 									gap: '.5rem',
-									fontWeight: location.pathname === page.to ? 'bold' : 'normal',
+									fontWeight: location.pathname === pagina.to ? 'bold' : 'normal',
 								}}
-								to={page.to}
+								to={pagina.to}
 								onClick={handleCloseNavMenu}
 							>
-								{page.icono}
-								{page.texto}
+								{pagina.icono}
+								{pagina.texto}
 							</Link>
 						))}
 				</Box>

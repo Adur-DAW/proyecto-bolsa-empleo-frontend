@@ -13,9 +13,9 @@ import { useForm } from 'react-hook-form'
 interface OfertasFilterForm {
 	filtro: ObtenerOfertas
 	search: string
-	sortBy: string
+	ordenarPor: string
 	estado: string
-	familiaId: string
+	idFamilia: string
 }
 
 export default function OfertasPage() {
@@ -31,25 +31,25 @@ export default function OfertasPage() {
 			filtro: (searchParams.get('filtro') as ObtenerOfertas) ||
 				(rol == 'sinRol' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
 			search: searchParams.get('search') || '',
-			sortBy: searchParams.get('sortBy') || 'fecha_publicacion.desc',
+			ordenarPor: searchParams.get('ordenarPor') || 'fecha_publicacion.desc',
 			estado: searchParams.get('estado') || 'abierta',
-			familiaId: searchParams.get('familiaId') || ''
+			idFamilia: searchParams.get('idFamilia') || ''
 		}
 	})
 
 	// 3. Applied state for Query
-	const [appliedFilters, setAppliedFilters] = useState<OfertasFilterForm>(watch())
+	const [filtros, setfiltros] = useState<OfertasFilterForm>(watch())
 
 	const onSubmit = (data: OfertasFilterForm) => {
 		const params: any = {}
 		if (data.filtro) params.filtro = data.filtro
 		if (data.search) params.search = data.search
-		if (data.sortBy) params.sortBy = data.sortBy
+		if (data.ordenarPor) params.ordenarPor = data.ordenarPor
 		if (data.estado) params.estado = data.estado
-		if (data.familiaId) params.familiaId = data.familiaId
+		if (data.idFamilia) params.idFamilia = data.idFamilia
 
 		setSearchParams(params)
-		setAppliedFilters(data)
+		setfiltros(data)
 	}
 
 	return (
@@ -91,11 +91,11 @@ export default function OfertasPage() {
 					</Box>
 
 					<OfertasLista
-						filtro={appliedFilters.filtro}
-						search={appliedFilters.search}
-						sortBy={appliedFilters.sortBy}
-						estado={appliedFilters.estado}
-						familiaId={appliedFilters.familiaId}
+						filtro={filtros.filtro}
+						search={filtros.search}
+						ordenarPor={filtros.ordenarPor}
+						estado={filtros.estado}
+						idFamilia={filtros.idFamilia}
 						clientFilter={clientFilter}
 					/>
 				</Box>
