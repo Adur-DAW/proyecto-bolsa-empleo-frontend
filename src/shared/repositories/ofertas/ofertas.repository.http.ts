@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 
 import {
 	RespuestaPaginada,
+	RespuestaPaginadaBackend,
 	getEntity,
 	postEntity,
 	putEntity,
@@ -37,7 +38,7 @@ export const OfertasRepositoryHttp = {
 		if (params?.idFamilia)
 			queryParams.append('id_familia', params.idFamilia.toString())
 
-		const response = await getEntity<RespuestaPaginada<any>>(
+		const response = await getEntity<RespuestaPaginadaBackend<any>>(
 			`/ofertas?${queryParams.toString()}`
 		)
 
@@ -45,17 +46,17 @@ export const OfertasRepositoryHttp = {
 			...response,
 			data: response?.data.map((x: any) => mapOfertaToFront(x)) || [],
 
-			pagina_actual: response?.pagina_actual || 1,
-			ultima_pagina: response?.ultima_pagina || 1,
-			primera_pagina_url: response?.primera_pagina_url || '',
-			ultima_pagina_url: response?.ultima_pagina_url || '',
+			paginaActual: response?.current_page || 1,
+			ultimaPagina: response?.last_page || 1,
+			primeraPaginaUrl: response?.first_page_url || '',
+			ultimaPaginaUrl: response?.last_page_url || '',
 			links: response?.links || [],
-			siguiente_pagina_url: response?.siguiente_pagina_url || null,
-			desde: response?.desde || 0,
-			per_pagina: response?.per_pagina || 0,
-			hasta: response?.hasta || 0,
+			siguientePaginaUrl: response?.next_page_url || null,
+			desde: response?.from || 0,
+			porPagina: response?.per_page || 0,
+			hasta: response?.to || 0,
 			total: response?.total || 0,
-			pagina_anterior_url: response?.pagina_anterior_url || null,
+			paginaAnteriorUrl: response?.prev_page_url || null,
 			path: response?.path || '',
 		}
 	},
@@ -82,24 +83,26 @@ export const OfertasRepositoryHttp = {
 
 		if (params?.idFamilia)
 			queryParams.append('id_familia', params.idFamilia.toString())
-		const response = await getEntity<RespuestaPaginada<any>>(
+
+		const response = await getEntity<RespuestaPaginadaBackend<any>>(
 			`/demandantes/jwt/ofertas-por-titulos?${queryParams.toString()}`
 		)
+
 		return {
 			...response,
 			data: response?.data.map((x: any) => mapOfertaToFront(x)) || [],
 
-			pagina_actual: response?.pagina_actual || 1,
-			ultima_pagina: response?.ultima_pagina || 1,
-			primera_pagina_url: response?.primera_pagina_url || '',
-			ultima_pagina_url: response?.ultima_pagina_url || '',
+			paginaActual: response?.current_page || 1,
+			ultimaPagina: response?.last_page || 1,
+			primeraPaginaUrl: response?.first_page_url || '',
+			ultimaPaginaUrl: response?.last_page_url || '',
 			links: response?.links || [],
-			siguiente_pagina_url: response?.siguiente_pagina_url || null,
-			desde: response?.desde || 0,
-			per_pagina: response?.per_pagina || 0,
-			hasta: response?.hasta || 0,
+			siguientePaginaUrl: response?.next_page_url || null,
+			desde: response?.from || 0,
+			porPagina: response?.per_page || 0,
+			hasta: response?.to || 0,
 			total: response?.total || 0,
-			pagina_anterior_url: response?.pagina_anterior_url || null,
+			paginaAnteriorUrl: response?.prev_page_url || null,
 			path: response?.path || '',
 		}
 	},
@@ -126,24 +129,24 @@ export const OfertasRepositoryHttp = {
 		if (params?.idFamilia)
 			queryParams.append('id_familia', params.idFamilia.toString())
 
-		const response = await getEntity<RespuestaPaginada<any>>(
+		const response = await getEntity<RespuestaPaginadaBackend<any>>(
 			`/empresas/jwt/ofertas?${queryParams.toString()}`
 		)
 		return {
 			...response,
 			data: response?.data.map((x: any) => mapOfertaToFront(x)) || [],
 
-			pagina_actual: response?.pagina_actual || 1,
-			ultima_pagina: response?.ultima_pagina || 1,
-			primera_pagina_url: response?.primera_pagina_url || '',
-			ultima_pagina_url: response?.ultima_pagina_url || '',
+			paginaActual: response?.current_page || 1,
+			ultimaPagina: response?.last_page || 1,
+			primeraPaginaUrl: response?.first_page_url || '',
+			ultimaPaginaUrl: response?.last_page_url || '',
 			links: response?.links || [],
-			siguiente_pagina_url: response?.siguiente_pagina_url || null,
-			desde: response?.desde || 0,
-			per_pagina: response?.per_pagina || 0,
-			hasta: response?.hasta || 0,
+			siguientePaginaUrl: response?.next_page_url || null,
+			desde: response?.from || 0,
+			porPagina: response?.per_page || 0,
+			hasta: response?.to || 0,
 			total: response?.total || 0,
-			pagina_anterior_url: response?.pagina_anterior_url || null,
+			paginaAnteriorUrl: response?.prev_page_url || null,
 			path: response?.path || '',
 		}
 	},
@@ -179,13 +182,15 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 const mapOfertaToFront = (oferta: any): Oferta => ({
 	...oferta,
 	idTipoContrato: oferta.id_tipo_contrato,
-	tipoContrato: oferta.tipo_contrato,
 	diasDescanso: oferta.dias_descanso,
 	numeroPuestos: oferta.numero_puestos,
 	fechaPublicacion: dayjs(oferta.fecha_publicacion),
 	fechaCierre: dayjs(oferta.fecha_cierre),
 	demandantesInscritos: oferta.demandantes_inscritos,
 	idEmpresa: oferta.id_empresa,
+	tipoContrato: oferta.id_tipo_contrato == 1
+		? { id: 1, nombre: 'Jornada Completa' }
+		: { id: 2, nombre: 'Media Jornada' },
 	empresa: {
 		...oferta.empresa,
 	},

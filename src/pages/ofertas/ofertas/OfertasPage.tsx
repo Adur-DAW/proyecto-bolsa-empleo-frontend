@@ -22,10 +22,8 @@ export default function OfertasPage() {
 	const { rol, mismoRol } = useRol()
 	const [searchParams, setSearchParams] = useSearchParams()
 
-	// 1. Client-side filter (Top Right)
 	const [clientFilter, setClientFilter] = useState('')
 
-	// 2. Initialize Form with useFormHook
 	const { control, handleSubmit, watch } = useForm<OfertasFilterForm>({
 		defaultValues: {
 			filtro: (searchParams.get('filtro') as ObtenerOfertas) ||
@@ -37,8 +35,7 @@ export default function OfertasPage() {
 		}
 	})
 
-	// 3. Applied state for Query
-	const [filtros, setfiltros] = useState<OfertasFilterForm>(watch())
+	const [filtros, setFiltros] = useState<OfertasFilterForm>(watch())
 
 	const onSubmit = (data: OfertasFilterForm) => {
 		const params: any = {}
@@ -49,7 +46,7 @@ export default function OfertasPage() {
 		if (data.idFamilia) params.idFamilia = data.idFamilia
 
 		setSearchParams(params)
-		setfiltros(data)
+		setFiltros(data)
 	}
 
 	return (
@@ -67,11 +64,10 @@ export default function OfertasPage() {
 				/>
 
 				<Box sx={{ flex: 1 }}>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-						{/* Client Side Filter */}
+					<Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2 }}>
 						<TextField
 							size="small"
-							placeholder="Filtrar resultados vistos..."
+							placeholder="Filtrar..."
 							value={clientFilter}
 							onChange={(e) => setClientFilter(e.target.value)}
 							sx={{ width: 300 }}
@@ -96,7 +92,7 @@ export default function OfertasPage() {
 						ordenarPor={filtros.ordenarPor}
 						estado={filtros.estado}
 						idFamilia={filtros.idFamilia}
-						clientFilter={clientFilter}
+						filtroFrontend={clientFilter}
 					/>
 				</Box>
 			</Box>

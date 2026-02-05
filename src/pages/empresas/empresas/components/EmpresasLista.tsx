@@ -1,25 +1,29 @@
 import {
-	Typography,
-	Chip,
 	Avatar,
-	Stack,
 	Box,
 	Button,
-	Pagination
+	Chip,
+	Pagination,
+	Stack,
+	Typography,
 } from '@mui/material'
-import { useState, useEffect } from 'react'
 import {
-	useMutation,
-	useQueryClient,
-} from '@tanstack/react-query'
-import { IconMapPin, IconBriefcase, IconCheck, IconX, IconNews, IconUsers } from '@tabler/icons-react'
+	IconBriefcase,
+	IconCheck,
+	IconMapPin,
+	IconNews,
+	IconUsers,
+	IconX,
+} from '@tabler/icons-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-import useRol from '@/shared/hooks/rol.hook'
-import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
-import EntityCard from '@/shared/components/cards/EntityCard'
-import { useEmpresasQuery } from '@/shared/hooks/useEmpresasQuery'
+import Tarjeta from '@/shared/components/tarjetas/Tarjeta'
+import useRol from '@/shared/hooks/rol.hook'
 import { useDebounce } from '@/shared/hooks/useDebounce'
+import { useEmpresasQuery } from '@/shared/hooks/useEmpresasQuery'
+import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 
 type EmpresasListaProps = {
 	search?: string
@@ -28,17 +32,32 @@ type EmpresasListaProps = {
 	query?: string
 }
 
-export default function EmpresasLista({ search, idFamiliaProfesional, ordenarPor, query }: EmpresasListaProps) {
+export default function EmpresasLista({
+	search,
+	idFamiliaProfesional,
+	ordenarPor,
+	query,
+}: EmpresasListaProps) {
 	return (
 		<Stack spacing={3}>
 			<PageDataContainer skeletonType="list">
-				<EmpresasListaSuspense search={search} idFamiliaProfesional={idFamiliaProfesional} ordenarPor={ordenarPor} query={query} />
+				<EmpresasListaSuspense
+					search={search}
+					idFamiliaProfesional={idFamiliaProfesional}
+					ordenarPor={ordenarPor}
+					query={query}
+				/>
 			</PageDataContainer>
 		</Stack>
 	)
 }
 
-const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query }: EmpresasListaProps) => {
+const EmpresasListaSuspense = ({
+	search,
+	idFamiliaProfesional,
+	ordenarPor,
+	query,
+}: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
 	const [pagina, setPagina] = useState(1)
 
@@ -52,16 +71,17 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 		search: busquedaDebounce,
 		idFamiliaProfesional,
 		ordenarPor,
-		pagina
+		pagina,
 	})
 
 	const allEmpresas = paginatedData?.data || []
 
 	const empresas = query
-		? allEmpresas.filter(e =>
-			e.nombre.toLowerCase().includes(query.toLowerCase()) ||
-			e.localidad?.toLowerCase().includes(query.toLowerCase())
-		)
+		? allEmpresas.filter(
+				(e) =>
+					e.nombre.toLowerCase().includes(query.toLowerCase()) ||
+					e.localidad?.toLowerCase().includes(query.toLowerCase())
+			)
 		: allEmpresas
 
 	const queryClient = useQueryClient()
@@ -78,12 +98,12 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 	})
 
 	const onValidarClick = (e: any, idEmpresa: number) => {
-		e.stopPropagation();
+		e.stopPropagation()
 		mutationAceptar.mutate(idEmpresa)
 	}
 
 	const onRechazarClick = (e: any, idEmpresa: number) => {
-		e.stopPropagation();
+		e.stopPropagation()
 		mutationRechazar.mutate(idEmpresa)
 	}
 
@@ -95,65 +115,87 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 	return (
 		<Box>
 			{empresas.length === 0 && !isLoading && (
-				<Typography align="center" color="text.secondary">No se encontraron empresas.</Typography>
+				<Typography align="center" color="text.secondary">
+					No se encontraron empresas.
+				</Typography>
 			)}
 
 			<Stack spacing={2}>
 				{empresas.map((empresa) => {
 					return (
-						<EntityCard
+						<Tarjeta
 							key={empresa.idEmpresa}
-							title={empresa.nombre}
+							titulo={empresa.nombre}
 							to={`/empresas/${empresa.idEmpresa}`}
 							avatar={
 								<Avatar
-									src={empresa.imagen_url || undefined}
+									src={empresa.imagenUrl || undefined}
 									sx={{ width: 48, height: 48 }}
 									variant="rounded"
 								>
 									{empresa.nombre.charAt(0)}
 								</Avatar>
 							}
-							badges={
+							etiquetas={
 								mismoRol('centro') && (
 									<Chip
 										label={empresa.validado ? 'Validado' : 'Pendiente'}
 										color={empresa.validado ? 'success' : 'warning'}
 										size="small"
-										icon={empresa.validado ? <IconCheck size={14} /> : <IconX size={14} />}
+										icon={
+											empresa.validado ? (
+												<IconCheck size={14} />
+											) : (
+												<IconX size={14} />
+											)
+										}
 									/>
 								)
 							}
-							details={[
+							detalles={[
 								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-									<IconBriefcase size={16} color="var(--mui-palette-text-secondary)" />
+									<IconBriefcase
+										size={16}
+										color="var(--mui-palette-text-secondary)"
+									/>
 									<Typography variant="body2" color="text.secondary">
-										{empresa.familiaProfesional?.nombre || 'Sin Familia Profesional'}
+										{empresa.familiaProfesional?.nombre ||
+											'Sin Familia Profesional'}
 									</Typography>
 								</Box>,
 								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-									<IconMapPin size={16} color="var(--mui-palette-text-secondary)" />
+									<IconMapPin
+										size={16}
+										color="var(--mui-palette-text-secondary)"
+									/>
 									<Typography variant="body2" color="text.secondary">
 										{empresa.localidad || 'Sin localidad'}
 									</Typography>
 								</Box>,
-								<Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
+								<Box sx={{ display: 'flex', gap: 3 }}>
 									<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-										<IconNews size={16} color="var(--mui-palette-primary-main)" />
+										<IconNews
+											size={16}
+											color="var(--mui-palette-primary-main)"
+										/>
 										<Typography variant="body2" fontWeight="medium">
 											{empresa.cantidadOfertas || 0} Ofertas
 										</Typography>
 									</Box>
 									<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-										<IconUsers size={16} color="var(--mui-palette-secondary-main)" />
+										<IconUsers
+											size={16}
+											color="var(--mui-palette-secondary-main)"
+										/>
 										<Typography variant="body2" fontWeight="medium">
 											{empresa.cantidadVacantes || 0} Vacantes
 										</Typography>
 									</Box>
-								</Box>
+								</Box>,
 							]}
-							actions={
-								mismoRol('centro') && !empresa.validado && (
+							acciones={
+								mismoRol('centro') &&
+								!empresa.validado && (
 									<Box sx={{ display: 'flex', gap: 1 }}>
 										<Button
 											variant="outlined"
@@ -179,10 +221,10 @@ const EmpresasListaSuspense = ({ search, idFamiliaProfesional, ordenarPor, query
 				})}
 			</Stack>
 
-			{paginatedData && paginatedData.ultima_pagina > 1 && (
+			{paginatedData && paginatedData.ultimaPagina > 1 && (
 				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
 					<Pagination
-						count={paginatedData.ultima_pagina}
+						count={paginatedData.ultimaPagina}
 						page={pagina}
 						onChange={handleCambioPagina}
 						color="primary"

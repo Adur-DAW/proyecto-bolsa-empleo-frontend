@@ -1,5 +1,6 @@
 import {
 	RespuestaPaginada,
+	RespuestaPaginadaBackend,
 	deleteEntity,
 	getEntity,
 	postEntity,
@@ -15,7 +16,6 @@ export const EmpresasRepositoryHttp = {
 		pagina: number = 1,
 		limit: number = 20
 	): Promise<RespuestaPaginada<Empresa>> => {
-
 		const queryParams = new URLSearchParams()
 
 		if (search) queryParams.append('search', search)
@@ -23,29 +23,28 @@ export const EmpresasRepositoryHttp = {
 		if (idFamiliaProfesional)
 			queryParams.append('id_familia', idFamiliaProfesional.toString())
 
-		if (ordenarPor)
-			queryParams.append('ordenar_por', ordenarPor)
+		if (ordenarPor) queryParams.append('ordenar_por', ordenarPor)
 
 		queryParams.append('pagina', pagina.toString())
 		queryParams.append('limit', limit.toString())
 
-		const response = await getEntity<RespuestaPaginada<any>>(
+		const response = await getEntity<RespuestaPaginadaBackend<any>>(
 			`/empresas?${queryParams.toString()}`
 		)
 
 		if (!response)
 			return {
-				pagina_actual: 1,
+				paginaActual: 1,
 				data: [],
-				primera_pagina_url: '',
+				primeraPaginaUrl: '',
 				desde: 0,
-				ultima_pagina: 1,
-				ultima_pagina_url: '',
+				ultimaPagina: 1,
+				ultimaPaginaUrl: '',
 				links: [],
-				siguiente_pagina_url: null,
+				siguientePaginaUrl: null,
 				path: '',
-				per_pagina: limit,
-				pagina_anterior_url: null,
+				porPagina: limit,
+				paginaAnteriorUrl: null,
 				hasta: 0,
 				total: 0,
 			}
@@ -57,7 +56,25 @@ export const EmpresasRepositoryHttp = {
 				idEmpresa: x.id_empresa,
 				cantidadOfertas: x.ofertas_count,
 				cantidadVacantes: x.vacantes,
+				familiaProfesional:  x.familia_profesional ? {
+					id: x.familia_profesional?.id,
+					nombre:  x.familia_profesional?.nombre,
+				} : null,
+				imagenUrl: x.imagen_url,
+				idFamiliaProfesional: x.id_familia_profesional,
 			})),
+			paginaActual: response?.current_page || 1,
+			ultimaPagina: response?.last_page || 1,
+			primeraPaginaUrl: response?.first_page_url || '',
+			ultimaPaginaUrl: response?.last_page_url || '',
+			links: response?.links || [],
+			siguientePaginaUrl: response?.next_page_url || null,
+			desde: response?.from || 0,
+			porPagina: response?.per_page || 0,
+			hasta: response?.to || 0,
+			total: response?.total || 0,
+			paginaAnteriorUrl: response?.prev_page_url || null,
+			path: response?.path || '',
 		}
 	},
 	obtenerPorId: async (id: number): Promise<Empresa> => {

@@ -35,6 +35,11 @@ export default function OfertasFiltros({
 		queryFn: MaestrosRepository.obtenerFamilias,
 	})
 
+	const estados = [
+		{ id: 'activas', nombre: 'Activas' },
+		{ id: 'finalizadas', nombre: 'Finalizadas' },
+	]
+
 	return (
 		<Box sx={{ width: { xs: '100%', md: 300 } }}>
 			<Paper sx={{ p: 3 }}>
@@ -42,7 +47,6 @@ export default function OfertasFiltros({
 					Filtros
 				</Typography>
 
-				{/* RADIO GROUP: Filter Mode (My Offers vs All) */}
 				<Box sx={{ mb: 3 }}>
 					<Typography variant="subtitle2" gutterBottom>
 						Ver ofertas
@@ -125,13 +129,15 @@ export default function OfertasFiltros({
 						name="estado"
 						control={control}
 						render={({ field }) => (
-							<FormControl fullWidth size="small">
-								<Select {...field}>
-									<MenuItem value="">Todas</MenuItem>
-									<MenuItem value="activas">Abiertas</MenuItem>
-									<MenuItem value="cerradas">Cerradas</MenuItem>
-								</Select>
-							</FormControl>
+							<Autocomplete
+								options={estados}
+								getOptionLabel={(option) => option.nombre}
+								value={estados.find((f) => f.id.toString() === field.value) || null}
+								onChange={(_, newValue) => field.onChange(newValue ? newValue.id.toString() : '')}
+								renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
+								isOptionEqualToValue={(option, value) => option.id.toString() === value.id.toString()}
+								noOptionsText="No se encontraron familias"
+							/>
 						)}
 					/>
 				</Box>

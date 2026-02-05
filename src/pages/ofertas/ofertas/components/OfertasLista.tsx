@@ -13,17 +13,16 @@ import {
 	IconClock,
 	IconEdit,
 	IconEye,
+	IconUsers,
 } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 
-import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
-
-import EntityCard from '@/shared/components/cards/EntityCard'
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
 import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
 import EmptyState from '@/shared/components/feedback/EmptyState'
+import Tarjeta from '@/shared/components/tarjetas/Tarjeta'
 import useRol from '@/shared/hooks/rol.hook'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import { useOfertasQuery } from '@/shared/hooks/useOfertasQuery'
@@ -35,7 +34,7 @@ type OfertasListaProps = {
 	search?: string
 	ordenarPor?: string
 	idFamilia?: string
-	clientFilter?: string
+	filtroFrontend?: string
 }
 
 const formatearFecha = (date: dayjs.Dayjs) => {
@@ -49,7 +48,7 @@ export default function OfertasLista({
 	search,
 	ordenarPor,
 	idFamilia,
-	clientFilter,
+	filtroFrontend,
 }: OfertasListaProps) {
 	return (
 		<Stack spacing={3}>
@@ -62,7 +61,7 @@ export default function OfertasLista({
 						search={search}
 						ordenarPor={ordenarPor}
 						idFamilia={idFamilia}
-						clientFilter={clientFilter}
+						filtroFrontend={filtroFrontend}
 					/>
 				</PageDataContainer>
 			</LimiteAccesoRestringido>
@@ -74,18 +73,15 @@ const OfertasListaSuspense = ({
 	filtro,
 	idEmpresa,
 	estado,
-	search,
+	search = '',
 	ordenarPor,
 	idFamilia,
-	clientFilter,
+	filtroFrontend,
 }: OfertasListaProps) => {
 	const { usuario, mismoRol } = useRol()
 	const [pagina, setPage] = useState(1)
 
-	const effectiveSearch = search || ''
-	const effectiveordenarPor = ordenarPor || 'fecha_publicacion.desc'
-
-	const [busquedaDebounce] = useDebounce(effectiveSearch, 500)
+	const [busquedaDebounce] = useDebounce(search, 500)
 
 	useEffect(() => {
 		setPage(1)
@@ -94,7 +90,6 @@ const OfertasListaSuspense = ({
 		idEmpresa,
 		estado,
 		busquedaDebounce,
-		effectiveordenarPor,
 		idFamilia,
 	])
 
@@ -103,21 +98,21 @@ const OfertasListaSuspense = ({
 		search: busquedaDebounce,
 		idEmpresa: idEmpresa?.toString(),
 		estado,
-		ordenarPor: effectiveordenarPor,
+		ordenarPor: ordenarPor ??  'fecha_publicacion.desc',
 		idFamilia,
 		pagina,
 	})
 
 	const allOfertas = paginatedData?.data || []
 
-	const ofertas = clientFilter
+	const ofertas = filtroFrontend
 		? allOfertas.filter(
 				(o) =>
-					o.nombre.toLowerCase().includes(clientFilter.toLowerCase()) ||
+					o.nombre.toLowerCase().includes(filtroFrontend.toLowerCase()) ||
 					o.empresa?.nombre
 						.toLowerCase()
-						.includes(clientFilter.toLowerCase()) ||
-					o.obs?.toLowerCase().includes(clientFilter.toLowerCase())
+						.includes(filtroFrontend.toLowerCase()) ||
+					o.obs?.toLowerCase().includes(filtroFrontend.toLowerCase())
 			)
 		: allOfertas
 
@@ -125,6 +120,8 @@ const OfertasListaSuspense = ({
 		setPage(value)
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
+
+	console.log(1);
 
 	return (
 		<Box>
@@ -137,12 +134,12 @@ const OfertasListaSuspense = ({
 
 			<Stack spacing={2}>
 				{ofertas.map((oferta) => (
-					<EntityCard
+					<Tarjeta
 						key={oferta.id}
-						title={oferta.nombre}
-						badges={
+						titulo={oferta.nombre}
+						etiquetas={
 							<Chip
-								label={oferta.abierta ? 'Activa' : 'Cerrada'}
+								label={oferta.abierta ? 'Activa' : 'Finalizada'}
 								color={oferta.abierta ? 'success' : 'default'}
 								size="small"
 								variant="outlined"
@@ -150,14 +147,14 @@ const OfertasListaSuspense = ({
 						}
 						avatar={
 							<Avatar
-								src={oferta.empresa?.imagen_url || undefined}
+								src={oferta.empresa?.imagenUrl || undefined}
 								sx={{ width: 48, height: 48 }}
 								variant="rounded"
 							>
 								{oferta.empresa?.nombre?.charAt(0)}
 							</Avatar>
 						}
-						subtitle={
+						subtitulo={
 							<Link
 								to={`/empresas/${oferta.idEmpresa}`}
 								style={{
@@ -183,12 +180,9 @@ const OfertasListaSuspense = ({
 								</Typography>
 							</Link>
 						}
-						details={[
+						detalles={[
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-								<IconClock
-									size={16}
-									color="var(--mui-palette-text-secondary)"
-								/>
+								<IconClock size={16} />
 								<Typography variant="body2" color="text.secondary">
 									{(oferta.tipoContrato as any)?.nombre ||
 										oferta.tipoContrato ||
@@ -197,25 +191,25 @@ const OfertasListaSuspense = ({
 								</Typography>
 							</Box>,
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-								<IconCalendar
-									size={16}
-									color="var(--mui-palette-text-secondary)"
-								/>
+								<IconCalendar size={16} />
 								<Typography variant="body2" color="text.secondary">
 									Hasta: {formatearFecha(oferta.fechaCierre)}
 								</Typography>
 							</Box>,
-							<Typography variant="body2" color="text.secondary">
-								{oferta.demandantesInscritos} inscritos / {oferta.numeroPuestos}{' '}
-								vacantes
-							</Typography>,
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+								<IconUsers size={16} />
+								<Typography variant="body2" color="text.secondary">
+									{oferta.demandantesInscritos} inscritos /{' '}
+									{oferta.numeroPuestos} vacantes
+								</Typography>
+							</Box>,
 						]}
-						actions={
+						acciones={
 							<>
 								<Typography
 									variant="caption"
 									color="text.secondary"
-									sx={{ mb: 1 }}
+									sx={{ mb: 1, mr: 2 }}
 								>
 									Publicado: {formatearFecha(oferta.fechaPublicacion)}
 								</Typography>
@@ -230,8 +224,6 @@ const OfertasListaSuspense = ({
 										Ver detalles
 									</Button>
 								</Link>
-
-								<InscribirseComponent oferta={oferta} filtro={filtro} />
 
 								{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
 									<Button
@@ -252,10 +244,10 @@ const OfertasListaSuspense = ({
 				))}
 			</Stack>
 
-			{paginatedData && paginatedData.ultima_pagina > 1 && (
+			{paginatedData && paginatedData.ultimaPagina > 1 && (
 				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
 					<Pagination
-						count={paginatedData.ultima_pagina}
+						count={paginatedData.ultimaPagina}
 						page={pagina}
 						onChange={handleCambioPagina}
 						color="primary"

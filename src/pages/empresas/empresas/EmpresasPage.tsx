@@ -63,7 +63,7 @@ export default function EmpresasPage() {
 					>
 						<TextField
 							size="small"
-							placeholder="Filtrar resultados vistos..."
+							placeholder="Filtrar..."
 							value={query}
 							onChange={(e) => setQuery(e.target.value)}
 							sx={{ width: 300 }}

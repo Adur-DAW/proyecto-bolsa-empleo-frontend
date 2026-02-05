@@ -11,27 +11,27 @@ import {
 import { ReactNode } from 'react'
 import { Link } from 'react-router'
 
-interface EntityCardProps {
-  title: string
-  subtitle?: ReactNode
+type TarjetaEmpresaProps = {
+  titulo: string
+  subtitulo?: ReactNode
   avatar?: ReactNode
-  badges?: ReactNode
-  details?: ReactNode[]
-  actions?: ReactNode
+  etiquetas?: ReactNode
+  detalles?: ReactNode[]
+  acciones?: ReactNode
   onClick?: () => void
   to?: string
 }
 
-export default function EntityCard({
-  title,
-  subtitle,
+export default function TarjetaEmpresa({
+  titulo,
+  subtitulo,
   avatar,
-  badges,
-  details = [],
-  actions,
+  etiquetas,
+  detalles = [],
+  acciones,
   onClick,
   to
-}: EntityCardProps) {
+}: TarjetaEmpresaProps) {
   const theme = useTheme();
   const CardWrapper = to ? Link : 'div';
   const wrapperProps = to ? { to, style: { textDecoration: 'none', color: 'inherit' } } : {};
@@ -75,25 +75,25 @@ export default function EntityCard({
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 1 }}>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 0.5 }}>
-                  {title}
+                  {titulo}
                 </Typography>
-                {subtitle && (
+                {subtitulo && (
                   <Box sx={{ color: 'text.secondary', typography: 'body2' }}>
-                    {subtitle}
+                    {subtitulo}
                   </Box>
                 )}
               </Box>
-              {badges && (
+              {etiquetas && (
                 <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
-                  {badges}
+                  {etiquetas}
                 </Stack>
               )}
             </Box>
 
-            {details.length > 0 && (
-              <Box sx={{ mt: 2.5, mb: actions ? 2 : 0 }}>
+            {detalles.length > 0 && (
+              <Box sx={{ mt: 2.5, mb: acciones ? 2 : 0 }}>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} flexWrap="wrap" useFlexGap sx={{ rowGap: 1 }}>
-                  {details.map((detail, index) => (
+                  {detalles.map((detail, index) => (
                     <Box
                       key={index}
                       sx={{
@@ -113,7 +113,7 @@ export default function EntityCard({
           </Box>
         </Box>
 
-        {actions && (
+        {acciones && (
           <>
             <Divider sx={{ my: 2, borderStyle: 'dashed' }} />
             <Box
@@ -126,7 +126,7 @@ export default function EntityCard({
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {actions}
+              {acciones}
             </Box>
           </>
         )}

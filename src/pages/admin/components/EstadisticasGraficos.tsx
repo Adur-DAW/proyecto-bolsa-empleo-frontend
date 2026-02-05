@@ -68,7 +68,7 @@ export default function EstadisticasGraficos({ estadisticas, colores: COLORES }:
             <Typography variant="h6" mb={2} color="text.secondary">Estado de Ofertas</Typography>
             <Box height={300} display="flex" justifyContent="center">
               <Pie data={{
-                labels: ['Abiertas', 'Adjudicadas', 'Cerradas'],
+                labels: ['Abiertas', 'Adjudicadas', 'Finalizadas'],
                 datasets: [{
                   data: [
                     estadisticas.estado_ofertas.abiertas,

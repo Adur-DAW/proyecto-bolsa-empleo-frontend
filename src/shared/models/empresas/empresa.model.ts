@@ -8,6 +8,6 @@ export type Empresa = {
 	cantidadVacantes?: number
 	telefono: string
 	cif?: string
-	imagen_url?: string
-	id_familia_profesional?: number
+	imagenUrl?: string
+	idFamiliaProfesional?: number
 }

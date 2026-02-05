@@ -73,18 +73,34 @@ export interface Pagination {
 	TotalPaginas: number
 }
 
-export interface RespuestaPaginada<T> {
-	pagina_actual: number
+export interface RespuestaPaginadaBackend<T> {
+	current_page: number
 	data: T[]
-	primera_pagina_url: string
-	desde: number
-	ultima_pagina: number
-	ultima_pagina_url: string
+	first_page_url: string
+	from: number
+	last_page: number
+	last_page_url: string
 	links: any[]
-	siguiente_pagina_url: string | null
+	next_page_url: string | null
 	path: string
-	per_pagina: number
-	pagina_anterior_url: string | null
+	per_page: number
+	prev_page_url: string | null
+	to: number
+	total: number
+}
+
+export interface RespuestaPaginada<T> {
+	paginaActual: number
+	data: T[]
+	primeraPaginaUrl: string
+	desde: number
+	ultimaPagina: number
+	ultimaPaginaUrl: string
+	links: any[]
+	siguientePaginaUrl: string | null
+	path: string
+	porPagina: number
+	paginaAnteriorUrl: string | null
 	hasta: number
 	total: number
 }
