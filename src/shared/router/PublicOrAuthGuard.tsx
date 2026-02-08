@@ -10,14 +10,13 @@ export default function PublicOrAuthGuard() {
   const { data: config, isLoading } = useQuery({
     queryKey: ['appConfig'],
     queryFn: ConfigRepository.obtener,
-    staleTime: 1000 * 60 * 5 // 5 minutes
+    staleTime: 1000 * 60 * 5
   })
 
   if (isLoading) {
-    return <div>Cargando configuración...</div> // Or a proper Spinner
+    return <div>Cargando configuración...</div>
   }
 
-  // If config is not loaded or ofertas_publicas is false AND user is not logged in, redirect
   if (config && !config.ofertas_publicas && !usuario) {
     return <Navigate to={getAbsolutePath('login')} replace />
   }

@@ -24,7 +24,7 @@ axiosInstance.interceptors.request.use(
 
 import { refreshTokenService } from '@/shared/services/refresh-token.service'
 
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+type CustomAxiosRequestConfig = InternalAxiosRequestConfig & {
 	_retry?: boolean
 }
 
@@ -43,7 +43,7 @@ axiosInstance.interceptors.response.use(
 				if (token) {
 					try {
 						const newToken = await refreshTokenService(token)
-						useAppStore.getState().login(useAppStore.getState().usuario!, newToken) // Update store
+						useAppStore.getState().login(useAppStore.getState().usuario!, newToken)
 						axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + newToken
 						originalRequest.headers['Authorization'] = 'Bearer ' + newToken
 						return axiosInstance(originalRequest)
@@ -53,7 +53,7 @@ axiosInstance.interceptors.response.use(
 						return Promise.reject(refreshError)
 					}
 				} else {
-					useAppStore.getState().logout() // Ensure logout if no token
+					useAppStore.getState().logout()
 				}
 			} else if (status === 403) {
 				toast.error('Acceso denegado', { description: 'No tienes permisos para realizar esta acción.' })

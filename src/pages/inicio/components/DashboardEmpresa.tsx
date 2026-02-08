@@ -71,7 +71,7 @@ export default function DashboardEmpresa() {
                     <Box sx={{ textAlign: 'left' }}>
                       <Typography fontWeight="bold">{oferta.nombre}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Publicado: {dayjs(oferta.fecha_publicacion).format('DD/MM/YYYY')}
+                        Publicada: {dayjs(oferta.fecha_publicacion).format('DD/MM/YYYY')}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>

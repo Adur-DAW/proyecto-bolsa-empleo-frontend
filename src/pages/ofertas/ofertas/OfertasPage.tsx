@@ -22,7 +22,7 @@ export default function OfertasPage() {
 	const { rol, mismoRol } = useRol()
 	const [searchParams, setSearchParams] = useSearchParams()
 
-	const [clientFilter, setClientFilter] = useState('')
+	const [filtroFrontend, setFiltroFrontend] = useState('')
 
 	const { control, handleSubmit, watch } = useForm<OfertasFilterForm>({
 		defaultValues: {
@@ -30,7 +30,7 @@ export default function OfertasPage() {
 				(rol == 'sinRol' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
 			search: searchParams.get('search') || '',
 			ordenarPor: searchParams.get('ordenarPor') || 'fecha_publicacion.desc',
-			estado: searchParams.get('estado') || 'abierta',
+			estado: searchParams.get('estado') || 'activas',
 			idFamilia: searchParams.get('idFamilia') || ''
 		}
 	})
@@ -68,8 +68,8 @@ export default function OfertasPage() {
 						<TextField
 							size="small"
 							placeholder="Filtrar..."
-							value={clientFilter}
-							onChange={(e) => setClientFilter(e.target.value)}
+							value={filtroFrontend}
+							onChange={(e) => setFiltroFrontend(e.target.value)}
 							sx={{ width: 300 }}
 						/>
 
@@ -92,7 +92,7 @@ export default function OfertasPage() {
 						ordenarPor={filtros.ordenarPor}
 						estado={filtros.estado}
 						idFamilia={filtros.idFamilia}
-						filtroFrontend={clientFilter}
+						filtroFrontend={filtroFrontend}
 					/>
 				</Box>
 			</Box>

@@ -86,7 +86,6 @@ const OfertaEditarDatosBaseInterno = () => {
 	})
 
 	const onSubmit = (data) => {
-		// Ensure correct types for backend
 		const payload = {
 			...oferta,
 			...data,

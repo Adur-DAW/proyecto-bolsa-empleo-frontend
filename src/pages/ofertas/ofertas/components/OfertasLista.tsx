@@ -98,7 +98,7 @@ const OfertasListaSuspense = ({
 		search: busquedaDebounce,
 		idEmpresa: idEmpresa?.toString(),
 		estado,
-		ordenarPor: ordenarPor ??  'fecha_publicacion.desc',
+		ordenarPor: ordenarPor ?? 'fecha_publicacion.desc',
 		idFamilia,
 		pagina,
 	})
@@ -107,13 +107,13 @@ const OfertasListaSuspense = ({
 
 	const ofertas = filtroFrontend
 		? allOfertas.filter(
-				(o) =>
-					o.nombre.toLowerCase().includes(filtroFrontend.toLowerCase()) ||
-					o.empresa?.nombre
-						.toLowerCase()
-						.includes(filtroFrontend.toLowerCase()) ||
-					o.obs?.toLowerCase().includes(filtroFrontend.toLowerCase())
-			)
+			(o) =>
+				o.nombre.toLowerCase().includes(filtroFrontend.toLowerCase()) ||
+				o.empresa?.nombre
+					.toLowerCase()
+					.includes(filtroFrontend.toLowerCase()) ||
+				o.obs?.toLowerCase().includes(filtroFrontend.toLowerCase())
+		)
 		: allOfertas
 
 	const handleCambioPagina = (_, value: number) => {
@@ -211,7 +211,7 @@ const OfertasListaSuspense = ({
 									color="text.secondary"
 									sx={{ mb: 1, mr: 2 }}
 								>
-									Publicado: {formatearFecha(oferta.fechaPublicacion)}
+									Publicada: {formatearFecha(oferta.fechaPublicacion)}
 								</Typography>
 
 								<Link to={`/ofertas/${oferta.id}`}>

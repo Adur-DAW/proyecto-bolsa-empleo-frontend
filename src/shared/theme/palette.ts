@@ -39,13 +39,13 @@ export function palette() {
 		...base,
 		mode: 'light',
 		primary: {
-			main: '#0a2342', // Navy Blue
+			main: '#0a2342',
 			light: '#344b6e',
 			dark: '#00001c',
 			contrastText: '#ffffff',
 		},
 		secondary: {
-			main: '#009688', // Teal
+			main: '#009688',
 			light: '#52c7b8',
 			dark: '#00675b',
 			contrastText: '#ffffff',
@@ -56,8 +56,8 @@ export function palette() {
 			disabled: grey[500],
 		},
 		background: {
-			paper: '#FFFFFF', //CARD
-			default: grey[100], //FONDO
+			paper: '#FFFFFF',
+			default: grey[100],
 			neutral: grey[200],
 		},
 		action: {

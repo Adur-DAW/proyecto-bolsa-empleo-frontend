@@ -1,7 +1,7 @@
 import { Box, Button, Typography, Paper } from '@mui/material'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
-interface ErrorStateProps {
+type ErrorStateProps = {
   message?: string
   retry?: () => void
 }

@@ -1,6 +1,6 @@
 import { Box, Skeleton, Stack } from '@mui/material'
 
-interface LoadingSkeletonProps {
+type LoadingSkeletonProps = {
   type?: 'list' | 'card' | 'detail' | 'dashboard'
 }
 
@@ -58,7 +58,6 @@ export default function LoadingSkeleton({
     )
   }
 
-  // Default list
   return (
     <Stack spacing={2}>
       {[1, 2, 3, 4].map((i) => (

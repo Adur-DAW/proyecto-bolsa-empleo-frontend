@@ -71,10 +71,9 @@ export function overrides(theme: Theme) {
 		MuiCard: {
 			styleOverrides: {
 				root: {
-					// boxShadow: theme.customShadows.card,
 					borderRadius: Number(theme.shape.borderRadius) * 2,
 					position: 'relative',
-					zIndex: 0, // Fix Safari overflow: hidden with border radius
+					zIndex: 0,
 				},
 			},
 		},
@@ -107,7 +106,6 @@ export function overrides(theme: Theme) {
 			styleOverrides: {
 				head: {
 					color: theme.palette.text.secondary,
-					// backgroundColor: theme.palette.background.neutral,
 				},
 			},
 		},

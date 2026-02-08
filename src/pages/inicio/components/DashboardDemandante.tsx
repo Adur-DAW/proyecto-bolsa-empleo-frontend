@@ -21,7 +21,7 @@ export default function DashboardDemandante() {
 
         <Grid size={{ xs: 12, md: 8 }}>
           <Typography variant="h6" gutterBottom>
-            Ofertas que encajan contigo ({data.matches.length})
+            Ofertas para ti ({data.matches.length})
           </Typography>
           {data.matches.length === 0 ? (
             <Paper sx={{ p: 4, textAlign: 'center' }}>

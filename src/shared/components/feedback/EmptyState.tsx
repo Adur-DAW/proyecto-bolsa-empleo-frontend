@@ -2,7 +2,7 @@ import { Box, Typography, Button } from '@mui/material'
 import { IconSearch } from '@tabler/icons-react'
 import { ReactNode } from 'react'
 
-interface EmptyStateProps {
+type EmptyStateProps = {
   title?: string
   description?: string
   icon?: ReactNode

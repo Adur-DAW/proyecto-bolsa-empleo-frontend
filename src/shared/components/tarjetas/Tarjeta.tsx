@@ -43,13 +43,13 @@ export default function TarjetaEmpresa({
         border: '1px solid',
         borderColor: 'divider',
         boxShadow: 'none',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.1s ease',
         position: 'relative',
         overflow: 'hidden',
         '&:hover': {
           borderColor: 'primary.main',
-          boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
-          transform: 'translateY(-2px)'
+          boxShadow: `0 8px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
+          transform: 'translateY(-1px)'
         },
         cursor: (onClick || to) ? 'pointer' : 'default',
         bgcolor: 'background.paper'

@@ -2,11 +2,11 @@ import { Box, Button, Typography } from '@mui/material'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Link } from 'react-router'
 
-interface Props {
+type LimiteAccesoRestringidoProps = {
   children: React.ReactNode
 }
 
-export default function LimiteAccesoRestringido({ children }: Props) {
+export default function LimiteAccesoRestringido({ children }: LimiteAccesoRestringidoProps) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>{children}</ErrorBoundary>
   )
@@ -21,7 +21,6 @@ function ErrorFallback({ error }) {
       isUnauthorized = true
     }
   } catch {
-    // Ignorar error de parseo
   }
 
   if (isUnauthorized) {
