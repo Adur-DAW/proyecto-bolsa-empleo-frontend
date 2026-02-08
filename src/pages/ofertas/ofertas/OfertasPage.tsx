@@ -27,7 +27,7 @@ export default function OfertasPage() {
 	const { control, handleSubmit, watch } = useForm<OfertasFilterForm>({
 		defaultValues: {
 			filtro: (searchParams.get('filtro') as ObtenerOfertas) ||
-				(rol == 'sinRol' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
+				(rol == 'sinRol' || rol == 'centro' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
 			search: searchParams.get('search') || '',
 			ordenarPor: searchParams.get('ordenarPor') || 'fecha_publicacion.desc',
 			estado: searchParams.get('estado') || 'activas',

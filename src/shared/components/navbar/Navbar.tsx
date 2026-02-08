@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import {
 	IconBuildingCommunity,
+	IconChartBar,
 	IconHome,
 	IconLetterA,
 	IconListCheck,
@@ -27,7 +28,7 @@ import { useNavbar } from '@/shared/hooks/navbar.hook'
 import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
 import { getAbsolutePath } from '@/shared/routes'
 import { useAppStore } from '@/shared/store/store'
-import EstadisticasPage from '@/pages/admin/EstadisticasPage'
+
 
 interface Menu {
 	name: string
@@ -100,7 +101,7 @@ export default function Navbar() {
 		paginas.push({
 			texto: 'Admin',
 			to: getAbsolutePath('admin'),
-			icono: <EstadisticasPage />,
+			icono: <IconChartBar />,
 		})
 	}
 

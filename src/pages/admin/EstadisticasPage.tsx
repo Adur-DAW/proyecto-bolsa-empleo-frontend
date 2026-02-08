@@ -81,9 +81,9 @@ export default function EstadisticasPage() {
 			<EstadisticasFiltros
 				filtros={filtros}
 				familias={familias}
-				onFilterChange={manejarCambioFiltro}
-				onExport={exportarCSV}
-				onRefresh={refetch}
+				onCambioFiltro={manejarCambioFiltro}
+				onExportar={exportarCSV}
+				onActualizar={refetch}
 			/>
 
 			<Box display="flex" flexWrap="wrap" gap={3} mb={4}>
@@ -121,7 +121,7 @@ export default function EstadisticasPage() {
 				</Box>
 			</Box>
 
-			<EstadisticasGraficos estadisticas={estadisticas} colors={COLORES} />
+			<EstadisticasGraficos estadisticas={estadisticas} colores={COLORES} />
 		</Box>
 	)
 }
