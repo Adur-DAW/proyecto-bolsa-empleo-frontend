@@ -14,7 +14,7 @@ export default function DashboardDemandante() {
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
-        Mis Oportunidades
+        Inicio
       </Typography>
 
       <Grid container spacing={4}>

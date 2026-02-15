@@ -14,11 +14,10 @@ export default function DashboardInvitado() {
     <Container sx={{ display: 'flex', flexDirection: 'column', gap: 6, py: 4 }}>
       <Box sx={{ textAlign: 'center', py: 4 }}>
         <Typography variant="h3" fontWeight="bold" gutterBottom>
-          Conecta con tu Futuro Profesional
+          Bolsa de Empleo
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
-          La plataforma líder que une a empresas innovadoras con el mejor talento.
-          Encuentra prácticas, primer empleo y oportunidades de crecimiento.
+          La plataforma líder para encontrar empleo tras titularse en Estella.
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
           <Button
