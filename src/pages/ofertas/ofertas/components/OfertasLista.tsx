@@ -16,8 +16,8 @@ import {
 	IconUsers,
 } from '@tabler/icons-react'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { useEffect } from 'react'
+import { Link, useSearchParams } from 'react-router'
 
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
 import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
@@ -35,6 +35,7 @@ type OfertasListaProps = {
 	ordenarPor?: string
 	idFamilia?: string
 	filtroFrontend?: string
+	inscrito?: string
 }
 
 const formatearFecha = (date: dayjs.Dayjs) => {
@@ -49,6 +50,7 @@ export default function OfertasLista({
 	ordenarPor,
 	idFamilia,
 	filtroFrontend,
+	inscrito,
 }: OfertasListaProps) {
 	return (
 		<Stack spacing={3}>
@@ -61,6 +63,7 @@ export default function OfertasLista({
 						search={search}
 						ordenarPor={ordenarPor}
 						idFamilia={idFamilia}
+						inscrito={inscrito}
 						filtroFrontend={filtroFrontend}
 					/>
 				</PageDataContainer>
@@ -76,10 +79,17 @@ const OfertasListaSuspense = ({
 	search = '',
 	ordenarPor,
 	idFamilia,
+	inscrito,
 	filtroFrontend,
 }: OfertasListaProps) => {
 	const { usuario, mismoRol } = useRol()
-	const [pagina, setPage] = useState(1)
+	const [searchParams, setSearchParams] = useSearchParams()
+	const pagina = Number(searchParams.get('pagina')) || 1
+
+	const setPage = (nuevaPagina: number) => {
+		searchParams.set('pagina', nuevaPagina.toString())
+		setSearchParams(searchParams, { replace: true })
+	}
 
 	const [busquedaDebounce] = useDebounce(search, 500)
 
@@ -91,6 +101,7 @@ const OfertasListaSuspense = ({
 		estado,
 		busquedaDebounce,
 		idFamilia,
+		inscrito,
 	])
 
 	const { data: paginatedData, isLoading } = useOfertasQuery({
@@ -101,6 +112,7 @@ const OfertasListaSuspense = ({
 		ordenarPor: ordenarPor ?? 'fecha_publicacion.desc',
 		idFamilia,
 		pagina,
+		inscrito,
 	})
 
 	const allOfertas = paginatedData?.data || []
@@ -121,8 +133,6 @@ const OfertasListaSuspense = ({
 		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}
 
-	console.log(1);
-
 	return (
 		<Box>
 			{ofertas.length === 0 && !isLoading && (
@@ -138,12 +148,21 @@ const OfertasListaSuspense = ({
 						key={oferta.id}
 						titulo={oferta.nombre}
 						etiquetas={
-							<Chip
-								label={oferta.abierta ? 'Activa' : 'Finalizada'}
-								color={oferta.abierta ? 'success' : 'default'}
-								size="small"
-								variant="outlined"
-							/>
+							<Box sx={{ display: 'flex', gap: 1 }}>
+								<Chip
+									label={oferta.abierta ? 'Activa' : 'Finalizada'}
+									color={oferta.abierta ? 'success' : 'default'}
+									size="small"
+									variant="outlined"
+								/>
+								{mismoRol('demandante') && oferta.inscrito && (
+									<Chip
+										label="Inscrito"
+										color="primary"
+										size="small"
+									/>
+								)}
+							</Box>
 						}
 						avatar={
 							<Avatar

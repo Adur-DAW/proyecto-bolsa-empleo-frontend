@@ -85,11 +85,14 @@ export default function Navbar() {
 			to: getAbsolutePath('ofertas'),
 			icono: <IconListCheck />,
 		})
-		paginas.push({
-			texto: 'Empresas',
-			to: getAbsolutePath('empresas'),
-			icono: <IconBuildingCommunity />,
-		})
+
+		if (usuario?.rol !== 'empresa') {
+			paginas.push({
+				texto: 'Empresas',
+				to: getAbsolutePath('empresas'),
+				icono: <IconBuildingCommunity />,
+			})
+		}
 	}
 
 	if (usuario?.rol === 'centro') {

@@ -13,6 +13,8 @@ import dayjs from 'dayjs'
 import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
 
 import { ofertaDefault } from '@/shared/models'
 import {
@@ -175,6 +177,24 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Observaciones"
 										type="text"
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Typography variant="body2" color="text.secondary" gutterBottom>
+								Descripción completa (README)
+							</Typography>
+							<Controller
+								name="readme"
+								control={control}
+								render={({ field }) => (
+									<ReactQuill
+										theme="snow"
+										value={field.value || ''}
+										onChange={field.onChange}
+										style={{ height: '300px', marginBottom: '50px' }}
 									/>
 								)}
 							/>

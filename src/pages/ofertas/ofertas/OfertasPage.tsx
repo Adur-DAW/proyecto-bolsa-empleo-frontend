@@ -16,6 +16,7 @@ interface OfertasFilterForm {
 	ordenarPor: string
 	estado: string
 	idFamilia: string
+	inscrito?: string
 }
 
 export default function OfertasPage() {
@@ -31,7 +32,8 @@ export default function OfertasPage() {
 			search: searchParams.get('search') || '',
 			ordenarPor: searchParams.get('ordenarPor') || 'fecha_publicacion.desc',
 			estado: searchParams.get('estado') || 'activas',
-			idFamilia: searchParams.get('idFamilia') || ''
+			idFamilia: searchParams.get('idFamilia') || '',
+			inscrito: searchParams.get('inscrito') || 'todas'
 		}
 	})
 
@@ -44,6 +46,7 @@ export default function OfertasPage() {
 		if (data.ordenarPor) params.ordenarPor = data.ordenarPor
 		if (data.estado) params.estado = data.estado
 		if (data.idFamilia) params.idFamilia = data.idFamilia
+		if (data.inscrito && data.inscrito !== 'todas') params.inscrito = data.inscrito
 
 		setSearchParams(params)
 		setFiltros(data)
@@ -92,6 +95,7 @@ export default function OfertasPage() {
 						ordenarPor={filtros.ordenarPor}
 						estado={filtros.estado}
 						idFamilia={filtros.idFamilia}
+						inscrito={filtros.inscrito}
 						filtroFrontend={filtroFrontend}
 					/>
 				</Box>

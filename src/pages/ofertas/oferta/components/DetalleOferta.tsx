@@ -1,4 +1,6 @@
 import { Avatar, Box, Card, CardContent, Typography } from '@mui/material'
+import { Link } from 'react-router'
+import DOMPurify from 'dompurify'
 
 import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
 
@@ -28,9 +30,11 @@ export default function DetalleOferta({ oferta }) {
 							>
 								Empresa:{' '}
 							</Typography>
-							<Typography variant="body2" component="span">
-								{oferta.empresa.nombre}
-							</Typography>
+							<Link to={`/empresas/${oferta.idEmpresa}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+								<Typography variant="body2" component="span" sx={{ '&:hover': { textDecoration: 'underline', color: 'primary.main' } }}>
+									{oferta.empresa.nombre}
+								</Typography>
+							</Link>
 						</Box>
 						<Box sx={{ marginBottom: 1 }}>
 							<Typography
@@ -77,7 +81,7 @@ export default function DetalleOferta({ oferta }) {
 								Fin de la oferta:{' '}
 							</Typography>
 							<Typography variant="body2" component="span">
-								{oferta.fechaCierre.format('DD/MM/YYYY')}
+								{oferta.fechaCierre?.isValid() ? oferta.fechaCierre.format('DD/MM/YYYY') : 'Sin fecha de cierre'}
 							</Typography>
 						</Box>
 						<Box sx={{ marginBottom: 1 }}>
@@ -116,10 +120,28 @@ export default function DetalleOferta({ oferta }) {
 								{oferta.demandantesInscritos} de {oferta.numeroPuestos} puestos
 							</Typography>
 						</Box>
+
+						{oferta.readme && (
+							<Box sx={{ mt: 3, mb: 1 }}>
+								<Typography variant="h6" gutterBottom>
+									Detalles de la Oferta
+								</Typography>
+								<Box
+									className="readme-content"
+									sx={{
+										padding: 2,
+										backgroundColor: 'background.paper',
+										borderRadius: 1,
+										boxShadow: 'inset 0 0 5px rgba(0,0,0,0.1)',
+									}}
+									dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(oferta.readme) }}
+								/>
+							</Box>
+						)}
 					</Box>
 
 					<Box>
-						<InscribirseComponent oferta={oferta} filtro={null} />
+						<InscribirseComponent oferta={oferta} />
 					</Box>
 				</Box>
 			</CardContent>

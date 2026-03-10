@@ -16,7 +16,8 @@ import {
 	IconX,
 } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router'
 
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
 import Tarjeta from '@/shared/components/tarjetas/Tarjeta'
@@ -59,7 +60,13 @@ const EmpresasListaSuspense = ({
 	query,
 }: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
-	const [pagina, setPagina] = useState(1)
+	const [searchParams, setSearchParams] = useSearchParams()
+	const pagina = Number(searchParams.get('pagina')) || 1
+
+	const setPagina = (nuevaPagina: number) => {
+		searchParams.set('pagina', nuevaPagina.toString())
+		setSearchParams(searchParams, { replace: true })
+	}
 
 	const [busquedaDebounce] = useDebounce(search || '', 500)
 
@@ -78,10 +85,10 @@ const EmpresasListaSuspense = ({
 
 	const empresas = query
 		? allEmpresas.filter(
-				(e) =>
-					e.nombre.toLowerCase().includes(query.toLowerCase()) ||
-					e.localidad?.toLowerCase().includes(query.toLowerCase())
-			)
+			(e) =>
+				e.nombre.toLowerCase().includes(query.toLowerCase()) ||
+				e.localidad?.toLowerCase().includes(query.toLowerCase())
+		)
 		: allEmpresas
 
 	const queryClient = useQueryClient()

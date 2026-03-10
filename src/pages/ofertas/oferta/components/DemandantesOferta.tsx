@@ -24,7 +24,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 	const ofertasDemandantesRepository = OfertasDemandanteRepositoryHttp
 
 	const { data: demandantes = [], isError } = useSuspenseQuery({
-		queryKey: ['demandantes', id],
+		queryKey: ['oferta', id, 'demandantes'],
 		queryFn: () =>
 			ofertasDemandantesRepository.obtenerDemandantesPorIdOferta(id),
 	})
@@ -78,7 +78,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 		},
 	]
 
-	const paginationModel = { pagina: 0, tamanoPagina: 5 }
+	const paginationModel = { page: 0, pageSize: 5 }
 
 	const rows = demandantes.map((demandante) => ({
 		id: demandante.idDemandante,
@@ -89,7 +89,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 			demandante.apellido1 +
 			' ' +
 			demandante.apellido2,
-		situacion: situacionesDemandante.find(x => x.id == demandante.situacion)?.valor  ?? 'Sin especificar',
+		situacion: situacionesDemandante.find(x => x.id == demandante.situacion)?.valor ?? 'Sin especificar',
 		titulos: demandante.titulos?.map((x) => x.titulo?.nombre).join(', '),
 		adjudicado: demandante.adjudicado,
 	}))

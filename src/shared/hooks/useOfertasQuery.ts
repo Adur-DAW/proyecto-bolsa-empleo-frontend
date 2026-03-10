@@ -10,6 +10,7 @@ export const useOfertasQuery = (params: {
 	estado?: string
 	ordenarPor?: string
 	pagina?: number
+	inscrito?: string
 }) => {
 	const {
 		filtro,
@@ -19,12 +20,13 @@ export const useOfertasQuery = (params: {
 		ordenarPor,
 		idFamilia,
 		pagina = 1,
+		inscrito,
 	} = params
 
 	return useQuery({
 		queryKey: [
 			'ofertas',
-			{ filtro, search, idEmpresa, estado, ordenarPor, idFamilia, pagina },
+			{ filtro, search, idEmpresa, estado, ordenarPor, idFamilia, pagina, inscrito },
 		],
 		queryFn: async () => {
 			if (filtro === 'demandante') {
@@ -34,6 +36,7 @@ export const useOfertasQuery = (params: {
 					ordenarPor,
 					idFamilia: idFamilia ? Number(idFamilia) : undefined,
 					pagina,
+					inscrito: inscrito,
 					limite: 10,
 				})
 				return res

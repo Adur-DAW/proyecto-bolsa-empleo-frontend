@@ -20,6 +20,7 @@ export type Oferta = {
 	id: number
 	inscrito: boolean
 	demandantesInscritos: number
+	readme?: string
 }
 
 export const ofertaDefault = {
@@ -32,4 +33,5 @@ export const ofertaDefault = {
 	obs: '',
 	abierta: true,
 	fechaCierre: dayjs(),
+	readme: ''
 }

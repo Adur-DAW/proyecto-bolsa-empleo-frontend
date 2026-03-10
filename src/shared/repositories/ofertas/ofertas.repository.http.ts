@@ -18,6 +18,7 @@ export const OfertasRepositoryHttp = {
 		estado?: string
 		ordenarPor?: string
 		idFamilia?: number
+		inscrito?: string
 	}): Promise<RespuestaPaginada<Oferta>> => {
 		const queryParams = new URLSearchParams()
 
@@ -37,6 +38,9 @@ export const OfertasRepositoryHttp = {
 
 		if (params?.idFamilia)
 			queryParams.append('id_familia', params.idFamilia.toString())
+
+		if (params?.inscrito)
+			queryParams.append('inscrito', params.inscrito)
 
 		const response = await getEntity<RespuestaPaginadaBackend<any>>(
 			`/ofertas?${queryParams.toString()}`
@@ -67,6 +71,7 @@ export const OfertasRepositoryHttp = {
 		estado?: string
 		ordenarPor?: string
 		idFamilia?: number
+		inscrito?: string
 	}): Promise<RespuestaPaginada<Oferta>> => {
 		const queryParams = new URLSearchParams()
 
@@ -83,6 +88,9 @@ export const OfertasRepositoryHttp = {
 
 		if (params?.idFamilia)
 			queryParams.append('id_familia', params.idFamilia.toString())
+
+		if (params?.inscrito)
+			queryParams.append('inscrito', params.inscrito)
 
 		const response = await getEntity<RespuestaPaginadaBackend<any>>(
 			`/demandantes/jwt/ofertas-por-titulos?${queryParams.toString()}`
@@ -185,7 +193,8 @@ const mapOfertaToFront = (oferta: any): Oferta => ({
 	diasDescanso: oferta.dias_descanso,
 	numeroPuestos: oferta.numero_puestos,
 	fechaPublicacion: dayjs(oferta.fecha_publicacion),
-	fechaCierre: dayjs(oferta.fecha_cierre),
+	fechaCierre: oferta.fecha_cierre ? dayjs(oferta.fecha_cierre) : dayjs('Invalid Date'),
+	abierta: oferta.abierta && (oferta.fecha_cierre ? !dayjs(oferta.fecha_cierre).isBefore(dayjs(), 'day') : true),
 	demandantesInscritos: oferta.demandantes_inscritos,
 	idEmpresa: oferta.id_empresa,
 	tipoContrato: oferta.id_tipo_contrato == 1

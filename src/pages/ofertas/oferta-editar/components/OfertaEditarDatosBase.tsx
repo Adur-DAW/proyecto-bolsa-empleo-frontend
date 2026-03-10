@@ -5,6 +5,8 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
 import { useParams } from 'react-router'
 import { z } from 'zod'
 import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
@@ -20,6 +22,7 @@ const ofertaSchema = z.object({
 	diasDescanso: z.coerce.number().optional(),
 	obs: z.string().optional(),
 	abierta: z.boolean(),
+	readme: z.string().optional(),
 })
 
 type OfertaFormData = z.infer<typeof ofertaSchema>
@@ -62,7 +65,8 @@ const OfertaEditarDatosBaseInterno = () => {
 			numeroPuestos: +oferta.numeroPuestos,
 			diasDescanso: oferta.diasDescanso ? +oferta.diasDescanso : 0,
 			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
-			idTipoContrato: oferta.idTipoContrato
+			idTipoContrato: oferta.idTipoContrato,
+			readme: oferta.readme || ''
 		},
 	})
 
@@ -266,6 +270,24 @@ const OfertaEditarDatosBaseInterno = () => {
 											onChange={(e) => field.onChange(e.target.checked)}
 										/>
 									</Stack>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Typography variant="body2" color="text.secondary" gutterBottom>
+								Descripción completa (README)
+							</Typography>
+							<Controller
+								name="readme"
+								control={control}
+								render={({ field }) => (
+									<ReactQuill
+										theme="snow"
+										value={field.value || ''}
+										onChange={field.onChange}
+										style={{ height: '300px', marginBottom: '50px' }}
+									/>
 								)}
 							/>
 						</Box>

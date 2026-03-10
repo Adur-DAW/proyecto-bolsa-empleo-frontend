@@ -161,6 +161,27 @@ export default function OfertasFiltros({
 					/>
 				</Box>
 
+				{rol === 'demandante' && (
+					<Box sx={{ mb: 3 }}>
+						<Typography variant="subtitle2" gutterBottom>
+							Inscripción
+						</Typography>
+						<Controller
+							name="inscrito"
+							control={control}
+							render={({ field }) => (
+								<FormControl fullWidth size="small">
+									<Select {...field}>
+										<MenuItem value="todas">Todas</MenuItem>
+										<MenuItem value="inscritas">Inscritas</MenuItem>
+										<MenuItem value="no_inscritas">No inscritas</MenuItem>
+									</Select>
+								</FormControl>
+							)}
+						/>
+					</Box>
+				)}
+
 				<Box sx={{ mb: 3 }}>
 					<Button
 						fullWidth
