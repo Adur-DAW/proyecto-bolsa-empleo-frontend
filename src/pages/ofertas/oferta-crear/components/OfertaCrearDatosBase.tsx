@@ -13,8 +13,8 @@ import dayjs from 'dayjs'
 import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 
 import { ofertaDefault } from '@/shared/models'
 import {
@@ -42,7 +42,9 @@ const OfertaEditarDatosBaseInterno = () => {
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
 			...ofertaDefault,
+			fechaPublicacion: dayjs().format('YYYY-MM-DD'),
 			idTipoContrato: undefined,
+			fechaCierre: ''
 		},
 	})
 
@@ -57,6 +59,7 @@ const OfertaEditarDatosBaseInterno = () => {
 		mutation.mutate({
 			...data,
 			idTipoContrato: data.idTipoContrato,
+			fechaCierre: data.fechaCierre ? dayjs(data.fechaCierre) : null
 		})
 	}
 
@@ -105,6 +108,23 @@ const OfertaEditarDatosBaseInterno = () => {
 							/>
 						</Box>
 
+						<Box>
+							<Controller
+								name="fechaCierre"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Fecha cierre"
+										type="date"
+										value={
+											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
+										}
+									/>
+								)}
+							/>
+						</Box>
 						<Box>
 							<Controller
 								name="numeroPuestos"
@@ -184,7 +204,7 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Typography variant="body2" color="text.secondary" gutterBottom>
-								Descripción completa (README)
+								Descripción completa
 							</Typography>
 							<Controller
 								name="readme"

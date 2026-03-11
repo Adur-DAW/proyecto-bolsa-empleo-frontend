@@ -38,8 +38,8 @@ type OfertasListaProps = {
 	inscrito?: string
 }
 
-const formatearFecha = (date: dayjs.Dayjs) => {
-	return date.isValid() ? date.format('DD/MM/YYYY') : 'N/D'
+const formatearFecha = (date?: dayjs.Dayjs) => {
+	return date?.isValid() ? date.format('DD/MM/YYYY') : 'N/D'
 }
 
 export default function OfertasLista({
@@ -239,13 +239,12 @@ const OfertasListaSuspense = ({
 
 								{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
 									<Button
-										variant="outlined"
+										variant="contained"
 										color="secondary"
 										size="small"
 										component={Link}
 										to={`/ofertas/${oferta.id}/editar`}
 										startIcon={<IconEdit size={18} />}
-										sx={{ mt: 1 }}
 									>
 										Editar
 									</Button>

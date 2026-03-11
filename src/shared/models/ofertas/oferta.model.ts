@@ -10,11 +10,11 @@ export type Oferta = {
 	numeroPuestos: number
 	idTipoContrato: number
 	tipoContrato?: TipoContrato
-	horario: string
+	horario?: string
 	diasDescanso: string
-	obs: string
+	obs?: string
 	abierta: boolean
-	fechaCierre: dayjs.Dayjs
+	fechaCierre?: dayjs.Dayjs
 	idEmpresa: number
 	empresa: Empresa
 	id: number

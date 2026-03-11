@@ -83,6 +83,7 @@ export default function OfertasPage() {
 								to={'/ofertas/nueva'}
 								component={Link}
 								startIcon={<IconPlus />}
+								sx={{ ml: 2 }}
 							>
 								Añadir nueva
 							</Button>

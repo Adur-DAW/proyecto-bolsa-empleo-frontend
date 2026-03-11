@@ -183,8 +183,12 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 	abierta: oferta.abierta,
 	id_tipo_contrato: oferta.idTipoContrato,
 	numero_puestos: oferta.numeroPuestos,
-	fecha_publicacion: dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD'),
-	fecha_cierre: dayjs(oferta.fechaCierre).format('YYYY-MM-DD'),
+	fecha_publicacion: (oferta.fechaPublicacion && dayjs(oferta.fechaPublicacion).isValid()) 
+		? dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD') 
+		: null,
+	fecha_cierre: (oferta.fechaCierre && dayjs(oferta.fechaCierre).isValid()) 
+		? dayjs(oferta.fechaCierre).format('YYYY-MM-DD') 
+		: null,
 })
 
 const mapOfertaToFront = (oferta: any): Oferta => ({
@@ -192,9 +196,9 @@ const mapOfertaToFront = (oferta: any): Oferta => ({
 	idTipoContrato: oferta.id_tipo_contrato,
 	diasDescanso: oferta.dias_descanso,
 	numeroPuestos: oferta.numero_puestos,
-	fechaPublicacion: dayjs(oferta.fecha_publicacion),
-	fechaCierre: oferta.fecha_cierre ? dayjs(oferta.fecha_cierre) : dayjs('Invalid Date'),
-	abierta: oferta.abierta && (oferta.fecha_cierre ? !dayjs(oferta.fecha_cierre).isBefore(dayjs(), 'day') : true),
+	fechaPublicacion: oferta.fecha_publicacion ? dayjs(oferta.fecha_publicacion) : dayjs(),
+	fechaCierre: oferta.fecha_cierre ? dayjs(oferta.fecha_cierre) : null,
+	abierta: !!oferta.abierta && (oferta.fecha_cierre ? !dayjs(oferta.fecha_cierre).isBefore(dayjs(), 'day') : true),
 	demandantesInscritos: oferta.demandantes_inscritos,
 	idEmpresa: oferta.id_empresa,
 	tipoContrato: oferta.id_tipo_contrato == 1

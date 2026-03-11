@@ -5,8 +5,8 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 import { useParams } from 'react-router'
 import { z } from 'zod'
 import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
@@ -18,11 +18,12 @@ const ofertaSchema = z.object({
 	fechaPublicacion: z.string(),
 	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
 	idTipoContrato: z.number('El tipo de contrato es obligatorio'),
-	horario: z.string().optional(),
-	diasDescanso: z.coerce.number().optional(),
-	obs: z.string().optional(),
+	horario: z.string().nullable().optional(),
+	diasDescanso: z.coerce.number().nullable().optional(),
+	obs: z.string().nullable().optional(),
 	abierta: z.boolean(),
-	readme: z.string().optional(),
+	fechaCierre: z.string().nullable().optional(),
+	readme: z.string().nullable().optional(),
 })
 
 type OfertaFormData = z.infer<typeof ofertaSchema>
@@ -64,8 +65,15 @@ const OfertaEditarDatosBaseInterno = () => {
 			...oferta,
 			numeroPuestos: +oferta.numeroPuestos,
 			diasDescanso: oferta.diasDescanso ? +oferta.diasDescanso : 0,
-			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
+			fechaPublicacion: (oferta.fechaPublicacion && dayjs(oferta.fechaPublicacion).isValid())
+				? dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD')
+				: dayjs().format('YYYY-MM-DD'),
 			idTipoContrato: oferta.idTipoContrato,
+			horario: oferta.horario || '',
+			obs: oferta.obs || '',
+			fechaCierre: (oferta.fechaCierre && dayjs(oferta.fechaCierre).isValid())
+				? dayjs(oferta.fechaCierre).format('YYYY-MM-DD')
+				: '',
 			readme: oferta.readme || ''
 		},
 	})
@@ -94,7 +102,8 @@ const OfertaEditarDatosBaseInterno = () => {
 			...oferta,
 			...data,
 			diasDescanso: data.diasDescanso?.toString() || '',
-			fechaPublicacion: dayjs(data.fechaPublicacion)
+			fechaPublicacion: dayjs(data.fechaPublicacion),
+			fechaCierre: data.fechaCierre ? dayjs(data.fechaCierre) : null
 		}
 		mutation.mutate(payload)
 	}
@@ -115,13 +124,6 @@ const OfertaEditarDatosBaseInterno = () => {
 				<Stack spacing={2} direction="row" marginBottom={2}>
 					<Button variant="outlined" color="error" startIcon={<IconTrash />}>
 						Eliminar
-					</Button>
-					<Button
-						variant="outlined"
-						color="secondary"
-						startIcon={<IconEyeCancel />}
-					>
-						Cerrar
 					</Button>
 				</Stack>
 			</Box>
@@ -160,6 +162,26 @@ const OfertaEditarDatosBaseInterno = () => {
 										}
 										error={!!errors.fechaPublicacion}
 										helperText={errors.fechaPublicacion?.message}
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="fechaCierre"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Fecha cierre"
+										type="date"
+										value={
+											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
+										}
+										error={!!errors.fechaCierre}
+										helperText={errors.fechaCierre?.message}
 									/>
 								)}
 							/>
@@ -276,7 +298,7 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Typography variant="body2" color="text.secondary" gutterBottom>
-								Descripción completa (README)
+								Descripción completa
 							</Typography>
 							<Controller
 								name="readme"
