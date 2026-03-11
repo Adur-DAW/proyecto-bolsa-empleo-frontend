@@ -1,5 +1,5 @@
 import { Box, Button, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -16,9 +16,10 @@ export default function ConfiguracionUsuarioDatosPersonales() {
 
 const ConfiguracionUsuarioDatosPersonalesInterno = () => {
 	const demandantesRepository = DemandantesRepositoryHttp
+	const queryClient = useQueryClient()
 
 	const { data: demandante } = useSuspenseQuery({
-		queryKey: ['demandante'],
+		queryKey: ['usuario-perfil'],
 		queryFn: () => demandantesRepository.obtenerJWT(),
 	})
 
@@ -36,6 +37,7 @@ const ConfiguracionUsuarioDatosPersonalesInterno = () => {
 	const onSubmit = (data) => {
 		mutation.mutate(data, {
 			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['usuario-perfil'] })
 				alert('Datos actualizados correctamente')
 			},
 			onError: () => {

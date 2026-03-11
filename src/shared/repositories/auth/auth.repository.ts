@@ -11,4 +11,6 @@ export type AuthRepository = {
 		password: string
 		password_confirmation: string
 	}) => Promise<void>
+
+	obtenerPerfil: () => Promise<Usuario>
 }

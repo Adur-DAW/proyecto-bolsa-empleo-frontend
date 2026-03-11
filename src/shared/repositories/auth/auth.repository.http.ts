@@ -1,4 +1,4 @@
-import { postEntity } from '@/shared/http/api.service'
+import { getEntity, postEntity } from '@/shared/http/api.service'
 import { Usuario } from '@/shared/models'
 
 import { AuthRepository } from './auth.repository'
@@ -18,5 +18,10 @@ export const AuthRepositoryHttp: AuthRepository = {
 		password_confirmation: string
 	}) => {
 		return postEntity('/registrar', datos)
+	},
+	obtenerPerfil: async (): Promise<Usuario> => {
+		const res = await getEntity<{ usuario: Usuario }>('/usuarios/jwt')
+		if (!res) throw new Error('Error al obtener perfil')
+		return res.usuario
 	},
 }

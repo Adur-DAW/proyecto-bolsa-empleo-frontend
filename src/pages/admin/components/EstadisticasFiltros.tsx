@@ -62,6 +62,7 @@ export default function EstadisticasFiltros({
 						onChange={(e) => onCambioFiltro('familia', e.target.value)}
 						sx={{ minWidth: 200 }}
 						SelectProps={{ displayEmpty: true }}
+						slotProps={{ inputLabel: { shrink: true } }}
 					>
 						<MenuItem value="">
 							<em>Todas</em>

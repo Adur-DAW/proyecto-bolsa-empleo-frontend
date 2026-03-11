@@ -12,7 +12,7 @@ export default function DetalleOferta({ oferta }) {
 					<Box sx={{ textAlign: 'left' }}>
 						<Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
 							<Avatar
-								src={oferta.empresa?.imagen_url || undefined}
+								src={oferta.empresa?.imagenUrl || undefined}
 								sx={{ width: 64, height: 64 }}
 								variant="rounded"
 							>

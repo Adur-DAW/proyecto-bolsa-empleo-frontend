@@ -23,11 +23,12 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router'
 
+import useRol from '@/shared/hooks/rol.hook'
+import { useUsuarioQuery } from '@/shared/hooks/useUsuarioQuery'
 import useLogout from '@/shared/hooks/logout.hook'
 import { useNavbar } from '@/shared/hooks/navbar.hook'
 import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
 import { getAbsolutePath } from '@/shared/routes'
-import { useAppStore } from '@/shared/store/store'
 
 
 interface Menu {
@@ -41,7 +42,20 @@ export default function Navbar() {
 	const navigate = useNavigate()
 
 	const { onLogout } = useLogout()
-	const usuario = useAppStore((x) => x.usuario)
+	const { data: usuarioPerfil } = useUsuarioQuery()
+	const { usuario: usuarioStore } = useRol()
+
+	const usuario = usuarioPerfil
+		? {
+			...usuarioStore,
+			...usuarioPerfil,
+			nombreCompleto:
+				(usuarioPerfil as any).nombre ||
+				(usuarioPerfil as any).nombreCompleto ||
+				usuarioStore?.nombreCompleto,
+			imagenUrl: (usuarioPerfil as any).imagenUrl || usuarioStore?.imagenUrl,
+		}
+		: usuarioStore
 
 	const { data: config } = useQuery({
 		queryKey: ['appConfig'],
@@ -213,7 +227,12 @@ export default function Navbar() {
 				{usuario && (
 					<Box sx={{ flexGrow: 0 }}>
 						<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-							<Avatar alt="Remy Sharp" />
+							<Avatar
+								alt={usuario.nombreCompleto}
+								src={usuario.imagenUrl}
+							>
+								{usuario.nombreCompleto?.charAt(0)}
+							</Avatar>
 						</IconButton>
 						<Menu
 							sx={{ mt: '45px' }}

@@ -56,9 +56,9 @@ export const EmpresasRepositoryHttp = {
 				idEmpresa: x.id_empresa,
 				cantidadOfertas: x.ofertas_count,
 				cantidadVacantes: x.vacantes,
-				familiaProfesional:  x.familia_profesional ? {
+				familiaProfesional: x.familia_profesional ? {
 					id: x.familia_profesional?.id,
-					nombre:  x.familia_profesional?.nombre,
+					nombre: x.familia_profesional?.nombre,
 				} : null,
 				imagenUrl: x.imagen_url,
 				idFamiliaProfesional: x.id_familia_profesional,
@@ -82,20 +82,28 @@ export const EmpresasRepositoryHttp = {
 		return {
 			...empresa,
 			idEmpresa: empresa.id_empresa,
+			imagenUrl: empresa.imagen_url,
 		}
 	},
 	obtenerJWT: async (): Promise<Empresa> => {
-		const empresa = (await getEntity('/empresas/jwt')) as any
+		const response = (await getEntity('/empresas/jwt')) as any
+		if (!response) return null as any
+
 		return {
-			...empresa,
-			idEmpresa: empresa.id_empresa,
+			...response,
+			idEmpresa: response.id_empresa,
+			imagenUrl: response.imagen_url,
 		}
 	},
 	registrar: async (empresa: Empresa) => {
 		return await postEntity('/empresas/', empresa)
 	},
-	actualizar: async (empresa: Empresa | FormData) => {
-		return await putEntity(`/empresas/`, empresa)
+	actualizar: async (payload: Empresa | FormData) => {
+		if (payload instanceof FormData) {
+			payload.append('_method', 'PUT')
+			return await postEntity('/empresas', payload)
+		}
+		return await putEntity(`/empresas/`, payload)
 	},
 	validar: async (idEmpresa: number) => {
 		return putEntity(`/empresas/${idEmpresa}/validar`, {})

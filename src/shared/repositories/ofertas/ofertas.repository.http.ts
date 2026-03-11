@@ -204,7 +204,8 @@ const mapOfertaToFront = (oferta: any): Oferta => ({
 	tipoContrato: oferta.id_tipo_contrato == 1
 		? { id: 1, nombre: 'Jornada Completa' }
 		: { id: 2, nombre: 'Media Jornada' },
-	empresa: {
+	empresa: oferta.empresa ? {
 		...oferta.empresa,
-	},
+		imagenUrl: oferta.empresa.imagen_url,
+	} : null,
 })

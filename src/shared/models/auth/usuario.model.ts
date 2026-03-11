@@ -5,4 +5,5 @@ export type Usuario = {
 	email: string
 	rol: TiposUsuario
 	nombreCompleto: string
+	imagenUrl?: string
 }

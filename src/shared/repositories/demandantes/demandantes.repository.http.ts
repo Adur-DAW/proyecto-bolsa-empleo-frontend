@@ -1,4 +1,4 @@
-import { getEntity, putEntity } from '@/shared/http/api.service'
+import { getEntity, postEntity, putEntity } from '@/shared/http/api.service'
 import { Demandante } from '@/shared/models'
 
 import { DemandantesRepository } from './demandantes.repository'
@@ -12,7 +12,11 @@ export const DemandantesRepositoryHttp: DemandantesRepository = {
 			telefonoMovil: demandante.telefono_movil,
 		}
 	},
-	actualizar: async (demandante: Demandante) => {
-		return putEntity('/demandantes', demandante)
+	actualizar: async (payload: Demandante | FormData) => {
+		if (payload instanceof FormData) {
+			payload.append('_method', 'PUT')
+			return await postEntity('/demandantes', payload)
+		}
+		return await putEntity('/demandantes', payload)
 	},
 }

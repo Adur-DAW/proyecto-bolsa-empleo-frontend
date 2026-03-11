@@ -41,7 +41,7 @@ export default function DashboardAdmin() {
           <Card sx={{ height: '100%' }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <IconActivity size={20} /> Indicadores Clave
+                <IconActivity size={20} /> Resumen
               </Typography>
 
               <Box sx={{ mt: 3 }}>

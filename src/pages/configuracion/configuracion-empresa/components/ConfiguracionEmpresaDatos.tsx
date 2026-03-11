@@ -10,6 +10,7 @@ import {
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 
@@ -23,11 +24,12 @@ export default function ConfiguracionEmpresaDatos() {
 
 const ConfiguracionEmpresaDatosInterno = () => {
 	const empresasRepository = EmpresasRepositoryHttp
+	const queryClient = useQueryClient()
 	const [selectedFile, setArchivoSeleccionado] = useState<File | null>(null)
 	const [urlPrevisualizacion, setUrlPrevisualizacion] = useState<string | null>(null)
 
 	const { data: empresa } = useSuspenseQuery({
-		queryKey: ['empresa'],
+		queryKey: ['usuario-perfil'],
 		queryFn: () => empresasRepository.obtenerJWT(),
 	})
 
@@ -64,6 +66,7 @@ const ConfiguracionEmpresaDatosInterno = () => {
 
 		mutation.mutate(payload, {
 			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['usuario-perfil'] })
 				alert('Datos actualizados correctamente')
 			},
 			onError: () => {
