@@ -72,7 +72,7 @@ const EmpresasListaSuspense = ({
 
 	useEffect(() => {
 		setPagina(1)
-	}, [search, idFamiliaProfesional, ordenarPor])
+	}, [])
 
 	const { data: paginatedData, isLoading } = useEmpresasQuery({
 		search: busquedaDebounce,

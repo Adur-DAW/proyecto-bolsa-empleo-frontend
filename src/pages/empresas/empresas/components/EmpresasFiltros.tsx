@@ -21,7 +21,7 @@ export default function EmpresasFiltros({
 
   return (
     <Box sx={{ width: { xs: '100%', md: 300 } }}>
-      <Paper sx={{ p: 3 }}>
+      <Paper sx={{ p: 3, textAlign: 'left' }}>
         <Typography variant="h6" gutterBottom>
           Filtros
         </Typography>

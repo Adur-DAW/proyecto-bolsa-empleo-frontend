@@ -95,14 +95,7 @@ const OfertasListaSuspense = ({
 
 	useEffect(() => {
 		setPage(1)
-	}, [
-		filtro,
-		idEmpresa,
-		estado,
-		busquedaDebounce,
-		idFamilia,
-		inscrito,
-	])
+	}, [])
 
 	const { data: paginatedData, isLoading } = useOfertasQuery({
 		filtro,
