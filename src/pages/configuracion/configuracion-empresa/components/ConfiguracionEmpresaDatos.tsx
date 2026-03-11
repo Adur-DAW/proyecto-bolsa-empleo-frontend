@@ -31,8 +31,8 @@ const ConfiguracionEmpresaDatosInterno = () => {
 		queryFn: () => empresasRepository.obtenerJWT(),
 	})
 
-	if (empresa.imagen_url && !urlPrevisualizacion && !selectedFile) {
-		setUrlPrevisualizacion(empresa.imagen_url)
+	if (empresa.imagenUrl && !urlPrevisualizacion && !selectedFile) {
+		setUrlPrevisualizacion(empresa.imagenUrl)
 	}
 
 	const { control, handleSubmit } = useForm({

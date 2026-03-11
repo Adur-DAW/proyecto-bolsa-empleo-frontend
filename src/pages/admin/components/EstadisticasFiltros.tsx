@@ -77,14 +77,14 @@ export default function EstadisticasFiltros({
 						type="date"
 						value={filtros.fechaInicio}
 						onChange={(e) => onCambioFiltro('fechaInicio', e.target.value)}
-						InputLabelProps={{ shrink: true }}
+						slotProps={{ inputLabel: { shrink: true } }}
 					/>
 					<TextField
 						label="Hasta"
 						type="date"
 						value={filtros.fechaFin}
 						onChange={(e) => onCambioFiltro('fechaFin', e.target.value)}
-						InputLabelProps={{ shrink: true }}
+						slotProps={{ inputLabel: { shrink: true } }}
 					/>
 					<Button variant="outlined" onClick={onExportar}>
 						Exportar CSV

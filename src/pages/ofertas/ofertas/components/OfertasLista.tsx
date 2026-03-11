@@ -131,7 +131,7 @@ const OfertasListaSuspense = ({
 			{ofertas.length === 0 && !isLoading && (
 				<EmptyState
 					title="No se encontraron ofertas"
-					description="Intenta ajustar tus filtros de búsqueda"
+					description="Ajusta los filtros de búsqueda"
 				/>
 			)}
 

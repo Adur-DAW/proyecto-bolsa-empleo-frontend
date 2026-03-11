@@ -41,7 +41,7 @@ const DetalleEmpresaHeader = ({ idEmpresa }: { idEmpresa: number }) => {
     <Paper elevation={3} sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
         <Avatar
-          src={empresa.imagen_url || undefined}
+          src={empresa.imagenUrl || undefined}
           sx={{ width: 80, height: 80, fontSize: 32 }}
           variant="rounded"
         >
@@ -94,7 +94,7 @@ const DetalleEmpresaOfertas = ({ idEmpresa }: { idEmpresa: number }) => {
       )}
 
       {tab === 1 && (
-        <OfertasLista idEmpresa={idEmpresa} estado="cerradas" />
+        <OfertasLista idEmpresa={idEmpresa} estado="finalizadas" />
       )}
     </Box>
   )

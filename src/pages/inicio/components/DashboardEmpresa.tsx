@@ -15,7 +15,7 @@ export default function DashboardEmpresa() {
     <Container sx={{ py: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4">
-          Panel de Selección
+          Inicio
         </Typography>
         <Button
           component={Link}
@@ -23,14 +23,14 @@ export default function DashboardEmpresa() {
           variant="contained"
           startIcon={<IconPlus />}
         >
-          Publicar Nueva Oferta
+          Publicar Oferta
         </Button>
       </Box>
 
       <Grid container spacing={4}>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card sx={{ bgcolor: 'secondary.light', color: 'secondary.contrastText' }}>
+          <Card sx={{ bgcolor: 'secondary.dark', color: 'secondary.contrastText' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                 <IconUsers size={32} />
@@ -39,7 +39,7 @@ export default function DashboardEmpresa() {
               <Typography variant="h3" fontWeight="bold">
                 {data.candidatos_pendientes}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              <Typography variant="body2">
                 Esperando revisión en tus ofertas
               </Typography>
             </CardContent>

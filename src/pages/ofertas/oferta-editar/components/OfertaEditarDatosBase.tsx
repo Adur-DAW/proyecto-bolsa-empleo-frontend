@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Button, Checkbox, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
-import { IconDeviceFloppy, IconEyeCancel, IconTrash } from '@tabler/icons-react'
+import { IconDeviceFloppy, IconTrash } from '@tabler/icons-react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense, useEffect, useState } from 'react'
@@ -122,13 +122,28 @@ const OfertaEditarDatosBaseInterno = () => {
 				</Typography>
 
 				<Stack spacing={2} direction="row" marginBottom={2}>
+					<Controller
+						name="abierta"
+						control={control}
+						render={({ field }) => (
+							<Stack direction="row" alignItems="center">
+								<Typography>Activa</Typography>
+								<Checkbox
+									{...field}
+									checked={field.value}
+									onChange={(e) => field.onChange(e.target.checked)}
+								/>
+							</Stack>
+						)}
+					/>
+
 					<Button variant="outlined" color="error" startIcon={<IconTrash />}>
 						Eliminar
 					</Button>
 				</Stack>
 			</Box>
 
-			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
+			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4, textAlign: 'left' }}>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Stack spacing={3}>
 						<Box>
@@ -155,6 +170,7 @@ const OfertaEditarDatosBaseInterno = () => {
 									<TextField
 										{...field}
 										fullWidth
+										slotProps={{ inputLabel: { shrink: true } }}
 										label="Fecha publicación"
 										type="date"
 										value={
@@ -175,6 +191,7 @@ const OfertaEditarDatosBaseInterno = () => {
 									<TextField
 										{...field}
 										fullWidth
+										slotProps={{ inputLabel: { shrink: true } }}
 										label="Fecha cierre"
 										type="date"
 										value={
@@ -275,23 +292,6 @@ const OfertaEditarDatosBaseInterno = () => {
 										error={!!errors.obs}
 										helperText={errors.obs?.message}
 									/>
-								)}
-							/>
-						</Box>
-
-						<Box>
-							<Controller
-								name="abierta"
-								control={control}
-								render={({ field }) => (
-									<Stack direction="row" alignItems="center" spacing={1}>
-										<Typography>Activa</Typography>
-										<Checkbox
-											{...field}
-											checked={field.value}
-											onChange={(e) => field.onChange(e.target.checked)}
-										/>
-									</Stack>
 								)}
 							/>
 						</Box>

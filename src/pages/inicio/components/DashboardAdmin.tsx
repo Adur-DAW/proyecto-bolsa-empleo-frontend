@@ -14,7 +14,7 @@ export default function DashboardAdmin() {
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
-        Panel de Administración
+        Inicio
       </Typography>
 
       {data.validaciones_pendientes > 0 && (

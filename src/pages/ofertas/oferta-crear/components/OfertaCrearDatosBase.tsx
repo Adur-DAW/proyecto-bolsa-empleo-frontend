@@ -8,9 +8,9 @@ import {
 	Typography,
 } from '@mui/material'
 import { IconPlus } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import ReactQuill from 'react-quill-new'
@@ -19,9 +19,25 @@ import 'react-quill-new/dist/quill.snow.css'
 import { ofertaDefault } from '@/shared/models'
 import {
 	MaestrosRepository,
-	TipoContrato,
 } from '@/shared/repositories/MaestrosRepository'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+const ofertaSchema = z.object({
+	nombre: z.string().nonempty('El título es obligatorio'),
+	fechaPublicacion: z.string(),
+	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
+	idTipoContrato: z.number('El tipo de contrato es obligatorio'),
+	horario: z.string().nullable().optional(),
+	diasDescanso: z.coerce.string().nullable().optional(),
+	obs: z.string().nullable().optional(),
+	abierta: z.boolean(),
+	fechaCierre: z.string().nullable().optional(),
+	readme: z.string().nullable().optional(),
+})
+
+type OfertaFormData = z.infer<typeof ofertaSchema>
 
 export default function OfertaCrearDatosBase() {
 	return (
@@ -33,19 +49,21 @@ export default function OfertaCrearDatosBase() {
 
 const OfertaEditarDatosBaseInterno = () => {
 	const ofertasRepository = OfertasRepositoryHttp
-	const [tiposContrato, setTiposContrato] = useState<TipoContrato[]>([])
 
-	useEffect(() => {
-		MaestrosRepository.obtenerTiposContrato().then(setTiposContrato)
-	}, [])
+	const { data: tiposContrato = [] } = useQuery({
+		queryKey: ['tipos-contrato'],
+		queryFn: () => MaestrosRepository.obtenerTiposContrato(),
+	})
 
-	const { control, handleSubmit } = useForm({
+	const { control, handleSubmit, formState: { errors }, } = useForm<OfertaFormData>({
 		defaultValues: {
 			...ofertaDefault,
 			fechaPublicacion: dayjs().format('YYYY-MM-DD'),
 			idTipoContrato: undefined,
 			fechaCierre: ''
 		},
+		resolver: zodResolver(ofertaSchema) as any,
+		mode: 'onSubmit'
 	})
 
 	const navigate = useNavigate()
@@ -77,7 +95,7 @@ const OfertaEditarDatosBaseInterno = () => {
 				</Typography>
 			</Box>
 
-			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
+			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4, textAlign: 'left' }}>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Stack spacing={3}>
 						<Box>
@@ -85,7 +103,9 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="nombre"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Título de la oferta" />
+									<TextField {...field} fullWidth label="Título de la oferta"
+										error={!!errors.nombre}
+										helperText={errors.nombre?.message} />
 								)}
 							/>
 						</Box>
@@ -103,6 +123,7 @@ const OfertaEditarDatosBaseInterno = () => {
 										value={
 											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
 										}
+										slotProps={{ inputLabel: { shrink: true } }}
 									/>
 								)}
 							/>
@@ -121,6 +142,9 @@ const OfertaEditarDatosBaseInterno = () => {
 										value={
 											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
 										}
+										slotProps={{ inputLabel: { shrink: true } }}
+										error={!!errors.fechaCierre}
+										helperText={errors.fechaCierre?.message}
 									/>
 								)}
 							/>
@@ -135,6 +159,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										type="number"
 										fullWidth
 										label="Número de puestos"
+										error={!!errors.numeroPuestos}
+										helperText={errors.numeroPuestos?.message}
 									/>
 								)}
 							/>
@@ -151,6 +177,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										select
 										label="Tipo de contrato"
 										value={field.value || ''}
+										error={!!errors.idTipoContrato}
+										helperText={errors.idTipoContrato?.message}
 									>
 										{tiposContrato.map((option) => (
 											<MenuItem key={option.id} value={option.id}>
@@ -167,7 +195,9 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="horario"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Horario" type="text" />
+									<TextField {...field} fullWidth label="Horario" type="text"
+										error={!!errors.horario}
+										helperText={errors.horario?.message} />
 								)}
 							/>
 						</Box>
@@ -182,6 +212,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Días de descanso semanal"
 										type="text"
+										error={!!errors.diasDescanso}
+										helperText={errors.diasDescanso?.message}
 									/>
 								)}
 							/>
@@ -197,6 +229,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Observaciones"
 										type="text"
+										error={!!errors.obs}
+										helperText={errors.obs?.message}
 									/>
 								)}
 							/>
@@ -235,6 +269,6 @@ const OfertaEditarDatosBaseInterno = () => {
 					</Stack>
 				</form>
 			</Paper>
-		</Box>
+		</Box >
 	)
 }
