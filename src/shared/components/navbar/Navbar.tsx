@@ -112,7 +112,7 @@ export default function Navbar() {
 
 	if (usuario?.rol === 'centro') {
 		paginas.push({
-			texto: 'Titulos',
+			texto: 'Títulos',
 			to: getAbsolutePath('titulos'),
 			icono: <IconLetterA />,
 		})

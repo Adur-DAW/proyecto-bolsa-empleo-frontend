@@ -6,6 +6,7 @@ import { situacionesDemandante } from '@/shared/models'
 import { IconDownload, IconSchool, IconUser } from '@tabler/icons-react'
 import { useAppStore } from '@/shared/store/store'
 import { descargarArchivoSeguro } from '@/shared/utils/descargar-archivo-seguro'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 
 export default function DemandanteDetallePage() {
 	const { id } = useParams()
@@ -29,22 +30,28 @@ export default function DemandanteDetallePage() {
 
 	return (
 		<Box sx={{ padding: 4 }}>
-			<Typography variant="h4" gutterBottom>
-				Perfil de Demandante
-			</Typography>
-
 			<Grid container spacing={3}>
 				<Grid size={{ xs: 12, md: 4 }}>
 					<Card elevation={3}>
 						<CardContent sx={{ textAlign: 'center' }}>
-							<Box
-								component="img"
-								src={demandante.imagenUrl || '/default-avatar.png'}
-								sx={{ width: 150, height: 150, borderRadius: '50%', mb: 2, objectFit: 'cover', border: '2px solid #eee' }}
-							/>
+							<AvatarSeguro
+								src={demandante.imagenUrl}
+								sx={{
+									width: 150,
+									height: 150,
+									mb: 2,
+									mx: 'auto',
+									fontSize: '3rem',
+									bgcolor: 'primary.main',
+									border: '4px solid #fff',
+									boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+								}}
+							>
+								{demandante.nombre?.charAt(0)}
+							</AvatarSeguro>
 							<Typography variant="h5">{`${demandante.nombre} ${demandante.apellido1} ${demandante.apellido2}`}</Typography>
 							<Typography color="textSecondary" gutterBottom>{situacion}</Typography>
-							
+
 							{canViewCv && demandante.cvPath && (
 								<Box sx={{ mt: 2 }}>
 									<MuiButton
@@ -71,10 +78,6 @@ export default function DemandanteDetallePage() {
 						<Divider sx={{ mb: 2 }} />
 						<Grid container spacing={2}>
 							<Grid size={{ xs: 12, sm: 6 }}>
-								<Typography variant="subtitle2" color="textSecondary">DNI</Typography>
-								<Typography variant="body1">{demandante.dni}</Typography>
-							</Grid>
-							<Grid size={{ xs: 12, sm: 6 }}>
 								<Typography variant="subtitle2" color="textSecondary">Email</Typography>
 								<Typography variant="body1">{demandante.email}</Typography>
 							</Grid>
@@ -92,7 +95,7 @@ export default function DemandanteDetallePage() {
 					<Paper elevation={3} sx={{ p: 3 }}>
 						<Stack direction="row" alignItems="center" spacing={1} mb={2}>
 							<IconSchool size={24} />
-							<Typography variant="h6">Titulaciones</Typography>
+							<Typography variant="h6">Títulos</Typography>
 						</Stack>
 						<Divider sx={{ mb: 2 }} />
 						{demandante.titulos && demandante.titulos.length > 0 ? (

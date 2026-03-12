@@ -3,7 +3,6 @@ import axiosInstance, { backendHost } from "../http/axios"
 
 export const descargarArchivoSeguro = async (url: string, nombreArchivo: string) => {
 	try {
-		// Aseguramos que la URL sea absoluta si no lo es
 		const urlCompleta = url.startsWith('http') ? url : `${backendHost}${url}`
 
 		const response = await axiosInstance.get(urlCompleta, {

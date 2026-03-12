@@ -7,11 +7,13 @@ import { Control, Controller } from 'react-hook-form'
 interface EmpresasFiltrosProps {
   control: Control<any>
   onBuscar: () => void
+  onLimpiar: () => void
 }
 
 export default function EmpresasFiltros({
   control,
-  onBuscar
+  onBuscar,
+  onLimpiar
 }: EmpresasFiltrosProps) {
 
   const { data: familias = [] } = useQuery({
@@ -84,7 +86,7 @@ export default function EmpresasFiltros({
           />
         </Box>
 
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 1 }}>
           <Button
             fullWidth
             variant="contained"
@@ -93,6 +95,16 @@ export default function EmpresasFiltros({
             onClick={onBuscar}
           >
             Buscar
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="inherit"
+            onClick={onLimpiar}
+          >
+            Limpiar filtros
           </Button>
         </Box>
       </Paper>

@@ -25,19 +25,35 @@ export default function OfertasPage() {
 
 	const [filtroFrontend, setFiltroFrontend] = useState('')
 
-	const { control, handleSubmit, watch } = useForm<OfertasFilterForm>({
-		defaultValues: {
-			filtro: (searchParams.get('filtro') as ObtenerOfertas) ||
-				(rol == 'sinRol' || rol == 'centro' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
-			search: searchParams.get('search') || '',
-			ordenarPor: searchParams.get('ordenarPor') || 'fecha_publicacion.desc',
-			estado: searchParams.get('estado') || 'activas',
-			idFamilia: searchParams.get('idFamilia') || '',
-			inscrito: searchParams.get('inscrito') || 'todas'
-		}
+	const obtenerValoresPorDefecto = () => ({
+		filtro: (searchParams.get('filtro') as ObtenerOfertas) ||
+			(rol == 'sinRol' || rol == 'centro' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
+		search: searchParams.get('search') || '',
+		ordenarPor: searchParams.get('ordenarPor') || 'fecha_publicacion.desc',
+		estado: searchParams.get('estado') || 'activas',
+		idFamilia: searchParams.get('idFamilia') || '',
+		inscrito: searchParams.get('inscrito') || 'todas'
+	})
+
+	const { control, handleSubmit, watch, reset } = useForm<OfertasFilterForm>({
+		defaultValues: obtenerValoresPorDefecto()
 	})
 
 	const [filtros, setFiltros] = useState<OfertasFilterForm>(watch())
+
+	const handleLimpiar = () => {
+		const emptyValues: OfertasFilterForm = {
+			filtro: (rol == 'sinRol' || rol == 'centro' ? 'todas' : rol == 'demandante' ? 'demandante' : 'empresa'),
+			search: '',
+			ordenarPor: 'fecha_publicacion.desc',
+			estado: 'activas',
+			idFamilia: '',
+			inscrito: 'todas'
+		}
+		reset(emptyValues)
+		setSearchParams({})
+		setFiltros(emptyValues)
+	}
 
 	const onSubmit = (data: OfertasFilterForm) => {
 		const params: any = {}
@@ -64,6 +80,7 @@ export default function OfertasPage() {
 				<OfertasFiltros
 					control={control}
 					onBuscar={handleSubmit(onSubmit)}
+					onLimpiar={handleLimpiar}
 				/>
 
 				<Box sx={{ flex: 1 }}>

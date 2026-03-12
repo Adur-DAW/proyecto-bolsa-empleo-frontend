@@ -35,7 +35,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 		return <div>Error al cargar los demandantes</div>
 	}
 
-	const [showRejected, setShowRejected] = useState(false)
+	const [mostrarRechazado, setMostrarRechazado] = useState(false)
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation({
@@ -82,7 +82,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 		{ field: 'nombre', headerName: 'Nombre Completo', width: 300 },
 		{
 			field: 'titulos',
-			headerName: 'Titulos',
+			headerName: 'Títulos',
 			type: 'string',
 			flex: 1,
 		},
@@ -135,12 +135,14 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 		imagenUrl: demandante.imagenUrl,
 	}))
 
-	const filteredAndSortedRows = useMemo(() => {
+	const demandantesFiltrados = useMemo(() => {
 		let result = rows
-		if (!showRejected) {
+		if (!mostrarRechazado) {
 			result = rows.filter(r => !r.rechazada)
+		} else {
+			result = rows.filter(r => r.rechazada)
 		}
-		
+
 		return [...result].sort((a, b) => {
 			if (a.adjudicado && !b.adjudicado) return -1
 			if (!a.adjudicado && b.adjudicado) return 1
@@ -148,7 +150,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			if (!a.rechazada && b.rechazada) return -1
 			return 0
 		})
-	}, [rows, showRejected])
+	}, [rows, mostrarRechazado])
 
 	return (
 		<Card sx={{ padding: 2, boxShadow: 2 }}>
@@ -157,18 +159,18 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 					<Typography variant="h5" component="h2">
 						No inscritos en la oferta
 					</Typography>
-					<MuiButton 
-						size="small" 
-						variant="outlined" 
-						color={showRejected ? "primary" : "inherit"}
-						onClick={() => setShowRejected(!showRejected)}
+					<MuiButton
+						size="small"
+						variant="outlined"
+						color={mostrarRechazado ? "primary" : "inherit"}
+						onClick={() => setMostrarRechazado(!mostrarRechazado)}
 					>
-						{showRejected ? "Ocultar rechazados" : "Ver rechazados"}
+						{mostrarRechazado ? "Ocultar rechazados" : "Ver rechazados"}
 					</MuiButton>
 				</Stack>
 
 				<DataGrid
-					rows={filteredAndSortedRows}
+					rows={demandantesFiltrados}
 					columns={columns}
 					initialState={{ pagination: { paginationModel } }}
 					pageSizeOptions={[5, 10]}

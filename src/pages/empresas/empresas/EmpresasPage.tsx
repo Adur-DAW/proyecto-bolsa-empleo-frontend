@@ -17,7 +17,7 @@ export default function EmpresasPage() {
 
 	const [query, setQuery] = useState('')
 
-	const { control, handleSubmit, watch } = useForm<EmpresasFilterForm>({
+	const { control, handleSubmit, watch, reset } = useForm<EmpresasFilterForm>({
 		defaultValues: {
 			search: searchParams.get('search') || '',
 			idFamiliaProfesional: searchParams.get('idFamiliaProfesional')
@@ -29,6 +29,17 @@ export default function EmpresasPage() {
 
 	const [filtros, setFiltros] =
 		useState<EmpresasFilterForm>(watch())
+
+	const handleLimpiar = () => {
+		const emptyValues: EmpresasFilterForm = {
+			search: '',
+			idFamiliaProfesional: null,
+			ordenarPor: 'nombre.asc',
+		}
+		reset(emptyValues)
+		setSearchParams({})
+		setFiltros(emptyValues)
+	}
 
 	const onSubmit = (data: EmpresasFilterForm) => {
 		const params: any = {}
@@ -50,7 +61,11 @@ export default function EmpresasPage() {
 					gap: 4,
 				}}
 			>
-				<EmpresasFiltros control={control} onBuscar={handleSubmit(onSubmit)} />
+				<EmpresasFiltros 
+					control={control} 
+					onBuscar={handleSubmit(onSubmit)} 
+					onLimpiar={handleLimpiar}
+				/>
 
 				<Box sx={{ flex: 1 }}>
 					<Box

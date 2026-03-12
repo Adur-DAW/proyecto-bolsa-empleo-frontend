@@ -92,21 +92,11 @@ export default function EstadisticasFiltros({
 					<Button variant="outlined" onClick={onExportar}>
 						Exportar CSV
 					</Button>
-					<Button 
-						variant="contained" 
-						onClick={onActualizar} 
+					<Button
+						variant="contained"
+						onClick={onActualizar}
 						size="large"
 						color={hayCambios ? 'warning' : 'primary'}
-						sx={{
-							...(hayCambios && {
-								animation: 'pulse 2s infinite',
-								'@keyframes pulse': {
-									'0%': { transform: 'scale(1)' },
-									'50%': { transform: 'scale(1.05)' },
-									'100%': { transform: 'scale(1)' },
-								},
-							})
-						}}
 					>
 						{hayCambios ? 'Aplicar Cambios' : 'Actualizar'}
 					</Button>

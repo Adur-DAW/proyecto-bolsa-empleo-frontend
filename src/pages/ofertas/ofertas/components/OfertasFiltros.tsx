@@ -22,11 +22,13 @@ import { Control, Controller } from 'react-hook-form'
 interface OfertasFiltrosProps {
 	control: Control<any>
 	onBuscar: () => void
+	onLimpiar: () => void
 }
 
 export default function OfertasFiltros({
 	control,
-	onBuscar
+	onBuscar,
+	onLimpiar
 }: OfertasFiltrosProps) {
 	const { rol } = useRol()
 
@@ -182,7 +184,7 @@ export default function OfertasFiltros({
 					</Box>
 				)}
 
-				<Box sx={{ mb: 3 }}>
+				<Box sx={{ mb: 1 }}>
 					<Button
 						fullWidth
 						variant="contained"
@@ -191,6 +193,16 @@ export default function OfertasFiltros({
 						onClick={onBuscar}
 					>
 						Buscar
+					</Button>
+				</Box>
+				<Box>
+					<Button
+						fullWidth
+						variant="outlined"
+						color="inherit"
+						onClick={onLimpiar}
+					>
+						Limpiar filtros
 					</Button>
 				</Box>
 			</Paper >

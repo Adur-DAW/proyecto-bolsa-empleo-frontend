@@ -35,7 +35,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 		return <div>Error al cargar los demandantes</div>
 	}
 
-	const [showRejected, setShowRejected] = useState(false)
+	const [mostrarRechazado, setMostrarRechazado] = useState(false)
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation({
@@ -76,8 +76,8 @@ const DemandantesOfertaInterno = ({ id }) => {
 		{ field: 'nombre', headerName: 'Nombre Completo', width: 300 },
 		{
 			field: 'titulos',
-			headerName: 'Titulos',
-			type: 'string', // Titulos is a comma separated string in rows
+			headerName: 'Títulos',
+			type: 'string',
 			flex: 1,
 		},
 		{ field: 'situacion', headerName: 'Situación' },
@@ -129,12 +129,14 @@ const DemandantesOfertaInterno = ({ id }) => {
 		imagenUrl: demandante.imagenUrl,
 	}))
 
-	const filteredAndSortedRows = useMemo(() => {
+	const demandantesFiltrados = useMemo(() => {
 		let result = rows
-		if (!showRejected) {
+		if (!mostrarRechazado) {
 			result = rows.filter(r => !r.rechazada)
+		} else {
+			result = rows.filter(r => r.rechazada)
 		}
-		
+
 		return [...result].sort((a, b) => {
 			if (a.adjudicado && !b.adjudicado) return -1
 			if (!a.adjudicado && b.adjudicado) return 1
@@ -142,7 +144,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 			if (!a.rechazada && b.rechazada) return -1
 			return 0
 		})
-	}, [rows, showRejected])
+	}, [rows, mostrarRechazado])
 
 	return (
 		<Card sx={{ padding: 2, boxShadow: 2 }}>
@@ -151,18 +153,18 @@ const DemandantesOfertaInterno = ({ id }) => {
 					<Typography variant="h5" component="h2">
 						Inscritos en la oferta
 					</Typography>
-					<MuiButton 
-						size="small" 
-						variant="outlined" 
-						color={showRejected ? "primary" : "inherit"}
-						onClick={() => setShowRejected(!showRejected)}
+					<MuiButton
+						size="small"
+						variant="outlined"
+						color={mostrarRechazado ? "primary" : "inherit"}
+						onClick={() => setMostrarRechazado(!mostrarRechazado)}
 					>
-						{showRejected ? "Ocultar rechazados" : "Ver rechazados"}
+						{mostrarRechazado ? "Ocultar rechazados" : "Ver rechazados"}
 					</MuiButton>
 				</Stack>
 
 				<DataGrid
-					rows={filteredAndSortedRows}
+					rows={demandantesFiltrados}
 					columns={columns}
 					initialState={{ pagination: { paginationModel } }}
 					pageSizeOptions={[5, 10]}
