@@ -1,12 +1,13 @@
-import { Card, CardContent, Typography } from '@mui/material'
 import { toast } from 'sonner'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { Card, CardContent, Typography, Chip, Button as MuiButton, Stack } from '@mui/material'
+import { IconCheck, IconX } from '@tabler/icons-react'
 import {
 	useMutation,
 	useQueryClient,
 	useSuspenseQuery,
 } from '@tanstack/react-query'
-import { Suspense } from 'react'
+import { Suspense, useState, useMemo } from 'react'
 
 import { Demandante, situacionesDemandante } from '@/shared/models'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
@@ -34,6 +35,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 		return <div>Error al cargar los demandantes</div>
 	}
 
+	const [showRejected, setShowRejected] = useState(false)
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation({
@@ -41,6 +43,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			ofertasDemandantesRepository.registrarDemandanteYAdjudicar(id, idDemandante),
 		onSuccess: () => {
 			toast.success('Demandante adjudicado correctamente')
+			queryClient.invalidateQueries({ queryKey: ['oferta', id] })
 			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
 			queryClient.invalidateQueries({
 				queryKey: ['oferta', id, 'demandantes', 'posibles'],
@@ -60,6 +63,7 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			ofertasDemandantesRepository.rechazarOferta(id, idDemandante),
 		onSuccess: () => {
 			toast.success('Demandante rechazado correctamente')
+			queryClient.invalidateQueries({ queryKey: ['oferta', id] })
 			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
 			queryClient.invalidateQueries({
 				queryKey: ['oferta', id, 'demandantes', 'posibles'],
@@ -79,19 +83,23 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 		{
 			field: 'titulos',
 			headerName: 'Titulos',
-			type: 'number',
+			type: 'string',
 			flex: 1,
 		},
 		{ field: 'situacion', headerName: 'Situación' },
 		{
 			field: 'adjudicado',
-			headerName: 'Adjudicado',
-			type: 'boolean',
-		},
-		{
-			field: 'rechazada',
-			headerName: 'Rechazada',
-			type: 'boolean',
+			headerName: 'Estado',
+			width: 150,
+			renderCell: (params) => {
+				if (params.row.adjudicado) {
+					return <Chip label="Adjudicado" color="success" size="small" icon={<IconCheck size={16} />} />
+				}
+				if (params.row.rechazada) {
+					return <Chip label="Rechazado" color="error" size="small" icon={<IconX size={16} />} variant="outlined" />
+				}
+				return <Chip label="Pendiente" color="warning" size="small" variant="outlined" />
+			},
 		},
 		{
 			field: 'acciones',
@@ -120,27 +128,53 @@ const DemandantesPosiblesOfertaInterno = ({ id }) => {
 			' ' +
 			demandante.apellido2,
 		situacion: situacionesDemandante.find(x => x.id == demandante.situacion)?.valor ?? 'Sin especificar',
-		titulos: demandante.titulos?.map((x) => x.titulo?.nombre).join(', '),
+		titulos: demandante.titulos?.map((x) => x.titulo?.nombre).join(', ') ?? '',
 		adjudicado: demandante.adjudicado,
 		rechazada: demandante.rechazada,
 		cvUrl: demandante.cvUrl,
 		imagenUrl: demandante.imagenUrl,
 	}))
 
+	const filteredAndSortedRows = useMemo(() => {
+		let result = rows
+		if (!showRejected) {
+			result = rows.filter(r => !r.rechazada)
+		}
+		
+		return [...result].sort((a, b) => {
+			if (a.adjudicado && !b.adjudicado) return -1
+			if (!a.adjudicado && b.adjudicado) return 1
+			if (a.rechazada && !b.rechazada) return 1
+			if (!a.rechazada && b.rechazada) return -1
+			return 0
+		})
+	}, [rows, showRejected])
+
 	return (
 		<Card sx={{ padding: 2, boxShadow: 2 }}>
 			<CardContent>
-				<Typography variant="h5" component="h2" marginBottom={2}>
-					No inscritos en la oferta
-				</Typography>
+				<Stack direction="row" justifyContent="space-between" alignItems="center" marginBottom={2}>
+					<Typography variant="h5" component="h2">
+						No inscritos en la oferta
+					</Typography>
+					<MuiButton 
+						size="small" 
+						variant="outlined" 
+						color={showRejected ? "primary" : "inherit"}
+						onClick={() => setShowRejected(!showRejected)}
+					>
+						{showRejected ? "Ocultar rechazados" : "Ver rechazados"}
+					</MuiButton>
+				</Stack>
 
 				<DataGrid
-					rows={rows}
+					rows={filteredAndSortedRows}
 					columns={columns}
 					initialState={{ pagination: { paginationModel } }}
 					pageSizeOptions={[5, 10]}
 					checkboxSelection
 					sx={{ border: 0 }}
+					autoHeight
 				/>
 			</CardContent>
 		</Card>

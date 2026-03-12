@@ -7,7 +7,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { z } from 'zod'
 import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
 
@@ -39,6 +39,7 @@ export default function OfertaEditarDatosBase() {
 
 const OfertaEditarDatosBaseInterno = () => {
 	const { id } = useParams()
+	const navigate = useNavigate()
 	if (!id) {
 		throw new Error('No se ha proporcionado un ID')
 	}
@@ -80,7 +81,7 @@ const OfertaEditarDatosBaseInterno = () => {
 	})
 
 
-	const mutation = useMutation({
+	const updateMutation = useMutation({
 		mutationFn: ofertasRepository.actualizar,
 		onSuccess: () => toast.success('Oferta actualizada con éxito'),
 		onError: (error) => {
@@ -99,6 +100,23 @@ const OfertaEditarDatosBaseInterno = () => {
 		},
 	})
 
+	const deleteMutation = useMutation({
+		mutationFn: () => ofertasRepository.eliminar(+id),
+		onSuccess: () => {
+			toast.success('Oferta eliminada correctamente')
+			navigate('/ofertas')
+		},
+		onError: () => {
+			toast.error('Error al eliminar la oferta')
+		},
+	})
+
+	const onEliminarClick = () => {
+		if (window.confirm('¿Estás seguro de que quieres eliminar esta oferta? Esta acción no se puede deshacer.')) {
+			deleteMutation.mutate()
+		}
+	}
+
 	const onSubmit = (data) => {
 		const payload = {
 			...oferta,
@@ -107,7 +125,7 @@ const OfertaEditarDatosBaseInterno = () => {
 			fechaPublicacion: dayjs(data.fechaPublicacion),
 			fechaCierre: data.fechaCierre ? dayjs(data.fechaCierre) : null
 		}
-		mutation.mutate(payload)
+		updateMutation.mutate(payload)
 	}
 
 	return (
@@ -139,8 +157,14 @@ const OfertaEditarDatosBaseInterno = () => {
 						)}
 					/>
 
-					<Button variant="outlined" color="error" startIcon={<IconTrash />}>
-						Eliminar
+					<Button 
+						variant="outlined" 
+						color="error" 
+						startIcon={<IconTrash />}
+						onClick={onEliminarClick}
+						disabled={deleteMutation.isPending}
+					>
+						{deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
 					</Button>
 				</Stack>
 			</Box>
@@ -322,10 +346,10 @@ const OfertaEditarDatosBaseInterno = () => {
 								variant="contained"
 								color="primary"
 								fullWidth
-								disabled={mutation.isPending}
+								disabled={updateMutation.isPending}
 								startIcon={<IconDeviceFloppy />}
 							>
-								{mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
+								{updateMutation.isPending ? 'Guardando...' : 'Guardar cambios'}
 							</Button>
 						</Box>
 					</Stack>

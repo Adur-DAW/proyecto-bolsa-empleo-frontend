@@ -95,6 +95,20 @@ export default function AppRouter() {
 						<Route
 							element={
 								<ProtectedRoute
+									allowedRoles={['centro', 'empresa']}
+									redirectTo={getAbsolutePath('login')}
+								/>
+							}
+						>
+							<Route
+								path={getAbsolutePath('demandante_detalle')}
+								element={<DemandanteDetallePage />}
+							/>
+						</Route>
+
+						<Route
+							element={
+								<ProtectedRoute
 									allowedRoles={['centro']}
 									redirectTo={getAbsolutePath('login')}
 								/>
@@ -107,10 +121,6 @@ export default function AppRouter() {
 							<Route
 								path={getAbsolutePath('admin')}
 								element={<EstadisticasPage />}
-							/>
-							<Route
-								path={getAbsolutePath('demandante_detalle')}
-								element={<DemandanteDetallePage />}
 							/>
 						</Route>
 

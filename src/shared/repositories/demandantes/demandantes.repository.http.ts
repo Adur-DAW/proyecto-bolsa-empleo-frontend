@@ -9,7 +9,10 @@ export const DemandantesRepositoryHttp: DemandantesRepository = {
 
 		return {
 			...demandante,
+			idDemandante: demandante.id_demandante,
 			telefonoMovil: demandante.telefono_movil,
+			cvPath: demandante.cv_path,
+			cvUrl: demandante.cv_path ? `/demandantes/${demandante.id_demandante}/cv` : undefined,
 		}
 	},
 	obtenerPorId: async (id: number): Promise<Demandante> => {
@@ -17,7 +20,10 @@ export const DemandantesRepositoryHttp: DemandantesRepository = {
 
 		return {
 			...demandante,
+			idDemandante: demandante.id_demandante,
 			telefonoMovil: demandante.telefono_movil,
+			cvPath: demandante.cv_path,
+			cvUrl: demandante.cv_path ? `/demandantes/${demandante.id_demandante}/cv` : undefined,
 		}
 	},
 	actualizar: async (payload: Demandante | FormData) => {

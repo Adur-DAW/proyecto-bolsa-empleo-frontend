@@ -6,6 +6,7 @@ import {
 	getEntity,
 	postEntity,
 	putEntity,
+	deleteEntity,
 } from '@/shared/http/api.service'
 import { Oferta } from '@/shared/models'
 
@@ -172,6 +173,9 @@ export const OfertasRepositoryHttp = {
 			`/ofertas/${oferta.id}`,
 			mapOfertaToBack(oferta)
 		)
+	},
+	eliminar: async (id: number) => {
+		return await deleteEntity<void>(`/ofertas/${id}`)
 	},
 }
 

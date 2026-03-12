@@ -1,13 +1,16 @@
-import { Box, Card, CardContent, Grid, Typography, Stack, Divider, Paper } from '@mui/material'
+import { Box, Card, CardContent, Grid, Typography, Stack, Divider, Paper, Button as MuiButton } from '@mui/material'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router'
 import { DemandantesRepositoryHttp } from '@/shared/repositories/demandantes/demandantes.repository.http'
 import { situacionesDemandante } from '@/shared/models'
-import { IconSchool, IconUser } from '@tabler/icons-react'
+import { IconDownload, IconSchool, IconUser } from '@tabler/icons-react'
+import { useAppStore } from '@/shared/store/store'
+import { descargarArchivoSeguro } from '@/shared/utils/descargar-archivo-seguro'
 
 export default function DemandanteDetallePage() {
 	const { id } = useParams()
 	const demandanteRepository = DemandantesRepositoryHttp
+	const user = useAppStore(x => x.usuario)
 
 	const { data: demandante } = useSuspenseQuery({
 		queryKey: ['demandante', id],
@@ -16,6 +19,14 @@ export default function DemandanteDetallePage() {
 
 	const situacion = situacionesDemandante.find(s => s.id === demandante.situacion)?.valor || 'No especificada'
 
+	const canViewCv = user?.rol === 'centro' || user?.rol === 'empresa'
+
+	const handleDescargarCv = () => {
+		if (demandante.cvUrl) {
+			descargarArchivoSeguro(demandante.cvUrl, `CV_${demandante.nombre}_${demandante.apellido1}.pdf`)
+		}
+	}
+
 	return (
 		<Box sx={{ padding: 4 }}>
 			<Typography variant="h4" gutterBottom>
@@ -23,7 +34,7 @@ export default function DemandanteDetallePage() {
 			</Typography>
 
 			<Grid container spacing={3}>
-				<Grid item xs={12} md={4}>
+				<Grid size={{ xs: 12, md: 4 }}>
 					<Card elevation={3}>
 						<CardContent sx={{ textAlign: 'center' }}>
 							<Box
@@ -32,12 +43,26 @@ export default function DemandanteDetallePage() {
 								sx={{ width: 150, height: 150, borderRadius: '50%', mb: 2, objectFit: 'cover', border: '2px solid #eee' }}
 							/>
 							<Typography variant="h5">{`${demandante.nombre} ${demandante.apellido1} ${demandante.apellido2}`}</Typography>
-							<Typography color="textSecondary">{situacion}</Typography>
+							<Typography color="textSecondary" gutterBottom>{situacion}</Typography>
+							
+							{canViewCv && demandante.cvPath && (
+								<Box sx={{ mt: 2 }}>
+									<MuiButton
+										variant="contained"
+										color="primary"
+										startIcon={<IconDownload />}
+										onClick={handleDescargarCv}
+										fullWidth
+									>
+										Descargar CV
+									</MuiButton>
+								</Box>
+							)}
 						</CardContent>
 					</Card>
 				</Grid>
 
-				<Grid item xs={12} md={8}>
+				<Grid size={{ xs: 12, md: 8 }}>
 					<Paper elevation={3} sx={{ p: 3, mb: 3 }}>
 						<Stack direction="row" alignItems="center" spacing={1} mb={2}>
 							<IconUser size={24} />
@@ -45,21 +70,21 @@ export default function DemandanteDetallePage() {
 						</Stack>
 						<Divider sx={{ mb: 2 }} />
 						<Grid container spacing={2}>
-							<Grid item xs={12} sm={6}>
+							<Grid size={{ xs: 12, sm: 6 }}>
 								<Typography variant="subtitle2" color="textSecondary">DNI</Typography>
 								<Typography variant="body1">{demandante.dni}</Typography>
 							</Grid>
-							<Grid item xs={12} sm={6}>
+							<Grid size={{ xs: 12, sm: 6 }}>
 								<Typography variant="subtitle2" color="textSecondary">Email</Typography>
 								<Typography variant="body1">{demandante.email}</Typography>
 							</Grid>
-							<Grid item xs={12} sm={6}>
+							<Grid size={{ xs: 12, sm: 6 }}>
 								<Typography variant="subtitle2" color="textSecondary">Teléfono</Typography>
 								<Typography variant="body1">{demandante.telefonoMovil}</Typography>
 							</Grid>
-							<Grid item xs={12} sm={6}>
+							<Grid size={{ xs: 12, sm: 6 }}>
 								<Typography variant="subtitle2" color="textSecondary">Familia Profesional</Typography>
-								<Typography variant="body1">{demandante.familiaProfesional?.nombre || 'No especificada'}</Typography>
+								<Typography variant="body1">{(demandante.familiaProfesional as any)?.nombre || 'No especificada'}</Typography>
 							</Grid>
 						</Grid>
 					</Paper>

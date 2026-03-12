@@ -124,17 +124,19 @@ export default function DetalleOferta({ oferta }) {
 						</Box>
 
 						{oferta.readme && (
-							<Box sx={{ mt: 3, mb: 1 }}>
+							<Box sx={{ mt: 3 }}>
 								<Typography variant="h6" gutterBottom>
 									Detalles de la Oferta
 								</Typography>
 								<Box
 									className="readme-content"
 									sx={{
-										padding: 2,
-										backgroundColor: 'background.paper',
-										borderRadius: 1,
-										boxShadow: 'inset 0 0 5px rgba(0,0,0,0.1)',
+										padding: 0,
+										backgroundColor: 'transparent',
+										color: 'text.primary',
+										'& p': { mb: 2 },
+										'& ul, & ol': { mb: 2, pl: 4 },
+										'& li': { mb: 0.5 },
 									}}
 									dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(oferta.readme) }}
 								/>
