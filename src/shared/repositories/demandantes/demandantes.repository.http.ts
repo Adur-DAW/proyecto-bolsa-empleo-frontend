@@ -12,6 +12,14 @@ export const DemandantesRepositoryHttp: DemandantesRepository = {
 			telefonoMovil: demandante.telefono_movil,
 		}
 	},
+	obtenerPorId: async (id: number): Promise<Demandante> => {
+		const demandante = (await getEntity(`/demandantes/${id}`)) as any
+
+		return {
+			...demandante,
+			telefonoMovil: demandante.telefono_movil,
+		}
+	},
 	actualizar: async (payload: Demandante | FormData) => {
 		if (payload instanceof FormData) {
 			payload.append('_method', 'PUT')

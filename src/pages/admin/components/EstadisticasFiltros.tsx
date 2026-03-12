@@ -20,6 +20,7 @@ type EstadisticasFiltrosProps = {
 	onCambioFiltro: (campo: string, valor: string) => void
 	onExportar: () => void
 	onActualizar: () => void
+	hayCambios?: boolean
 }
 
 export default function EstadisticasFiltros({
@@ -28,9 +29,10 @@ export default function EstadisticasFiltros({
 	onCambioFiltro,
 	onExportar,
 	onActualizar,
+	hayCambios,
 }: EstadisticasFiltrosProps) {
 	return (
-		<Paper elevation={3} sx={{ p: 2, mb: 4 }}>
+		<Paper elevation={3} sx={{ p: 2, mb: 4, border: hayCambios ? '1px solid #ff9800' : 'none' }}>
 			<Box
 				display="flex"
 				justifyContent="space-between"
@@ -90,8 +92,23 @@ export default function EstadisticasFiltros({
 					<Button variant="outlined" onClick={onExportar}>
 						Exportar CSV
 					</Button>
-					<Button variant="contained" onClick={onActualizar} size="large">
-						Actualizar
+					<Button 
+						variant="contained" 
+						onClick={onActualizar} 
+						size="large"
+						color={hayCambios ? 'warning' : 'primary'}
+						sx={{
+							...(hayCambios && {
+								animation: 'pulse 2s infinite',
+								'@keyframes pulse': {
+									'0%': { transform: 'scale(1)' },
+									'50%': { transform: 'scale(1.05)' },
+									'100%': { transform: 'scale(1)' },
+								},
+							})
+						}}
+					>
+						{hayCambios ? 'Aplicar Cambios' : 'Actualizar'}
 					</Button>
 				</Box>
 			</Box>

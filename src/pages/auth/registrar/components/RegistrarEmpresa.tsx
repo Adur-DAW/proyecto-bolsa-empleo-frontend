@@ -1,4 +1,5 @@
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
+import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, Button } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
@@ -66,7 +67,10 @@ export default function RegistrarEmpresa() {
 
 	const mutation = useMutation({
 		mutationFn: authRepository.registrar,
-		onSuccess: () => navigate('/login'),
+		onSuccess: () => {
+			toast.success('Cuenta de empresa creada correctamente. Ya puedes iniciar sesión.')
+			navigate('/login')
+		},
 		onError: (error) => {
 			try {
 				const { errors } = JSON.parse(error.message)
@@ -79,7 +83,7 @@ export default function RegistrarEmpresa() {
 				}
 			} catch (e) {
 				console.log(e)
-				alert('Error inesperado en el servidor')
+				toast.error('Error inesperado en el servidor')
 			}
 		},
 	})

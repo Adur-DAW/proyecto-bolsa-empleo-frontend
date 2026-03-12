@@ -11,6 +11,7 @@ import { useParams } from 'react-router'
 import { z } from 'zod'
 import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
 
+import { toast } from 'sonner'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
 
 const ofertaSchema = z.object({
@@ -78,9 +79,10 @@ const OfertaEditarDatosBaseInterno = () => {
 		},
 	})
 
+
 	const mutation = useMutation({
 		mutationFn: ofertasRepository.actualizar,
-		onSuccess: () => console.log('Datos actualizados correctamente'),
+		onSuccess: () => toast.success('Oferta actualizada con éxito'),
 		onError: (error) => {
 			try {
 				const { errors } = JSON.parse(error.message)
@@ -89,10 +91,10 @@ const OfertaEditarDatosBaseInterno = () => {
 						setError(key as any, { type: 'server', message: errors[key][0] })
 					})
 				} else {
-					alert('Error al actualizar la oferta')
+					toast.error('Error al actualizar la oferta')
 				}
 			} catch {
-				alert('Error inesperado al actualizar')
+				toast.error('Error inesperado al actualizar')
 			}
 		},
 	})

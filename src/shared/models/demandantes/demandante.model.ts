@@ -17,6 +17,7 @@ export type Demandante = {
 	titulos: TituloDemandante[]
 
 	adjudicado: boolean
+	rechazada: boolean
 }
 
 export const situacionesDemandante = [

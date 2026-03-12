@@ -189,6 +189,7 @@ const mapOfertaToBack = (oferta: Oferta): any => ({
 	fecha_cierre: (oferta.fechaCierre && dayjs(oferta.fechaCierre).isValid()) 
 		? dayjs(oferta.fechaCierre).format('YYYY-MM-DD') 
 		: null,
+	readme: oferta.readme,
 })
 
 const mapOfertaToFront = (oferta: any): Oferta => ({
@@ -201,6 +202,7 @@ const mapOfertaToFront = (oferta: any): Oferta => ({
 	abierta: !!oferta.abierta && (oferta.fecha_cierre ? !dayjs(oferta.fecha_cierre).isBefore(dayjs(), 'day') : true),
 	demandantesInscritos: oferta.demandantes_inscritos,
 	idEmpresa: oferta.id_empresa,
+	readme: oferta.readme,
 	tipoContrato: oferta.id_tipo_contrato == 1
 		? { id: 1, nombre: 'Jornada Completa' }
 		: { id: 2, nombre: 'Media Jornada' },

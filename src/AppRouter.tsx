@@ -42,6 +42,7 @@ const OfertaCrearPage = lazy(
 )
 
 const EstadisticasPage = lazy(() => import('./pages/admin/EstadisticasPage'))
+const DemandanteDetallePage = lazy(() => import('./pages/demandante/DemandanteDetallePage'))
 
 export default function AppRouter() {
 	return (
@@ -106,6 +107,10 @@ export default function AppRouter() {
 							<Route
 								path={getAbsolutePath('admin')}
 								element={<EstadisticasPage />}
+							/>
+							<Route
+								path={getAbsolutePath('demandante_detalle')}
+								element={<DemandanteDetallePage />}
 							/>
 						</Route>
 

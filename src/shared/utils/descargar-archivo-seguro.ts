@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import axiosInstance, { backendHost } from "../http/axios"
 
 export const descargarArchivoSeguro = async (url: string, nombreArchivo: string) => {
@@ -20,6 +21,6 @@ export const descargarArchivoSeguro = async (url: string, nombreArchivo: string)
 		window.URL.revokeObjectURL(downloadUrl)
 	} catch (error) {
 		console.error('Error al descargar el archivo:', error)
-		alert('No se pudo descargar el archivo. Es posible que no tengas permisos.')
+		toast.error('No se pudo descargar el archivo. Es posible que no tengas permisos.')
 	}
 }

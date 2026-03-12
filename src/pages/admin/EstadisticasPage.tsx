@@ -14,13 +14,16 @@ import EstadisticasGraficos from './components/EstadisticasGraficos'
 import TarjetaEstadistica from './components/TarjetaEstadistica'
 import { useEstadisticasAdministracion } from './hooks/useEstadisticasAdministracion'
 
+import { IconBriefcase, IconUserCheck, IconUsers, IconChartBar } from '@tabler/icons-react'
+
 export default function EstadisticasPage() {
-	const [filtros, setFiltros] = useState({
+	const [filtrosDraft, setFiltrosDraft] = useState({
 		fechaInicio: dayjs().subtract(6, 'month').format('YYYY-MM-DD'),
 		fechaFin: dayjs().format('YYYY-MM-DD'),
 		familia: '',
 		agrupacion: 'diario',
 	})
+	const [filtrosActivos, setFiltrosActivos] = useState(filtrosDraft)
 	const [familias, setFamilias] = useState<FamiliaProfesional[]>([])
 
 	useEffect(() => {
@@ -28,11 +31,17 @@ export default function EstadisticasPage() {
 	}, [])
 
 	const manejarCambioFiltro = (campo: string, valor: string) => {
-		setFiltros((prev) => ({ ...prev, [campo]: valor }))
+		setFiltrosDraft((prev) => ({ ...prev, [campo]: valor }))
 	}
 
-	const { estadisticas, isLoading, error, refetch, conversionRate } =
-		useEstadisticasAdministracion(filtros)
+	const aplicarFiltros = () => {
+		setFiltrosActivos(filtrosDraft)
+	}
+
+	const { estadisticas, isLoading, error, conversionRate } =
+		useEstadisticasAdministracion(filtrosActivos)
+
+	const hayCambiosSinAplicar = JSON.stringify(filtrosDraft) !== JSON.stringify(filtrosActivos)
 
 	if (isLoading)
 		return (
@@ -79,44 +88,49 @@ export default function EstadisticasPage() {
 	return (
 		<Box p={3}>
 			<EstadisticasFiltros
-				filtros={filtros}
+				filtros={filtrosDraft}
 				familias={familias}
 				onCambioFiltro={manejarCambioFiltro}
 				onExportar={exportarCSV}
-				onActualizar={refetch}
+				onActualizar={aplicarFiltros}
+				hayCambios={hayCambiosSinAplicar}
 			/>
 
 			<Box display="flex" flexWrap="wrap" gap={3} mb={4}>
-				<Box flex="1 1 150px">
+				<Box flex="1 1 200px">
 					<TarjetaEstadistica
 						titulo="Ofertas Publicadas"
 						valor={estadisticas.totales.ofertas}
 						color={COLORES.ofertas}
 						variacion={estadisticas.totales.variacion?.ofertas}
+						icon={<IconBriefcase size={24} />}
 					/>
 				</Box>
-				<Box flex="1 1 150px">
+				<Box flex="1 1 200px">
 					<TarjetaEstadistica
 						titulo="Adjudicadas"
 						valor={estadisticas.totales.ofertas_adjudicadas}
 						color={COLORES.adjudicadas}
 						variacion={estadisticas.totales.variacion?.ofertas_adjudicadas}
+						icon={<IconUserCheck size={24} />}
 					/>
 				</Box>
-				<Box flex="1 1 150px">
+				<Box flex="1 1 200px">
 					<TarjetaEstadistica
 						titulo="Demandantes Nuevos"
 						valor={estadisticas.totales.demandantes}
 						color={COLORES.demandantes}
 						variacion={estadisticas.totales.variacion?.demandantes}
+						icon={<IconUsers size={24} />}
 					/>
 				</Box>
-				<Box flex="1 1 150px">
+				<Box flex="1 1 200px">
 					<TarjetaEstadistica
 						titulo="Tasa de Adjudicación"
 						valor={`${conversionRate}%`}
 						color="#9c27b0"
 						subtext={`${estadisticas.funnel.adjudicados} de ${estadisticas.funnel.inscritos} inscripciones`}
+						icon={<IconChartBar size={24} />}
 					/>
 				</Box>
 			</Box>

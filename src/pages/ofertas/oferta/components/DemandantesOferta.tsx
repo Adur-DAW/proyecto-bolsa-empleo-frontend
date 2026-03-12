@@ -1,4 +1,5 @@
 import { Card, CardContent, Typography } from '@mui/material'
+import { toast } from 'sonner'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import {
 	useMutation,
@@ -39,15 +40,32 @@ const DemandantesOfertaInterno = ({ id }) => {
 		mutationFn: (idDemandante: number) =>
 			ofertasDemandantesRepository.adjudicarOferta(id, idDemandante),
 		onSuccess: () => {
+			toast.success('Demandante adjudicado correctamente')
 			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
-			queryClient.invalidateQueries({
-				queryKey: ['oferta', id, 'demandantes'],
-			})
 		},
+		onError: () => {
+			toast.error('Error al adjudicar el demandante')
+		}
 	})
 
 	const onAdjudicarClick = (demandante: Demandante) => {
 		mutation.mutate(demandante.idDemandante)
+	}
+
+	const rechazarMutation = useMutation({
+		mutationFn: (idDemandante: number) =>
+			ofertasDemandantesRepository.rechazarOferta(id, idDemandante),
+		onSuccess: () => {
+			toast.success('Demandante rechazado correctamente')
+			queryClient.invalidateQueries({ queryKey: ['oferta', id, 'demandantes'] })
+		},
+		onError: () => {
+			toast.error('Error al rechazar el demandante')
+		}
+	})
+
+	const onRechazarClick = (demandante: Demandante) => {
+		rechazarMutation.mutate(demandante.idDemandante)
 	}
 
 	const columns: GridColDef[] = [
@@ -65,6 +83,11 @@ const DemandantesOfertaInterno = ({ id }) => {
 			type: 'boolean',
 		},
 		{
+			field: 'rechazada',
+			headerName: 'Rechazada',
+			type: 'boolean',
+		},
+		{
 			field: 'acciones',
 			headerName: 'Acciones',
 			type: 'actions',
@@ -73,6 +96,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 				<AccionesPopover
 					demandante={params.row}
 					onAdjudicarClick={onAdjudicarClick}
+					onRechazarClick={onRechazarClick}
 				/>
 			),
 		},
@@ -92,6 +116,7 @@ const DemandantesOfertaInterno = ({ id }) => {
 		situacion: situacionesDemandante.find(x => x.id == demandante.situacion)?.valor ?? 'Sin especificar',
 		titulos: demandante.titulos?.map((x) => x.titulo?.nombre).join(', '),
 		adjudicado: demandante.adjudicado,
+		rechazada: demandante.rechazada,
 		cvUrl: demandante.cvUrl,
 		imagenUrl: demandante.imagenUrl,
 	}))

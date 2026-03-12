@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { Box, Button, Typography } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
@@ -86,7 +87,10 @@ export default function RegistrarDemandante() {
 
 	const mutation = useMutation({
 		mutationFn: (data: FormData) => authRepository.registrar(data as any),
-		onSuccess: () => navigate('/login'),
+		onSuccess: () => {
+			toast.success('Cuenta creada correctamente. Ya puedes iniciar sesión.')
+			navigate('/login')
+		},
 		onError: (error) => {
 			try {
 				const { errors } = JSON.parse(error.message)
@@ -98,7 +102,7 @@ export default function RegistrarDemandante() {
 					setError('dni', { type: 'server', message: errors?.dni[0] })
 				}
 			} catch {
-				alert('Error inesperado en el servidor')
+				toast.error('Error inesperado en el servidor')
 			}
 		},
 	})

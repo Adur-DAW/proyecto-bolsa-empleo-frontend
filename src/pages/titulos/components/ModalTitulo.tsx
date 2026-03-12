@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { IconDeviceFloppy, IconPlus } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -41,12 +42,13 @@ export default function ModalNuevoTitulo({
 			? titulosRepository.actualizar
 			: titulosRepository.registrar,
 		onSuccess: () => {
+			toast.success(titulo?.id ? 'Título actualizado' : 'Título creado')
 			queryClient.refetchQueries({ queryKey: ['titulos'] })
 			cerrarModal()
 			reset()
 		},
 		onError: () => {
-			alert('Hubo un error al añadir el título')
+			toast.error('Hubo un error al procesar el título')
 		},
 	})
 
