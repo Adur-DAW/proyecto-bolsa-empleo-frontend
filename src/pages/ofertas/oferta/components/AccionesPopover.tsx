@@ -4,6 +4,8 @@ import { useState } from 'react'
 
 import { Demandante } from '@/shared/models'
 
+import { descargarArchivoSeguro } from '@/shared/utils/descargar-archivo-seguro'
+
 export default function AccionesPopover({
 	demandante,
 	onAdjudicarClick,
@@ -28,6 +30,13 @@ export default function AccionesPopover({
 		handleClose()
 	}
 
+	const handleDescargarCv = () => {
+		if (demandante.cvUrl) {
+			descargarArchivoSeguro(demandante.cvUrl, `CV_${demandante.nombre}_${demandante.apellido1}.pdf`)
+		}
+		handleClose()
+	}
+
 	return (
 		<>
 			<IconButton onClick={handleOpen}>
@@ -48,6 +57,9 @@ export default function AccionesPopover({
 			>
 				{!demandante.adjudicado && (
 					<MenuItem onClick={handleAdjudicar}>Adjudicar</MenuItem>
+				)}
+				{demandante.cvUrl && (
+					<MenuItem onClick={handleDescargarCv}>Descargar CV</MenuItem>
 				)}
 				<MenuItem onClick={handleClose}>Ver perfil</MenuItem>
 			</Menu>

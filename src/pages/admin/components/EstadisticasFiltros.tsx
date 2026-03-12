@@ -39,7 +39,7 @@ export default function EstadisticasFiltros({
 				gap={2}
 			>
 				<Typography variant="h4" fontWeight="bold" color="primary">
-					Panel de Control
+					Estadísticas
 				</Typography>
 				<Box display="flex" gap={2} flexWrap="wrap">
 					<TextField

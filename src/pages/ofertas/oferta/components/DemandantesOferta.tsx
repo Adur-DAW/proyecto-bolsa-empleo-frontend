@@ -92,6 +92,8 @@ const DemandantesOfertaInterno = ({ id }) => {
 		situacion: situacionesDemandante.find(x => x.id == demandante.situacion)?.valor ?? 'Sin especificar',
 		titulos: demandante.titulos?.map((x) => x.titulo?.nombre).join(', '),
 		adjudicado: demandante.adjudicado,
+		cvUrl: demandante.cvUrl,
+		imagenUrl: demandante.imagenUrl,
 	}))
 
 	return (

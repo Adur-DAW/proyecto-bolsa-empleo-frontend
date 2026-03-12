@@ -86,7 +86,7 @@ export default function EstadisticasGraficos({ estadisticas, colores: COLORES }:
       <Box display="flex" flexWrap="wrap" gap={3} mb={4}>
         <Box flex="2 1 500px">
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" mb={2} color="text.secondary">Publicadas vs Adjudicadas</Typography>
+            <Typography variant="h6" mb={2} color="text.secondary">Ofertas publicadas vs adjudicadas</Typography>
             <Bar data={{
               labels: estadisticas.ofertas.map(o => o.periodo),
               datasets: [
@@ -106,7 +106,7 @@ export default function EstadisticasGraficos({ estadisticas, colores: COLORES }:
         </Box>
         <Box flex="1 1 400px">
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" mb={2} color="text.secondary">Top 10 Familias (Global)</Typography>
+            <Typography variant="h6" mb={2} color="text.secondary">Top 10 Familias</Typography>
             <Doughnut data={{
               labels: estadisticas.top_familias.map(f => f.familia_profesional),
               datasets: [{
@@ -123,7 +123,7 @@ export default function EstadisticasGraficos({ estadisticas, colores: COLORES }:
       <Box display="flex" flexWrap="wrap" gap={3}>
         <Box flex="1 1 300px">
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" mb={2} color="text.secondary">Top Empresas (+Activas)</Typography>
+            <Typography variant="h6" mb={2} color="text.secondary">Top Empresas (Ofertas)</Typography>
             <Divider sx={{ mb: 2 }} />
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1 }}>
               {estadisticas.top_empresas?.map((e, i) => (
@@ -138,7 +138,7 @@ export default function EstadisticasGraficos({ estadisticas, colores: COLORES }:
         </Box>
         <Box flex="1 1 300px">
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" mb={2} color="text.secondary">Títulos Más Solicitados</Typography>
+            <Typography variant="h6" mb={2} color="text.secondary">Top Títulos (Ofertas)</Typography>
             <Divider sx={{ mb: 2 }} />
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1 }}>
               {estadisticas.top_titulos?.map((t, i) => (
@@ -153,7 +153,7 @@ export default function EstadisticasGraficos({ estadisticas, colores: COLORES }:
         </Box>
         <Box flex="1 1 300px">
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" mb={2} color="text.secondary">Distribución Geográfica</Typography>
+            <Typography variant="h6" mb={2} color="text.secondary">Distribución Empresas</Typography>
             <Divider sx={{ mb: 2 }} />
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 1 }}>
               {estadisticas.localidades.map((loc, i) => (

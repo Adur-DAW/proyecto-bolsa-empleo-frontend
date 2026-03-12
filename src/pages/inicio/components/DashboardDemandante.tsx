@@ -80,7 +80,7 @@ export default function DashboardDemandante() {
           </Card>
 
           <Typography variant="h6" gutterBottom>
-            Mis últimas candidaturas
+            Mis últimas inscripciones
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {data.mis_candidaturas.map((candidatura: any) => (

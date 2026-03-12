@@ -113,7 +113,7 @@ export default function EstadisticasPage() {
 				</Box>
 				<Box flex="1 1 150px">
 					<TarjetaEstadistica
-						titulo="Tasa de Conversión"
+						titulo="Tasa de Adjudicación"
 						valor={`${conversionRate}%`}
 						color="#9c27b0"
 						subtext={`${estadisticas.funnel.adjudicados} de ${estadisticas.funnel.inscritos} inscripciones`}

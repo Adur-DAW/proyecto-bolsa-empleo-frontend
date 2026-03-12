@@ -1,7 +1,6 @@
 import logoImage from '@/assets/icon.svg'
 import {
 	AppBar,
-	Avatar,
 	Box,
 	IconButton,
 	ListItemIcon,
@@ -10,6 +9,7 @@ import {
 	Toolbar,
 	Typography,
 } from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import {
 	IconBuildingCommunity,
 	IconChartBar,
@@ -29,6 +29,7 @@ import useLogout from '@/shared/hooks/logout.hook'
 import { useNavbar } from '@/shared/hooks/navbar.hook'
 import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
 import { getAbsolutePath } from '@/shared/routes'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
 
 
 interface Menu {
@@ -116,7 +117,7 @@ export default function Navbar() {
 			icono: <IconLetterA />,
 		})
 		paginas.push({
-			texto: 'Admin',
+			texto: 'Estadísticas',
 			to: getAbsolutePath('admin'),
 			icono: <IconChartBar />,
 		})
@@ -227,12 +228,12 @@ export default function Navbar() {
 				{usuario && (
 					<Box sx={{ flexGrow: 0 }}>
 						<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-							<Avatar
+							<AvatarSeguro
 								alt={usuario.nombreCompleto}
-								src={usuario.imagenUrl}
+								src={getImagenUrl(usuario.imagenUrl)}
 							>
 								{usuario.nombreCompleto?.charAt(0)}
-							</Avatar>
+							</AvatarSeguro>
 						</IconButton>
 						<Menu
 							sx={{ mt: '45px' }}

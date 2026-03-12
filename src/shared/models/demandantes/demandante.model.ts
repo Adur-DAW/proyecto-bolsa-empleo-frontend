@@ -12,6 +12,8 @@ export type Demandante = {
 	situacion: number
 	familiaProfesional: string
 	cvPath: string
+	cvUrl: string
+	imagenUrl: string
 	titulos: TituloDemandante[]
 
 	adjudicado: boolean

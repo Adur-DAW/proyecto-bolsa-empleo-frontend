@@ -46,19 +46,19 @@ export default function DashboardAdmin() {
 
               <Box sx={{ mt: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography>Ofertas Activas</Typography>
+                  <Typography>Ofertas activas</Typography>
                   <Typography fontWeight="bold">{data.kpis.ofertas_activas}</Typography>
                 </Box>
                 <LinearProgress variant="determinate" value={100} color="primary" sx={{ mb: 3 }} />
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography>Total Demandantes</Typography>
+                  <Typography>Demandantes registrados</Typography>
                   <Typography fontWeight="bold">{data.kpis.total_demandantes}</Typography>
                 </Box>
                 <LinearProgress variant="determinate" value={100} color="secondary" sx={{ mb: 3 }} />
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography>Tasa de Éxito (Adjudicadas)</Typography>
+                  <Typography>Inscripciones adjudicadas</Typography>
                   <Typography fontWeight="bold">{data.kpis.tasa_exito_ofertas}</Typography>
                 </Box>
                 <LinearProgress
@@ -75,7 +75,7 @@ export default function DashboardAdmin() {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Actividad Reciente
+                Actividad
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {data.actividad_reciente.empresas.map((empresa: any, index: number) => (

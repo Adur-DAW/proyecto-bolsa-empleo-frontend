@@ -1,5 +1,4 @@
 import {
-	Avatar,
 	Box,
 	Button,
 	Paper,
@@ -7,12 +6,14 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
 
 export default function ConfiguracionEmpresaDatos() {
 	return (
@@ -34,7 +35,7 @@ const ConfiguracionEmpresaDatosInterno = () => {
 	})
 
 	if (empresa.imagenUrl && !urlPrevisualizacion && !selectedFile) {
-		setUrlPrevisualizacion(empresa.imagenUrl)
+		setUrlPrevisualizacion(getImagenUrl(empresa.imagenUrl) || null)
 	}
 
 	const { control, handleSubmit } = useForm({
@@ -108,13 +109,13 @@ const ConfiguracionEmpresaDatosInterno = () => {
 								gap: 2,
 							}}
 						>
-							<Avatar
-								src={urlPrevisualizacion || undefined}
+							<AvatarSeguro
+								src={urlPrevisualizacion}
 								sx={{ width: 100, height: 100, fontSize: 40 }}
 								variant="rounded"
 							>
 								{empresa.nombre?.charAt(0)}
-							</Avatar>
+							</AvatarSeguro>
 							<Button variant="outlined" component="label">
 								Subir Logo
 								<input

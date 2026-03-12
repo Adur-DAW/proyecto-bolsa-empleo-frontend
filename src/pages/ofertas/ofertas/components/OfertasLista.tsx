@@ -1,5 +1,4 @@
 import {
-	Avatar,
 	Box,
 	Button,
 	Chip,
@@ -7,6 +6,7 @@ import {
 	Stack,
 	Typography,
 } from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import {
 	IconBuilding,
 	IconCalendar,
@@ -26,6 +26,7 @@ import Tarjeta from '@/shared/components/tarjetas/Tarjeta'
 import useRol from '@/shared/hooks/rol.hook'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import { useOfertasQuery } from '@/shared/hooks/useOfertasQuery'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
 
 type OfertasListaProps = {
 	filtro?: string
@@ -158,13 +159,13 @@ const OfertasListaSuspense = ({
 							</Box>
 						}
 						avatar={
-							<Avatar
-								src={oferta.empresa?.imagenUrl || undefined}
+							<AvatarSeguro
+								src={getImagenUrl(oferta.empresa?.imagenUrl)}
 								sx={{ width: 48, height: 48 }}
 								variant="rounded"
 							>
 								{oferta.empresa?.nombre?.charAt(0)}
-							</Avatar>
+							</AvatarSeguro>
 						}
 						subtitulo={
 							<Link

@@ -1,8 +1,10 @@
-import { Avatar, Box, Card, CardContent, Typography } from '@mui/material'
+import { Box, Card, CardContent, Typography } from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import { Link } from 'react-router'
 import DOMPurify from 'dompurify'
 
 import InscribirseComponent from '@/pages/ofertas/shared/components/InscribirseComponent'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
 
 export default function DetalleOferta({ oferta }) {
 	return (
@@ -11,13 +13,13 @@ export default function DetalleOferta({ oferta }) {
 				<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
 					<Box sx={{ textAlign: 'left' }}>
 						<Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
-							<Avatar
-								src={oferta.empresa?.imagenUrl || undefined}
+							<AvatarSeguro
+								src={getImagenUrl(oferta.empresa?.imagenUrl)}
 								sx={{ width: 64, height: 64 }}
 								variant="rounded"
 							>
 								{oferta.empresa?.nombre?.charAt(0)}
-							</Avatar>
+							</AvatarSeguro>
 							<Typography variant="h6">
 								{oferta.nombre}
 							</Typography>

@@ -5,8 +5,8 @@ import {
   Tab,
   Tabs,
   Typography,
-  Avatar
 } from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useParams } from 'react-router'
@@ -15,6 +15,7 @@ import OfertasLista from '@/pages/ofertas/ofertas/components/OfertasLista'
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 
 import PageDataContainer from '@/shared/components/containers/PageDataContainer'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
 
 export default function DetalleEmpresaPage() {
   const { id } = useParams()
@@ -40,13 +41,13 @@ const DetalleEmpresaHeader = ({ idEmpresa }: { idEmpresa: number }) => {
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-        <Avatar
-          src={empresa.imagenUrl || undefined}
+        <AvatarSeguro
+          src={getImagenUrl(empresa.imagenUrl)}
           sx={{ width: 80, height: 80, fontSize: 32 }}
           variant="rounded"
         >
           {empresa.nombre?.charAt(0)}
-        </Avatar>
+        </AvatarSeguro>
         <Box>
           <Typography variant="h4" gutterBottom>
             {empresa.nombre}

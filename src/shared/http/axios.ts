@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { useAppStore } from '@/shared/store/store'
 
-export const baseUrl = 'http://127.0.0.1:8000/api'
+export const baseUrl = 'https://backend.tfg.alphapro.es/api'
+export const backendHost = 'https://backend.tfg.alphapro.es'
 
 const axiosInstance = axios.create({
 	baseURL: baseUrl,
