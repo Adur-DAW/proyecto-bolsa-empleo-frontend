@@ -1,118 +1,211 @@
 import {
 	Box,
-	Button,
+	FormControl,
 	FormControlLabel,
+	MenuItem,
+	Paper,
 	Radio,
 	RadioGroup,
+	Select,
 	TextField,
 	Typography,
+	Button,
+	Autocomplete
 } from '@mui/material'
-import { useQueryClient } from '@tanstack/react-query'
 
 import useRol from '@/shared/hooks/rol.hook'
+import { MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
 import { IconSearch } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
+import { Control, Controller } from 'react-hook-form'
 
-export default function OfertasFiltros({ filtro, onCambiarFiltro }) {
-	const { mismoRol } = useRol()
+interface OfertasFiltrosProps {
+	control: Control<any>
+	onBuscar: () => void
+	onLimpiar: () => void
+}
 
-	const queryClient = useQueryClient()
+export default function OfertasFiltros({
+	control,
+	onBuscar,
+	onLimpiar
+}: OfertasFiltrosProps) {
+	const { rol } = useRol()
 
-	const onAplicarFiltros = () => {
-		return queryClient.refetchQueries({
-			queryKey: ['ofertas', filtro],
-		})
-	}
+	const { data: familias = [] } = useQuery({
+		queryKey: ['familias-profesionales'],
+		queryFn: MaestrosRepository.obtenerFamilias,
+	})
+
+	const estados = [
+		{ id: 'activas', nombre: 'Activas' },
+		{ id: 'finalizadas', nombre: 'Finalizadas' },
+	]
 
 	return (
-		<Box
-			sx={{
-				padding: 4,
-				boxShadow: 1,
-				backgroundColor: 'white',
-				borderRadius: 2,
-				textAlign: 'left',
-				minWidth: 300,
-			}}
-		>
-			<Typography variant="h6" gutterBottom textAlign={'center'}>
-				Filtrar ofertas
-			</Typography>
-
-			<Box sx={{ marginTop: 4 }}>
-				<Typography variant="subtitle1" sx={{ marginTop: 2 }}>
-					Obtener
+		<Box sx={{ width: { xs: '100%', md: 300 } }}>
+			<Paper sx={{ p: 3, textAlign: 'left' }}>
+				<Typography variant="h6" gutterBottom>
+					Filtros
 				</Typography>
-				<RadioGroup value={filtro} onChange={onCambiarFiltro}>
-					<FormControlLabel
-						value="todas"
-						control={<Radio />}
-						label="Todas las ofertas"
-					/>
-					{mismoRol('demandante') && (
-						<FormControlLabel
-							value="demandante"
-							control={<Radio />}
-							label="Ofertas para mí"
-						/>
-					)}
-					{mismoRol('sinRol') && (
-						<FormControlLabel
-							disabled
-							title="Debes iniciar sesión para ver las ofertas para ti"
-							value="demandante"
-							control={<Radio />}
-							label="Ofertas para mí"
-						/>
-					)}
-					{mismoRol('empresa') && (
-						<FormControlLabel
-							value="empresa"
-							control={<Radio />}
-							label="Ofertas creadas por mí"
-						/>
-					)}
-				</RadioGroup>
-			</Box>
-			<Box sx={{ marginTop: 4 }}>
-				<Typography variant="subtitle1" sx={{ marginTop: 2 }}>
-					Ordenar por
-				</Typography>
-				<RadioGroup defaultValue="fechaPublicacion">
-					<FormControlLabel
-						value="fechaPublicacion"
-						control={<Radio />}
-						label="Fecha publicación"
-					/>
-					<FormControlLabel
-						value="numeroPuestos"
-						control={<Radio />}
-						label="Numero puestos"
-					/>
-				</RadioGroup>
-			</Box>
 
-			<Box sx={{ marginTop: 4 }}>
-				<Typography variant="subtitle1" sx={{ marginTop: 2 }}>
-					Palabra clave
-				</Typography>
-				<TextField
-					fullWidth
-					placeholder="Introduce nombre o empresa"
-					size="small"
-					sx={{ marginTop: 1 }}
-				/>
-			</Box>
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Ver ofertas
+					</Typography>
+					<Controller
+						name="filtro"
+						control={control}
+						render={({ field }) => (
+							<RadioGroup {...field}>
+								{rol !== 'empresa' && (
+									<FormControlLabel
+										value="todas"
+										control={<Radio />}
+										label="Todas"
+									/>
+								)}
+								{rol === 'demandante' && (
+									<FormControlLabel
+										value="demandante"
+										control={<Radio />}
+										label="Para mí"
+									/>
+								)}
+								{rol === 'empresa' && (
+									<FormControlLabel
+										value="empresa"
+										control={<Radio />}
+										label="Mis ofertas"
+									/>
+								)}
+							</RadioGroup>
+						)}
+					/>
+				</Box>
 
-			<Button
-				variant="contained"
-				color="primary"
-				fullWidth
-				sx={{ marginTop: 2 }}
-				onClick={onAplicarFiltros}
-				startIcon={<IconSearch />}
-			>
-				Buscar
-			</Button>
-		</Box>
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Palabra clave
+					</Typography>
+					<Controller
+						name="search"
+						control={control}
+						render={({ field }) => (
+							<TextField
+								{...field}
+								fullWidth
+								size="small"
+								placeholder="Buscar..."
+							/>
+						)}
+					/>
+				</Box>
+
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Familia Profesional
+					</Typography>
+					<Controller
+						name="idFamilia"
+						control={control}
+						render={({ field }) => (
+							<Autocomplete
+								options={familias}
+								getOptionLabel={(option) => option.nombre}
+								value={familias.find((f) => f.id.toString() === field.value) || null}
+								onChange={(_, newValue) => field.onChange(newValue ? newValue.id.toString() : '')}
+								renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
+								isOptionEqualToValue={(option, value) => option.id.toString() === value.id.toString()}
+								noOptionsText="No se encontraron familias"
+							/>
+						)}
+					/>
+				</Box>
+
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Estado
+					</Typography>
+					<Controller
+						name="estado"
+						control={control}
+						render={({ field }) => (
+							<Autocomplete
+								options={estados}
+								getOptionLabel={(option) => option.nombre}
+								value={estados.find((f) => f.id.toString() === field.value) || null}
+								onChange={(_, newValue) => field.onChange(newValue ? newValue.id.toString() : '')}
+								renderInput={(params) => <TextField {...params} size="small" placeholder="Todas" />}
+								isOptionEqualToValue={(option, value) => option.id.toString() === value.id.toString()}
+								noOptionsText="No se encontraron familias"
+							/>
+						)}
+					/>
+				</Box>
+
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="subtitle2" gutterBottom>
+						Ordenar por
+					</Typography>
+					<Controller
+						name="ordenarPor"
+						control={control}
+						render={({ field }) => (
+							<FormControl fullWidth size="small">
+								<Select {...field}>
+									<MenuItem value="fecha_publicacion.desc">Más recientes</MenuItem>
+									<MenuItem value="fecha_publicacion.asc">Más antiguas</MenuItem>
+									<MenuItem value="fecha_cierre.asc">Cierre próximo</MenuItem>
+								</Select>
+							</FormControl>
+						)}
+					/>
+				</Box>
+
+				{rol === 'demandante' && (
+					<Box sx={{ mb: 3 }}>
+						<Typography variant="subtitle2" gutterBottom>
+							Inscripción
+						</Typography>
+						<Controller
+							name="inscrito"
+							control={control}
+							render={({ field }) => (
+								<FormControl fullWidth size="small">
+									<Select {...field}>
+										<MenuItem value="todas">Todas</MenuItem>
+										<MenuItem value="inscritas">Inscritas</MenuItem>
+										<MenuItem value="no_inscritas">No inscritas</MenuItem>
+									</Select>
+								</FormControl>
+							)}
+						/>
+					</Box>
+				)}
+
+				<Box sx={{ mb: 1 }}>
+					<Button
+						fullWidth
+						variant="contained"
+						color="primary"
+						startIcon={<IconSearch size={18} />}
+						onClick={onBuscar}
+					>
+						Buscar
+					</Button>
+				</Box>
+				<Box>
+					<Button
+						fullWidth
+						variant="outlined"
+						color="inherit"
+						onClick={onLimpiar}
+					>
+						Limpiar filtros
+					</Button>
+				</Box>
+			</Paper >
+		</Box >
 	)
 }

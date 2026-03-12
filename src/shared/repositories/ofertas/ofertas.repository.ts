@@ -7,4 +7,5 @@ export type OfertasRepository = {
 	obtenerPorId: (id: number) => Promise<Oferta>
 	registrar: (oferta: Oferta) => Promise<{ oferta: Oferta }>
 	actualizar: (oferta: Oferta) => Promise<void>
+	eliminar: (id: number) => Promise<void>
 }

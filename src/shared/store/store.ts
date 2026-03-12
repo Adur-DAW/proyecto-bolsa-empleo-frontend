@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 import {
 	GeneralActions,
@@ -8,16 +9,20 @@ import {
 } from './general.slice'
 
 type State = GeneralState
-
 type Actions = GeneralActions
 
-export const defaultState: State = {
-	...defaultGeneralState,
-}
-
-const useAppStore = create<State & Actions>((...a) => ({
-	...defaultState,
-	...createGeneralSlice(...a),
-}))
-
-export { useAppStore }
+export const useAppStore = create<State & Actions>()(
+	persist(
+		(...a) => ({
+			...defaultGeneralState,
+			...createGeneralSlice(...a),
+		}),
+		{
+			name: 'app-storage',
+			partialize: (state) => ({
+				token: state.token,
+				usuario: state.usuario,
+			}),
+		}
+	)
+)

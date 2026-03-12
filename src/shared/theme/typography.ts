@@ -1,5 +1,3 @@
-// ----------------------------------------------------------------------
-
 export function remToPx(value) {
 	return Math.round(parseFloat(value) * 16)
 }
@@ -22,10 +20,8 @@ export function responsiveFontSizes({ sm, md, lg }) {
 	}
 }
 
-export const primaryFont = 'Public Sans, sans-serif'
+export const primaryFont = 'Inter, Public Sans, sans-serif'
 export const secondaryFont = 'Barlow, sans-serif'
-
-// ----------------------------------------------------------------------
 
 export const typography = {
 	fontFamily: primaryFont,

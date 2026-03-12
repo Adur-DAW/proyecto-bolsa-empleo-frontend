@@ -69,8 +69,40 @@ export const toQueryString = (params: Record<string, any>) => {
 }
 
 export interface Pagination {
-	CurrentPage: number
-	TotalPageCount: number
+	PaginaActual: number
+	TotalPaginas: number
+}
+
+export interface RespuestaPaginadaBackend<T> {
+	current_page: number
+	data: T[]
+	first_page_url: string
+	from: number
+	last_page: number
+	last_page_url: string
+	links: any[]
+	next_page_url: string | null
+	path: string
+	per_page: number
+	prev_page_url: string | null
+	to: number
+	total: number
+}
+
+export interface RespuestaPaginada<T> {
+	paginaActual: number
+	data: T[]
+	primeraPaginaUrl: string
+	desde: number
+	ultimaPagina: number
+	ultimaPaginaUrl: string
+	links: any[]
+	siguientePaginaUrl: string | null
+	path: string
+	porPagina: number
+	paginaAnteriorUrl: string | null
+	hasta: number
+	total: number
 }
 
 const convertirError = (error: any) => {

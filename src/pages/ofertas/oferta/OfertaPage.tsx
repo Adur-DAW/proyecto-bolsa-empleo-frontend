@@ -10,12 +10,15 @@ import DemandantesPosiblesOferta from './components/DemandantesPosiblesOferta'
 import DetalleOferta from './components/DetalleOferta'
 import { Box } from '@mui/material'
 import TitulosOferta from './components/TitulosOferta'
+import LimiteAccesoRestringido from '@/shared/components/error/LimiteAccesoRestringido'
 
 export default function OfertaPage() {
 	return (
-		<Suspense fallback={<div>Cargando...</div>}>
-			<OfertaInternoPage />
-		</Suspense>
+		<LimiteAccesoRestringido>
+			<Suspense fallback={<div>Cargando...</div>}>
+				<OfertaInternoPage />
+			</Suspense>
+		</LimiteAccesoRestringido>
 	)
 }
 
@@ -36,7 +39,7 @@ const OfertaInternoPage = () => {
 	})
 
 	return (
-		<Box sx={{display: 'flex', flexDirection: 'column', gap: 4, textAlign: 'left'}}>
+		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, textAlign: 'left' }}>
 			<DetalleOferta oferta={oferta} />
 			<TitulosOferta oferta={oferta} />
 			{mismoRol('empresa') && (

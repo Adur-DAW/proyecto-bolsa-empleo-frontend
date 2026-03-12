@@ -1,9 +1,19 @@
-import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import {
+	Box,
+	Button,
+	Paper,
+	Stack,
+	TextField,
+	Typography,
+} from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
 
 export default function ConfiguracionEmpresaDatos() {
 	return (
@@ -15,11 +25,18 @@ export default function ConfiguracionEmpresaDatos() {
 
 const ConfiguracionEmpresaDatosInterno = () => {
 	const empresasRepository = EmpresasRepositoryHttp
+	const queryClient = useQueryClient()
+	const [selectedFile, setArchivoSeleccionado] = useState<File | null>(null)
+	const [urlPrevisualizacion, setUrlPrevisualizacion] = useState<string | null>(null)
 
 	const { data: empresa } = useSuspenseQuery({
-		queryKey: ['empresa'],
+		queryKey: ['usuario-perfil'],
 		queryFn: () => empresasRepository.obtenerJWT(),
 	})
+
+	if (empresa.imagenUrl && !urlPrevisualizacion && !selectedFile) {
+		setUrlPrevisualizacion(getImagenUrl(empresa.imagenUrl) || null)
+	}
 
 	const { control, handleSubmit } = useForm({
 		defaultValues: {
@@ -33,14 +50,38 @@ const ConfiguracionEmpresaDatosInterno = () => {
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate(data, {
+		let payload: any = data
+
+		if (selectedFile) {
+			const formData = new FormData()
+			formData.append('cif', data.cif)
+			formData.append('nombre', data.nombre)
+			formData.append('localidad', data.localidad)
+			formData.append('telefono', data.telefono)
+			if (data.id_familia_profesional) {
+				formData.append('id_familia_profesional', data.id_familia_profesional)
+			}
+			formData.append('imagen', selectedFile)
+			payload = formData
+		}
+
+		mutation.mutate(payload, {
 			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['usuario-perfil'] })
 				alert('Datos actualizados correctamente')
 			},
 			onError: () => {
 				alert('Hubo un error al actualizar los datos')
 			},
 		})
+	}
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files[0]) {
+			const file = e.target.files[0]
+			setArchivoSeleccionado(file)
+			setUrlPrevisualizacion(URL.createObjectURL(file))
+		}
 	}
 
 	return (
@@ -60,6 +101,32 @@ const ConfiguracionEmpresaDatosInterno = () => {
 			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Stack spacing={3}>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								gap: 2,
+							}}
+						>
+							<AvatarSeguro
+								src={urlPrevisualizacion}
+								sx={{ width: 100, height: 100, fontSize: 40 }}
+								variant="rounded"
+							>
+								{empresa.nombre?.charAt(0)}
+							</AvatarSeguro>
+							<Button variant="outlined" component="label">
+								Subir Logo
+								<input
+									type="file"
+									hidden
+									accept="image/*"
+									onChange={handleFileChange}
+								/>
+							</Button>
+						</Box>
+
 						<Box>
 							<Controller
 								name="nombre"
@@ -85,7 +152,12 @@ const ConfiguracionEmpresaDatosInterno = () => {
 								name="localidad"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="localidad" type="text" />
+									<TextField
+										{...field}
+										fullWidth
+										label="localidad"
+										type="text"
+									/>
 								)}
 							/>
 						</Box>

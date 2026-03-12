@@ -35,6 +35,12 @@ export const OfertasDemandanteRepositoryHttp: OfertasDemandanteRepository = {
 			{}
 		)
 	},
+	rechazarOferta: async (idOferta: number, idDemandante: number) => {
+		return putEntity(
+			`/ofertas/${idOferta}/demandantes/${idDemandante}/rechazar`,
+			{}
+		)
+	},
 	registrarDemandanteYAdjudicar: async (
 		idOferta: number,
 		idDemandante: number

@@ -50,6 +50,14 @@ const routing = createRouting({
 		relativePath: 'titulos',
 		absolutePath: '/titulos',
 	},
+	admin: {
+		relativePath: 'admin',
+		absolutePath: '/admin',
+	},
+	demandante_detalle: {
+		relativePath: 'demandante/:id',
+		absolutePath: '/demandante/:id',
+	},
 })
 
 export const getRelativePath = (name: keyof typeof routing): string =>

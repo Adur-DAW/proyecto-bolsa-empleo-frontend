@@ -1,10 +1,15 @@
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
+import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
+import { useEffect, useState } from 'react'
+import { FamiliaProfesional, MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
+import { FormInputText } from '@/shared/components/form/FormInputText'
+import { FormInputSelect } from '@/shared/components/form/FormInputSelect'
 
 const empresaSchema = z
 	.object({
@@ -20,6 +25,7 @@ const empresaSchema = z
 		cif: z.string().regex(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/, 'El CIF no es válido'),
 		localidad: z.string().nonempty('La localidad es obligatoria'),
 		telefono: z.string().regex(/^\d{9}$/, 'El teléfono debe tener 9 dígitos'),
+		idFamiliaProfesional: z.number(),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -29,10 +35,12 @@ const empresaSchema = z
 type EmpresaFormData = z.infer<typeof empresaSchema>
 
 export default function RegistrarEmpresa() {
+	const [familias, setFamilias] = useState<FamiliaProfesional[]>([])
+
 	const {
 		control,
 		handleSubmit,
-		formState: { errors, isValid },
+		formState: { isValid },
 		setError,
 	} = useForm<EmpresaFormData>({
 		resolver: zodResolver(empresaSchema),
@@ -45,6 +53,7 @@ export default function RegistrarEmpresa() {
 			cif: '',
 			localidad: '',
 			telefono: '',
+			idFamiliaProfesional: undefined,
 		},
 		mode: 'onBlur',
 	})
@@ -52,23 +61,30 @@ export default function RegistrarEmpresa() {
 	const navigate = useNavigate()
 	const authRepository = AuthRepositoryHttp
 
+	useEffect(() => {
+		MaestrosRepository.obtenerFamilias().then(setFamilias)
+	}, [])
+
 	const mutation = useMutation({
 		mutationFn: authRepository.registrar,
-		onSuccess: () => navigate('/login'),
+		onSuccess: () => {
+			toast.success('Cuenta de empresa creada correctamente. Ya puedes iniciar sesión.')
+			navigate('/login')
+		},
 		onError: (error) => {
 			try {
-        const { errors } = JSON.parse(error.message)
+				const { errors } = JSON.parse(error.message)
 
-        if (errors?.email) {
-          setError('email', { type: 'server', message: errors.email[0] })
-        }
+				if (errors?.email) {
+					setError('email', { type: 'server', message: errors.email[0] })
+				}
 				if (errors?.cif) {
 					setError('cif', { type: 'server', message: errors.cif[0] })
 				}
-      } catch(e) {
+			} catch (e) {
 				console.log(e)
-        alert('Error inesperado en el servidor')
-      }
+				toast.error('Error inesperado en el servidor')
+			}
 		},
 	})
 
@@ -77,115 +93,69 @@ export default function RegistrarEmpresa() {
 			email: data.email,
 			password: data.password,
 			password_confirmation: data.verificarPassword,
+			id_familia_profesional: data.idFamiliaProfesional,
 			...data,
 		})
 	}
 
 	return (
 		<Box component="form" onSubmit={handleSubmit(onSubmit)}>
-			<Controller
+			<FormInputText
 				name="email"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="email"
-						label="Email"
-						fullWidth
-						margin="normal"
-						error={!!errors.email}
-						helperText={errors.email?.message}
-					/>
-				)}
+				label="Email"
+				autoComplete="email"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="password"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="password"
-						label="Contraseña"
-						type="password"
-						fullWidth
-						margin="normal"
-						error={!!errors.password}
-						helperText={errors.password?.message}
-					/>
-				)}
+				label="Contraseña"
+				type="password"
+				autoComplete="new-password"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="verificarPassword"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="password"
-						label="Verificar contraseña"
-						type="password"
-						fullWidth
-						margin="normal"
-						error={!!errors.verificarPassword}
-						helperText={errors.verificarPassword?.message}
-					/>
-				)}
+				label="Verificar contraseña"
+				type="password"
+				autoComplete="new-password"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="nombre"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Nombre"
-						fullWidth
-						margin="normal"
-						error={!!errors.nombre}
-						helperText={errors.nombre?.message}
-					/>
-				)}
+				label="Nombre Empresa o Establecimiento"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="cif"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="CIF"
-						fullWidth
-						margin="normal"
-						error={!!errors.cif}
-						helperText={errors.cif?.message}
-					/>
-				)}
+				label="CIF"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="localidad"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Localidad"
-						fullWidth
-						margin="normal"
-						error={!!errors.localidad}
-						helperText={errors.localidad?.message}
-					/>
-				)}
+				label="Localidad"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="telefono"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Teléfono"
-						fullWidth
-						margin="normal"
-						error={!!errors.telefono}
-						helperText={errors.telefono?.message}
-					/>
-				)}
+				label="Teléfono"
+				margin="normal"
 			/>
+			<Box sx={{ mt: 2 }}>
+				<FormInputSelect
+					name="idFamiliaProfesional"
+					control={control}
+					label="Familia Profesional"
+					options={familias.map(f => ({ id: f.id, label: f.nombre }))}
+					margin="normal"
+				/>
+			</Box>
 			<Button
 				type="submit"
 				variant="contained"

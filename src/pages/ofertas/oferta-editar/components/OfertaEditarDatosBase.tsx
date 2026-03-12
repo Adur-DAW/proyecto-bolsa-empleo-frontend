@@ -1,12 +1,33 @@
-import { Box, Button, Checkbox, Paper, Stack, TextField, Typography } from '@mui/material'
-import { IconDeviceFloppy, IconEyeCancel, IconTrash } from '@tabler/icons-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Box, Button, Checkbox, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
+import { IconDeviceFloppy, IconTrash } from '@tabler/icons-react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { useParams } from 'react-router'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
+import { useNavigate, useParams } from 'react-router'
+import { z } from 'zod'
+import { MaestrosRepository, TipoContrato } from '@/shared/repositories/MaestrosRepository'
 
+import { toast } from 'sonner'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+
+const ofertaSchema = z.object({
+	nombre: z.string().nonempty('El título es obligatorio'),
+	fechaPublicacion: z.string(),
+	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
+	idTipoContrato: z.number('El tipo de contrato es obligatorio'),
+	horario: z.string().nullable().optional(),
+	diasDescanso: z.coerce.number().nullable().optional(),
+	obs: z.string().nullable().optional(),
+	abierta: z.boolean(),
+	fechaCierre: z.string().nullable().optional(),
+	readme: z.string().nullable().optional(),
+})
+
+type OfertaFormData = z.infer<typeof ofertaSchema>
 
 export default function OfertaEditarDatosBase() {
 	return (
@@ -18,32 +39,93 @@ export default function OfertaEditarDatosBase() {
 
 const OfertaEditarDatosBaseInterno = () => {
 	const { id } = useParams()
+	const navigate = useNavigate()
 	if (!id) {
 		throw new Error('No se ha proporcionado un ID')
 	}
 
 	const ofertasRepository = OfertasRepositoryHttp
+	const [tiposContrato, setTiposContrato] = useState<TipoContrato[]>([])
+
+	useEffect(() => {
+		MaestrosRepository.obtenerTiposContrato().then(setTiposContrato)
+	}, [])
 
 	const { data: oferta } = useSuspenseQuery({
 		queryKey: ['oferta', +id],
 		queryFn: () => ofertasRepository.obtenerPorId(+id),
 	})
 
-	const { control, handleSubmit } = useForm({
+	const {
+		control,
+		handleSubmit,
+		setError,
+		formState: { errors },
+	} = useForm<OfertaFormData>({
+		resolver: zodResolver(ofertaSchema) as any,
 		defaultValues: {
 			...oferta,
 			numeroPuestos: +oferta.numeroPuestos,
-			fechaPublicacion: oferta.fechaPublicacion.toISOString(),
+			diasDescanso: oferta.diasDescanso ? +oferta.diasDescanso : 0,
+			fechaPublicacion: (oferta.fechaPublicacion && dayjs(oferta.fechaPublicacion).isValid())
+				? dayjs(oferta.fechaPublicacion).format('YYYY-MM-DD')
+				: dayjs().format('YYYY-MM-DD'),
+			idTipoContrato: oferta.idTipoContrato,
+			horario: oferta.horario || '',
+			obs: oferta.obs || '',
+			fechaCierre: (oferta.fechaCierre && dayjs(oferta.fechaCierre).isValid())
+				? dayjs(oferta.fechaCierre).format('YYYY-MM-DD')
+				: '',
+			readme: oferta.readme || ''
 		},
 	})
 
-	const mutation = useMutation({
+
+	const updateMutation = useMutation({
 		mutationFn: ofertasRepository.actualizar,
-		onSuccess: () => console.log('Datos actualizados correctamente'),
+		onSuccess: () => toast.success('Oferta actualizada con éxito'),
+		onError: (error) => {
+			try {
+				const { errors } = JSON.parse(error.message)
+				if (errors) {
+					Object.keys(errors).forEach((key) => {
+						setError(key as any, { type: 'server', message: errors[key][0] })
+					})
+				} else {
+					toast.error('Error al actualizar la oferta')
+				}
+			} catch {
+				toast.error('Error inesperado al actualizar')
+			}
+		},
 	})
 
+	const deleteMutation = useMutation({
+		mutationFn: () => ofertasRepository.eliminar(+id),
+		onSuccess: () => {
+			toast.success('Oferta eliminada correctamente')
+			navigate('/ofertas')
+		},
+		onError: () => {
+			toast.error('Error al eliminar la oferta')
+		},
+	})
+
+	const onEliminarClick = () => {
+		if (window.confirm('¿Estás seguro de que quieres eliminar esta oferta? Esta acción no se puede deshacer.')) {
+			deleteMutation.mutate()
+		}
+	}
+
 	const onSubmit = (data) => {
-		mutation.mutate(data)
+		const payload = {
+			...oferta,
+			...data,
+			diasDescanso: data.diasDescanso?.toString() || '',
+			fechaPublicacion: dayjs(data.fechaPublicacion),
+			fechaCierre: data.fechaCierre ? dayjs(data.fechaCierre) : null
+		}
+		updateMutation.mutate(payload)
 	}
 
 	return (
@@ -60,20 +142,34 @@ const OfertaEditarDatosBaseInterno = () => {
 				</Typography>
 
 				<Stack spacing={2} direction="row" marginBottom={2}>
-					<Button variant="outlined" color="error" startIcon={<IconTrash />}>
-						Eliminar
-					</Button>
-					<Button
-						variant="outlined"
-						color="secondary"
-						startIcon={<IconEyeCancel />}
+					<Controller
+						name="abierta"
+						control={control}
+						render={({ field }) => (
+							<Stack direction="row" alignItems="center">
+								<Typography>Activa</Typography>
+								<Checkbox
+									{...field}
+									checked={field.value}
+									onChange={(e) => field.onChange(e.target.checked)}
+								/>
+							</Stack>
+						)}
+					/>
+
+					<Button 
+						variant="outlined" 
+						color="error" 
+						startIcon={<IconTrash />}
+						onClick={onEliminarClick}
+						disabled={deleteMutation.isPending}
 					>
-						Cerrar
+						{deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
 					</Button>
 				</Stack>
 			</Box>
 
-			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
+			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4, textAlign: 'left' }}>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Stack spacing={3}>
 						<Box>
@@ -81,7 +177,13 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="nombre"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Nombre" />
+									<TextField
+										{...field}
+										fullWidth
+										label="Título de la oferta"
+										error={!!errors.nombre}
+										helperText={errors.nombre?.message}
+									/>
 								)}
 							/>
 						</Box>
@@ -94,11 +196,35 @@ const OfertaEditarDatosBaseInterno = () => {
 									<TextField
 										{...field}
 										fullWidth
+										slotProps={{ inputLabel: { shrink: true } }}
 										label="Fecha publicación"
 										type="date"
 										value={
 											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
 										}
+										error={!!errors.fechaPublicacion}
+										helperText={errors.fechaPublicacion?.message}
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="fechaCierre"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										slotProps={{ inputLabel: { shrink: true } }}
+										label="Fecha cierre"
+										type="date"
+										value={
+											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
+										}
+										error={!!errors.fechaCierre}
+										helperText={errors.fechaCierre?.message}
 									/>
 								)}
 							/>
@@ -114,6 +240,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										type="number"
 										fullWidth
 										label="Número de puestos"
+										error={!!errors.numeroPuestos}
+										helperText={errors.numeroPuestos?.message}
 									/>
 								)}
 							/>
@@ -121,15 +249,24 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Controller
-								name="tipoContrato"
+								name="idTipoContrato"
 								control={control}
 								render={({ field }) => (
 									<TextField
 										{...field}
 										fullWidth
+										select
 										label="Tipo de contrato"
-										type="text"
-									/>
+										error={!!errors.idTipoContrato}
+										helperText={errors.idTipoContrato?.message}
+										value={field.value || ''}
+									>
+										{tiposContrato.map((option) => (
+											<MenuItem key={option.id} value={option.id}>
+												{option.nombre}
+											</MenuItem>
+										))}
+									</TextField>
 								)}
 							/>
 						</Box>
@@ -139,7 +276,31 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="horario"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Horario" type="text" />
+									<TextField
+										{...field}
+										fullWidth
+										label="Horario"
+										type="text"
+										error={!!errors.horario}
+										helperText={errors.horario?.message}
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="diasDescanso"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Días de descanso semanal"
+										type="number"
+										error={!!errors.diasDescanso}
+										helperText={errors.diasDescanso?.message}
+									/>
 								)}
 							/>
 						</Box>
@@ -154,24 +315,27 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Observaciones"
 										type="text"
+										error={!!errors.obs}
+										helperText={errors.obs?.message}
 									/>
 								)}
 							/>
 						</Box>
 
 						<Box>
+							<Typography variant="body2" color="text.secondary" gutterBottom>
+								Descripción completa
+							</Typography>
 							<Controller
-								name="abierta"
+								name="readme"
 								control={control}
 								render={({ field }) => (
-									<Stack direction="row" alignItems="center" spacing={1}>
-										<Typography>Activa</Typography>
-										<Checkbox
-											{...field}
-											checked={field.value}
-											onChange={(e) => field.onChange(e.target.checked)}
-										/>
-									</Stack>
+									<ReactQuill
+										theme="snow"
+										value={field.value || ''}
+										onChange={field.onChange}
+										style={{ height: '300px', marginBottom: '50px' }}
+									/>
 								)}
 							/>
 						</Box>
@@ -182,10 +346,10 @@ const OfertaEditarDatosBaseInterno = () => {
 								variant="contained"
 								color="primary"
 								fullWidth
-								disabled={mutation.isPending}
+								disabled={updateMutation.isPending}
 								startIcon={<IconDeviceFloppy />}
 							>
-								{mutation.isPending ? 'Guardando...' : 'Guardar cambios'}
+								{updateMutation.isPending ? 'Guardando...' : 'Guardar cambios'}
 							</Button>
 						</Box>
 					</Stack>

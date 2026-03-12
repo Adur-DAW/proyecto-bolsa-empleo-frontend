@@ -7,33 +7,37 @@ import useRol from '@/shared/hooks/rol.hook'
 import { Oferta } from '@/shared/models'
 import { OfertasDemandanteRepositoryHttp } from '@/shared/repositories/ofertas-demandante/ofertas-demandante.repository.http'
 
-const validacionesInscribir = (oferta: Oferta) => oferta.abierta && oferta.demandantesInscritos < oferta.numeroPuestos;
+const validacionesInscribir = (oferta: Oferta) => oferta.abierta;
 
 export default function InscribirseComponent({
 	oferta,
-	filtro,
 }: {
 	oferta: Oferta
-	filtro: any
 }) {
 	const queryClient = useQueryClient()
 	const { mismoRol } = useRol()
 
 	const ofertasDemandanteRepository = OfertasDemandanteRepositoryHttp
 
-	const mutateInscribir = useMutation({
+	const {
+		mutate: inscribir,
+		isPending: inscribiendo,
+	} = useMutation({
 		mutationFn: ofertasDemandanteRepository.registrarJWT,
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
-			queryClient.refetchQueries({ queryKey: ['oferta', oferta.id] })
+			queryClient.invalidateQueries({ queryKey: ['ofertas'] })
+			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id] })
 		},
 	})
 
-	const mutateDesinscribir = useMutation({
+	const {
+		mutate: desinscribir,
+		isPending: desinscribiendo,
+	} = useMutation({
 		mutationFn: ofertasDemandanteRepository.eliminarJWT,
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['ofertas', filtro] })
-			queryClient.refetchQueries({ queryKey: ['oferta', oferta.id] })
+			queryClient.invalidateQueries({ queryKey: ['ofertas'] })
+			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id] })
 		},
 	})
 
@@ -60,9 +64,10 @@ export default function InscribirseComponent({
 				color="secondary"
 				sx={{ marginTop: 2 }}
 				startIcon={<IconClipboardOff />}
-				onClick={() => mutateDesinscribir.mutate(oferta.id)}
+				onClick={() => desinscribir(oferta.id)}
+				disabled={desinscribiendo}
 			>
-				Desinscribirme
+				{desinscribiendo ? 'Desinscribiendo…' : 'Desinscribirme'}
 			</Button>
 		) : (
 			<Button
@@ -70,9 +75,10 @@ export default function InscribirseComponent({
 				color="secondary"
 				sx={{ marginTop: 2 }}
 				startIcon={<IconClipboard />}
-				onClick={() => mutateInscribir.mutate(oferta.id)}
+				onClick={() => inscribir(oferta.id)}
+				disabled={inscribiendo}
 			>
-				Inscribirme
+				{inscribiendo ? 'Inscribiendo…' : 'Inscribirme'}
 			</Button>
 		)
 	) : (

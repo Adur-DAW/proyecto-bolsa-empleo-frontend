@@ -1,13 +1,43 @@
-import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import {
+	Box,
+	Button,
+	MenuItem,
+	Paper,
+	Stack,
+	TextField,
+	Typography,
+} from '@mui/material'
 import { IconPlus } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Suspense } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 
 import { ofertaDefault } from '@/shared/models'
+import {
+	MaestrosRepository,
+} from '@/shared/repositories/MaestrosRepository'
 import { OfertasRepositoryHttp } from '@/shared/repositories/ofertas/ofertas.repository.http'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+const ofertaSchema = z.object({
+	nombre: z.string().nonempty('El título es obligatorio'),
+	fechaPublicacion: z.string(),
+	numeroPuestos: z.coerce.number().min(1, 'Debe haber al menos un puesto'),
+	idTipoContrato: z.number('El tipo de contrato es obligatorio'),
+	horario: z.string().nullable().optional(),
+	diasDescanso: z.coerce.string().nullable().optional(),
+	obs: z.string().nullable().optional(),
+	abierta: z.boolean(),
+	fechaCierre: z.string().nullable().optional(),
+	readme: z.string().nullable().optional(),
+})
+
+type OfertaFormData = z.infer<typeof ofertaSchema>
 
 export default function OfertaCrearDatosBase() {
 	return (
@@ -20,10 +50,20 @@ export default function OfertaCrearDatosBase() {
 const OfertaEditarDatosBaseInterno = () => {
 	const ofertasRepository = OfertasRepositoryHttp
 
-	const { control, handleSubmit } = useForm({
+	const { data: tiposContrato = [] } = useQuery({
+		queryKey: ['tipos-contrato'],
+		queryFn: () => MaestrosRepository.obtenerTiposContrato(),
+	})
+
+	const { control, handleSubmit, formState: { errors }, } = useForm<OfertaFormData>({
 		defaultValues: {
 			...ofertaDefault,
+			fechaPublicacion: dayjs().format('YYYY-MM-DD'),
+			idTipoContrato: undefined,
+			fechaCierre: ''
 		},
+		resolver: zodResolver(ofertaSchema) as any,
+		mode: 'onSubmit'
 	})
 
 	const navigate = useNavigate()
@@ -34,7 +74,11 @@ const OfertaEditarDatosBaseInterno = () => {
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate(data)
+		mutation.mutate({
+			...data,
+			idTipoContrato: data.idTipoContrato,
+			fechaCierre: data.fechaCierre ? dayjs(data.fechaCierre) : null
+		})
 	}
 
 	return (
@@ -51,7 +95,7 @@ const OfertaEditarDatosBaseInterno = () => {
 				</Typography>
 			</Box>
 
-			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4 }}>
+			<Paper elevation={3} sx={{ padding: 3, marginBottom: 4, textAlign: 'left' }}>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Stack spacing={3}>
 						<Box>
@@ -59,7 +103,9 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="nombre"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Nombre" />
+									<TextField {...field} fullWidth label="Título de la oferta"
+										error={!!errors.nombre}
+										helperText={errors.nombre?.message} />
 								)}
 							/>
 						</Box>
@@ -77,11 +123,32 @@ const OfertaEditarDatosBaseInterno = () => {
 										value={
 											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
 										}
+										slotProps={{ inputLabel: { shrink: true } }}
 									/>
 								)}
 							/>
 						</Box>
 
+						<Box>
+							<Controller
+								name="fechaCierre"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Fecha cierre"
+										type="date"
+										value={
+											field.value ? dayjs(field.value).format('YYYY-MM-DD') : ''
+										}
+										slotProps={{ inputLabel: { shrink: true } }}
+										error={!!errors.fechaCierre}
+										helperText={errors.fechaCierre?.message}
+									/>
+								)}
+							/>
+						</Box>
 						<Box>
 							<Controller
 								name="numeroPuestos"
@@ -92,6 +159,8 @@ const OfertaEditarDatosBaseInterno = () => {
 										type="number"
 										fullWidth
 										label="Número de puestos"
+										error={!!errors.numeroPuestos}
+										helperText={errors.numeroPuestos?.message}
 									/>
 								)}
 							/>
@@ -99,15 +168,24 @@ const OfertaEditarDatosBaseInterno = () => {
 
 						<Box>
 							<Controller
-								name="tipoContrato"
+								name="idTipoContrato"
 								control={control}
 								render={({ field }) => (
 									<TextField
 										{...field}
 										fullWidth
+										select
 										label="Tipo de contrato"
-										type="text"
-									/>
+										value={field.value || ''}
+										error={!!errors.idTipoContrato}
+										helperText={errors.idTipoContrato?.message}
+									>
+										{tiposContrato.map((option) => (
+											<MenuItem key={option.id} value={option.id}>
+												{option.nombre}
+											</MenuItem>
+										))}
+									</TextField>
 								)}
 							/>
 						</Box>
@@ -117,7 +195,26 @@ const OfertaEditarDatosBaseInterno = () => {
 								name="horario"
 								control={control}
 								render={({ field }) => (
-									<TextField {...field} fullWidth label="Horario" type="text" />
+									<TextField {...field} fullWidth label="Horario" type="text"
+										error={!!errors.horario}
+										helperText={errors.horario?.message} />
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Controller
+								name="diasDescanso"
+								control={control}
+								render={({ field }) => (
+									<TextField
+										{...field}
+										fullWidth
+										label="Días de descanso semanal"
+										type="text"
+										error={!!errors.diasDescanso}
+										helperText={errors.diasDescanso?.message}
+									/>
 								)}
 							/>
 						</Box>
@@ -132,6 +229,26 @@ const OfertaEditarDatosBaseInterno = () => {
 										fullWidth
 										label="Observaciones"
 										type="text"
+										error={!!errors.obs}
+										helperText={errors.obs?.message}
+									/>
+								)}
+							/>
+						</Box>
+
+						<Box>
+							<Typography variant="body2" color="text.secondary" gutterBottom>
+								Descripción completa
+							</Typography>
+							<Controller
+								name="readme"
+								control={control}
+								render={({ field }) => (
+									<ReactQuill
+										theme="snow"
+										value={field.value || ''}
+										onChange={field.onChange}
+										style={{ height: '300px', marginBottom: '50px' }}
 									/>
 								)}
 							/>
@@ -152,6 +269,6 @@ const OfertaEditarDatosBaseInterno = () => {
 					</Stack>
 				</form>
 			</Paper>
-		</Box>
+		</Box >
 	)
 }

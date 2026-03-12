@@ -1,7 +1,6 @@
 import logoImage from '@/assets/icon.svg'
 import {
 	AppBar,
-	Avatar,
 	Box,
 	IconButton,
 	ListItemIcon,
@@ -10,8 +9,10 @@ import {
 	Toolbar,
 	Typography,
 } from '@mui/material'
+import { AvatarSeguro } from '@/shared/components/media/AvatarSeguro'
 import {
 	IconBuildingCommunity,
+	IconChartBar,
 	IconHome,
 	IconLetterA,
 	IconListCheck,
@@ -19,12 +20,17 @@ import {
 	IconMenu,
 	IconSettings,
 } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router'
 
+import useRol from '@/shared/hooks/rol.hook'
+import { useUsuarioQuery } from '@/shared/hooks/useUsuarioQuery'
 import useLogout from '@/shared/hooks/logout.hook'
 import { useNavbar } from '@/shared/hooks/navbar.hook'
+import { ConfigRepository } from '@/shared/repositories/ConfigRepository'
 import { getAbsolutePath } from '@/shared/routes'
-import { useAppStore } from '@/shared/store/store'
+import { getImagenUrl } from '@/shared/utils/get-imagen-url'
+
 
 interface Menu {
 	name: string
@@ -37,7 +43,26 @@ export default function Navbar() {
 	const navigate = useNavigate()
 
 	const { onLogout } = useLogout()
-	const usuario = useAppStore((x) => x.usuario)
+	const { data: usuarioPerfil } = useUsuarioQuery()
+	const { usuario: usuarioStore } = useRol()
+
+	const usuario = usuarioPerfil
+		? {
+			...usuarioStore,
+			...usuarioPerfil,
+			nombreCompleto:
+				(usuarioPerfil as any).nombre ||
+				(usuarioPerfil as any).nombreCompleto ||
+				usuarioStore?.nombreCompleto,
+			imagenUrl: (usuarioPerfil as any).imagenUrl || usuarioStore?.imagenUrl,
+		}
+		: usuarioStore
+
+	const { data: config } = useQuery({
+		queryKey: ['appConfig'],
+		queryFn: ConfigRepository.obtener,
+		initialData: { ofertas_publicas: false },
+	})
 
 	const settings = [
 		{
@@ -61,29 +86,40 @@ export default function Navbar() {
 		handleOpenNavMenu,
 	} = useNavbar()
 
-	const pages = [
+	const paginas = [
 		{
 			texto: 'Inicio',
 			to: getAbsolutePath('inicio'),
 			icono: <IconHome />,
 		},
-		{
+	]
+
+	if (config.ofertas_publicas || usuario) {
+		paginas.push({
 			texto: 'Ofertas',
 			to: getAbsolutePath('ofertas'),
 			icono: <IconListCheck />,
-		},
-		{
-			texto: 'Empresas',
-			to: getAbsolutePath('empresas'),
-			icono: <IconBuildingCommunity />,
-		},
-	]
+		})
+
+		if (usuario?.rol !== 'empresa') {
+			paginas.push({
+				texto: 'Empresas',
+				to: getAbsolutePath('empresas'),
+				icono: <IconBuildingCommunity />,
+			})
+		}
+	}
 
 	if (usuario?.rol === 'centro') {
-		pages.push({
-			texto: 'Titulos',
+		paginas.push({
+			texto: 'Títulos',
 			to: getAbsolutePath('titulos'),
 			icono: <IconLetterA />,
+		})
+		paginas.push({
+			texto: 'Estadísticas',
+			to: getAbsolutePath('admin'),
+			icono: <IconChartBar />,
 		})
 	}
 
@@ -147,50 +183,57 @@ export default function Navbar() {
 						onClose={handleCloseNavMenu}
 						sx={{ display: { xs: 'block', md: 'none' } }}
 					>
-						{pages.map((page) => (
-							<MenuItem
-								key={page.to}
-								onClick={handleCloseNavMenu}
-								sx={{ display: 'flex', gap: 1 }}
-							>
-								{page.icono}
-								<Link
-									style={{ textAlign: 'center', color: 'black' }}
-									to={page.to}
+						{paginas.length > 1 &&
+							paginas.map((pagina) => (
+								<MenuItem
+									key={pagina.to}
+									onClick={handleCloseNavMenu}
+									sx={{ display: 'flex', gap: 1 }}
 								>
-									{page.texto}
-								</Link>
-							</MenuItem>
-						))}
+									{pagina.icono}
+									<Link
+										style={{ textAlign: 'center', color: 'black' }}
+										to={pagina.to}
+									>
+										{pagina.texto}
+									</Link>
+								</MenuItem>
+							))}
 					</Menu>
 				</Box>
 
 				<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-					{pages.map((page) => (
-						<Link
-							key={page.to}
-							style={{
-								color: 'white',
-								fontSize: '1rem',
-								padding: '1rem',
-								display: 'flex',
-								alignItems: 'center',
-								gap: '.5rem',
-								fontWeight: location.pathname === page.to ? 'bold' : 'normal',
-							}}
-							to={page.to}
-							onClick={handleCloseNavMenu}
-						>
-							{page.icono}
-							{page.texto}
-						</Link>
-					))}
+					{paginas.length > 1 &&
+						paginas.map((pagina) => (
+							<Link
+								key={pagina.to}
+								style={{
+									color: 'white',
+									fontSize: '1rem',
+									padding: '1rem',
+									display: 'flex',
+									alignItems: 'center',
+									gap: '.5rem',
+									fontWeight: location.pathname === pagina.to ? 'bold' : 'normal',
+								}}
+								to={pagina.to}
+								onClick={handleCloseNavMenu}
+							>
+								{pagina.icono}
+								{pagina.texto}
+							</Link>
+						))}
 				</Box>
 
 				{usuario && (
 					<Box sx={{ flexGrow: 0 }}>
 						<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-							<Avatar alt="Remy Sharp" />
+							<AvatarSeguro
+								alt={usuario.nombreCompleto}
+								src={getImagenUrl(usuario.imagenUrl)}
+							>
+								{usuario.nombreCompleto?.charAt(0)}
+							</AvatarSeguro>
 						</IconButton>
 						<Menu
 							sx={{ mt: '45px' }}

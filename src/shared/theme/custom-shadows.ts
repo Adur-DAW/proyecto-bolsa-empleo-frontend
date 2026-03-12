@@ -11,8 +11,6 @@ import {
 	warning,
 } from './colors'
 
-// ----------------------------------------------------------------------
-
 export function customShadows() {
 	const transparent = alpha(grey[500], 0.16)
 

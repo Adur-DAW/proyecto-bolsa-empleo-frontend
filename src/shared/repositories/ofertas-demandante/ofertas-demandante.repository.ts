@@ -7,5 +7,6 @@ export type OfertasDemandanteRepository = {
 	obtenerDemandantesPorIdOferta: (idOferta: number) => Promise<Demandante[]>
 	obtenerDemandantesPosiblesPorIdOferta: (idOferta: number) => Promise<Demandante[]>
 	adjudicarOferta: (idOferta: number, idDemandante: number) => Promise<void>
+	rechazarOferta: (idOferta: number, idDemandante: number) => Promise<void>
 	registrarDemandanteYAdjudicar: (idOferta: number, idDemandante: number) => Promise<void>
 }

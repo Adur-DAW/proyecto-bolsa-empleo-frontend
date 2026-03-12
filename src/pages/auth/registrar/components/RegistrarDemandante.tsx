@@ -1,11 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Box, Button, TextField } from '@mui/material'
+import { toast } from 'sonner'
+import { Box, Button, Typography } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
+import { useEffect, useState } from 'react'
 
 import { AuthRepositoryHttp } from '@/shared/repositories/auth/auth.repository.http'
+import { FamiliaProfesional, MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
+import SelectorTitulos from '@/shared/components/SelectorTitulos'
+import { Titulo } from '@/shared/models'
+import { FormInputText } from '@/shared/components/form/FormInputText'
+import { FormInputSelect } from '@/shared/components/form/FormInputSelect'
 
 const demandanteSchema = z
 	.object({
@@ -25,6 +32,9 @@ const demandanteSchema = z
 			.string()
 			.regex(/^\d{9}$/, 'El teléfono móvil debe tener 9 dígitos'),
 		situacion: z.number(),
+		idFamiliaProfesional: z.number().optional(),
+		cv: z.any().optional(),
+		titulos: z.array(z.any()).min(1, 'Debe seleccionar al menos un título académico'),
 	})
 	.refine((data) => data.password === data.verificarPassword, {
 		message: 'Las contraseñas no coinciden',
@@ -34,11 +44,16 @@ const demandanteSchema = z
 type DemandanteFormData = z.infer<typeof demandanteSchema>
 
 export default function RegistrarDemandante() {
+	const [familias, setFamilias] = useState<FamiliaProfesional[]>([])
+
 	const {
 		control,
 		handleSubmit,
 		setError,
-		formState: { errors, isValid },
+		register,
+		watch,
+		setValue,
+		formState: { errors },
 	} = useForm<DemandanteFormData>({
 		resolver: zodResolver(demandanteSchema),
 		defaultValues: {
@@ -52,168 +67,176 @@ export default function RegistrarDemandante() {
 			dni: '',
 			telefonoMovil: '',
 			situacion: 0,
+			idFamiliaProfesional: undefined,
+			titulos: [],
 		},
 		mode: 'onBlur',
 	})
 
 	const navigate = useNavigate()
 	const authRepository = AuthRepositoryHttp
+	const familiaSeleccionada = watch('idFamiliaProfesional')
+
+	useEffect(() => {
+		MaestrosRepository.obtenerFamilias().then(setFamilias)
+	}, [])
+
+	useEffect(() => {
+		setValue('titulos', [])
+	}, [familiaSeleccionada, setValue])
 
 	const mutation = useMutation({
-		mutationFn: authRepository.registrar,
-		onSuccess: () => navigate('/login'),
+		mutationFn: (data: FormData) => authRepository.registrar(data as any),
+		onSuccess: () => {
+			toast.success('Cuenta creada correctamente. Ya puedes iniciar sesión.')
+			navigate('/login')
+		},
 		onError: (error) => {
 			try {
 				const { errors } = JSON.parse(error.message)
 
-        if (errors?.email) {
-          setError('email', { type: 'server', message: errors?.email[0] })
-        }
+				if (errors?.email) {
+					setError('email', { type: 'server', message: errors?.email[0] })
+				}
 				if (errors?.dni) {
-          setError('dni', { type: 'server', message: errors?.dni[0] })
-        }
-      } catch {
-        alert('Error inesperado en el servidor')
-      }
+					setError('dni', { type: 'server', message: errors?.dni[0] })
+				}
+			} catch {
+				toast.error('Error inesperado en el servidor')
+			}
 		},
 	})
 
 	const onSubmit = (data) => {
-		mutation.mutate({
-			email: data.email,
-			password: data.password,
-			password_confirmation: data.verificarPassword,
-			telefono_movil: data.telefonoMovil,
-			...data,
-		})
+		const formData = new FormData();
+		formData.append('rol', data.rol);
+		formData.append('email', data.email);
+		formData.append('password', data.password);
+		formData.append('password_confirmation', data.verificarPassword);
+		formData.append('nombre', data.nombre);
+		formData.append('apellido1', data.apellido1);
+		formData.append('apellido2', data.apellido2 || '');
+		formData.append('dni', data.dni);
+		formData.append('telefono_movil', data.telefonoMovil);
+		formData.append('situacion', data.situacion.toString());
+
+		if (data.idFamiliaProfesional) {
+			formData.append('id_familia_profesional', data.idFamiliaProfesional.toString());
+		}
+
+		if (data.titulos && data.titulos.length > 0) {
+			data.titulos.forEach((titulo: Titulo, index) => {
+				formData.append(`titulos[${index}]`, titulo.id.toString());
+			});
+		}
+
+		if (data.cv && data.cv.length > 0) {
+			formData.append('cv', data.cv[0]);
+		}
+
+		mutation.mutate(formData)
 	}
 
 	return (
 		<Box component="form" onSubmit={handleSubmit(onSubmit)}>
-			<Controller
+			<FormInputText
 				name="email"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="email"
-						label="Email"
-						fullWidth
-						margin="normal"
-						error={!!errors.email}
-						helperText={errors.email?.message}
-					/>
-				)}
+				label="Email"
+				autoComplete="email"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="password"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="password"
-						label="Contraseña"
-						type="password"
-						fullWidth
-						margin="normal"
-						error={!!errors.password}
-						helperText={errors.password?.message}
-					/>
-				)}
+				label="Contraseña"
+				type="password"
+				autoComplete="new-password"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="verificarPassword"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						autoComplete="password"
-						label="Verificar contraseña"
-						type="password"
-						fullWidth
-						margin="normal"
-						error={!!errors.verificarPassword}
-						helperText={errors.verificarPassword?.message}
-					/>
-				)}
+				label="Verificar contraseña"
+				type="password"
+				autoComplete="new-password"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="nombre"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Nombre"
-						fullWidth
-						margin="normal"
-						error={!!errors.nombre}
-						helperText={errors.nombre?.message}
-					/>
-				)}
+				label="Nombre"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="apellido1"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Primer apellido"
-						fullWidth
-						margin="normal"
-						error={!!errors.apellido1}
-						helperText={errors.apellido1?.message}
-					/>
-				)}
+				label="Primer apellido"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="apellido2"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Segundo apellido"
-						fullWidth
-						margin="normal"
-						error={!!errors.apellido2}
-						helperText={errors.apellido2?.message}
-					/>
-				)}
+				label="Segundo apellido"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="dni"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="DNI"
-						fullWidth
-						margin="normal"
-						error={!!errors.dni}
-						helperText={errors.dni?.message}
-					/>
-				)}
+				label="DNI"
+				margin="normal"
 			/>
-			<Controller
+			<FormInputText
 				name="telefonoMovil"
 				control={control}
-				render={({ field }) => (
-					<TextField
-						{...field}
-						label="Teléfono móvil"
-						fullWidth
-						margin="normal"
-						error={!!errors.telefonoMovil}
-						helperText={errors.telefonoMovil?.message}
-					/>
-				)}
+				label="Teléfono móvil"
+				margin="normal"
 			/>
+
+			<Box sx={{ mt: 2 }}>
+				<FormInputSelect
+					name="idFamiliaProfesional"
+					control={control}
+					label="Familia Profesional (Filtro)"
+					options={familias.map(f => ({ id: f.id, label: f.nombre }))}
+					margin="normal"
+				/>
+			</Box>
+
+			<Box sx={{ mt: 2, mb: 1 }}>
+				<Controller
+					name="titulos"
+					control={control}
+					render={({ field }) => (
+						<SelectorTitulos
+							valor={field.value}
+							alCambiar={field.onChange}
+							error={!!errors.titulos}
+							textoAyuda={errors.titulos?.message?.toString()}
+							familiaFiltro={familiaSeleccionada}
+						/>
+					)}
+				/>
+			</Box>
+
+			<Box sx={{ mt: 2, mb: 1 }}>
+				<Typography variant="body1" gutterBottom>
+					Adjuntar Currículum (PDF)
+				</Typography>
+				<input
+					type="file"
+					accept=".pdf"
+					{...register('cv')}
+				/>
+			</Box>
+
 			<Button
 				type="submit"
 				variant="contained"
 				color="primary"
 				fullWidth
 				sx={{ mt: 2 }}
-				disabled={!isValid || mutation.isPending}
+				disabled={mutation.isPending}
 			>
 				{mutation.isPending ? 'Registrando...' : 'Registrar'}
 			</Button>

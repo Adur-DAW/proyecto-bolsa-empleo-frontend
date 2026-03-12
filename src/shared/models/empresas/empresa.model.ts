@@ -1,9 +1,13 @@
 export type Empresa = {
 	idEmpresa: number
-	id: number
-	validado: boolean
-	cif: string
 	nombre: string
 	localidad: string
+	familiaProfesional: any
+	validado: boolean
+	cantidadOfertas?: number
+	cantidadVacantes?: number
 	telefono: string
+	cif?: string
+	imagenUrl?: string
+	idFamiliaProfesional?: number
 }

@@ -1,42 +1,98 @@
 import {
+	Avatar,
 	Box,
 	Button,
-	Card,
-	CardContent,
+	Chip,
+	Pagination,
 	Stack,
 	Typography,
 } from '@mui/material'
 import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from '@tanstack/react-query'
-import { Suspense } from 'react'
+	IconBriefcase,
+	IconCheck,
+	IconMapPin,
+	IconNews,
+	IconUsers,
+	IconX,
+} from '@tabler/icons-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router'
 
+import PageDataContainer from '@/shared/components/containers/PageDataContainer'
+import Tarjeta from '@/shared/components/tarjetas/Tarjeta'
 import useRol from '@/shared/hooks/rol.hook'
+import { useDebounce } from '@/shared/hooks/useDebounce'
+import { useEmpresasQuery } from '@/shared/hooks/useEmpresasQuery'
 import { EmpresasRepositoryHttp } from '@/shared/repositories/empresas/empresas.repository.http'
 
-export default function EmpresasLista() {
+type EmpresasListaProps = {
+	search?: string
+	idFamiliaProfesional?: number | null
+	ordenarPor?: string
+	query?: string
+}
+
+export default function EmpresasLista({
+	search,
+	idFamiliaProfesional,
+	ordenarPor,
+	query,
+}: EmpresasListaProps) {
 	return (
 		<Stack spacing={3}>
-			<Suspense fallback={<div>Cargando...</div>}>
-				<EmpresasListaSuspense />
-			</Suspense>
+			<PageDataContainer skeletonType="list">
+				<EmpresasListaSuspense
+					search={search}
+					idFamiliaProfesional={idFamiliaProfesional}
+					ordenarPor={ordenarPor}
+					query={query}
+				/>
+			</PageDataContainer>
 		</Stack>
 	)
 }
 
-const EmpresasListaSuspense = () => {
+const EmpresasListaSuspense = ({
+	search,
+	idFamiliaProfesional,
+	ordenarPor,
+	query,
+}: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
+	const [searchParams, setSearchParams] = useSearchParams()
+	const pagina = Number(searchParams.get('pagina')) || 1
 
-	const empresasRepository = EmpresasRepositoryHttp
+	const setPagina = (nuevaPagina: number) => {
+		searchParams.set('pagina', nuevaPagina.toString())
+		setSearchParams(searchParams, { replace: true })
+	}
 
-	const { data: empresas = [] } = useSuspenseQuery({
-		queryKey: ['empresas'],
-		queryFn: () => empresasRepository.obtener(),
+	const [busquedaDebounce] = useDebounce(search || '', 500)
+
+	useEffect(() => {
+		setPagina(1)
+	}, [])
+
+	const { data: paginatedData, isLoading } = useEmpresasQuery({
+		search: busquedaDebounce,
+		idFamiliaProfesional,
+		ordenarPor,
+		pagina,
 	})
 
+	const allEmpresas = paginatedData?.data || []
+
+	const empresas = query
+		? allEmpresas.filter(
+			(e) =>
+				e.nombre.toLowerCase().includes(query.toLowerCase()) ||
+				e.localidad?.toLowerCase().includes(query.toLowerCase())
+		)
+		: allEmpresas
+
 	const queryClient = useQueryClient()
+	const empresasRepository = EmpresasRepositoryHttp
 
 	const mutationAceptar = useMutation({
 		mutationFn: (idEmpresa: number) => empresasRepository.validar(idEmpresa),
@@ -48,100 +104,141 @@ const EmpresasListaSuspense = () => {
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['empresas'] }),
 	})
 
-	const onValidarClick = (idEmpresa: number) => {
+	const onValidarClick = (e: any, idEmpresa: number) => {
+		e.stopPropagation()
 		mutationAceptar.mutate(idEmpresa)
 	}
 
-	const onRechazarClick = (idEmpresa: number) => {
+	const onRechazarClick = (e: any, idEmpresa: number) => {
+		e.stopPropagation()
 		mutationRechazar.mutate(idEmpresa)
 	}
 
-	return empresas.map((empresa) => {
-		return (
-			<Card key={empresa.id} sx={{ padding: 2, boxShadow: 2 }}>
-				<CardContent>
-					<Box
-						sx={{
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'flex-start',
-						}}
-					>
-						<Box sx={{ textAlign: 'left' }}>
-							<Typography variant="h6" sx={{ marginBottom: 2 }}>
-								{empresa.nombre}
-							</Typography>
-							<Box sx={{ marginBottom: 1 }}>
-								<Typography
-									variant="subtitle2"
-									color="text.secondary"
-									component="span"
+	const handleCambioPagina = (_, value: number) => {
+		setPagina(value)
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	}
+
+	return (
+		<Box>
+			{empresas.length === 0 && !isLoading && (
+				<Typography align="center" color="text.secondary">
+					No se encontraron empresas.
+				</Typography>
+			)}
+
+			<Stack spacing={2}>
+				{empresas.map((empresa) => {
+					return (
+						<Tarjeta
+							key={empresa.idEmpresa}
+							titulo={empresa.nombre}
+							to={`/empresas/${empresa.idEmpresa}`}
+							avatar={
+								<Avatar
+									src={empresa.imagenUrl || undefined}
+									sx={{ width: 48, height: 48 }}
+									variant="rounded"
 								>
-									CIF:{' '}
-								</Typography>
-								<Typography variant="body2" component="span">
-									{empresa.cif}
-								</Typography>
-							</Box>
-							<Box sx={{ marginBottom: 1 }}>
-								<Typography
-									variant="subtitle2"
-									color="text.secondary"
-									component="span"
-								>
-									Localidad:{' '}
-								</Typography>
-								<Typography variant="body2" component="span">
-									{empresa.localidad}
-								</Typography>
-							</Box>
-							<Box sx={{ marginBottom: 1 }}>
-								<Typography
-									variant="subtitle2"
-									color="text.secondary"
-									component="span"
-								>
-									Teléfono:{' '}
-								</Typography>
-								<Typography variant="body2" component="span">
-									{empresa.telefono}
-								</Typography>
-							</Box>
-						</Box>
-						<Box
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'flex-end',
-							}}
-						>
-							{mismoRol('centro') &&
-								(empresa.validado ? (
-									<Button variant="outlined" color="secondary" disabled>
-										Validado
-									</Button>
-								) : (
+									{empresa.nombre.charAt(0)}
+								</Avatar>
+							}
+							etiquetas={
+								mismoRol('centro') && (
+									<Chip
+										label={empresa.validado ? 'Validado' : 'Pendiente'}
+										color={empresa.validado ? 'success' : 'warning'}
+										size="small"
+										icon={
+											empresa.validado ? (
+												<IconCheck size={14} />
+											) : (
+												<IconX size={14} />
+											)
+										}
+									/>
+								)
+							}
+							detalles={[
+								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+									<IconBriefcase
+										size={16}
+										color="var(--mui-palette-text-secondary)"
+									/>
+									<Typography variant="body2" color="text.secondary">
+										{empresa.familiaProfesional?.nombre ||
+											'Sin Familia Profesional'}
+									</Typography>
+								</Box>,
+								<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+									<IconMapPin
+										size={16}
+										color="var(--mui-palette-text-secondary)"
+									/>
+									<Typography variant="body2" color="text.secondary">
+										{empresa.localidad || 'Sin localidad'}
+									</Typography>
+								</Box>,
+								<Box sx={{ display: 'flex', gap: 3 }}>
+									<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+										<IconNews
+											size={16}
+											color="var(--mui-palette-primary-main)"
+										/>
+										<Typography variant="body2" fontWeight="medium">
+											{empresa.cantidadOfertas || 0} Ofertas
+										</Typography>
+									</Box>
+									<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+										<IconUsers
+											size={16}
+											color="var(--mui-palette-secondary-main)"
+										/>
+										<Typography variant="body2" fontWeight="medium">
+											{empresa.cantidadVacantes || 0} Vacantes
+										</Typography>
+									</Box>
+								</Box>,
+							]}
+							acciones={
+								mismoRol('centro') &&
+								!empresa.validado && (
 									<Box sx={{ display: 'flex', gap: 1 }}>
 										<Button
 											variant="outlined"
 											color="error"
-											onClick={() => onRechazarClick(empresa.idEmpresa)}
+											size="small"
+											onClick={(e) => onRechazarClick(e, empresa.idEmpresa)}
 										>
 											Rechazar
 										</Button>
 										<Button
-											variant="outlined"
-											color="secondary"
-											onClick={() => onValidarClick(empresa.idEmpresa)}
+											variant="contained"
+											color="success"
+											size="small"
+											onClick={(e) => onValidarClick(e, empresa.idEmpresa)}
 										>
 											Aceptar
 										</Button>
 									</Box>
-								))}
-						</Box>
-					</Box>
-				</CardContent>
-			</Card>
-		)
-	})
+								)
+							}
+						/>
+					)
+				})}
+			</Stack>
+
+			{paginatedData && paginatedData.ultimaPagina > 1 && (
+				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+					<Pagination
+						count={paginatedData.ultimaPagina}
+						page={pagina}
+						onChange={handleCambioPagina}
+						color="primary"
+						size="large"
+					/>
+				</Box>
+			)}
+		</Box>
+	)
 }

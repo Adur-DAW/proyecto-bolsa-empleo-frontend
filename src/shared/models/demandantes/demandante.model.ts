@@ -10,9 +10,14 @@ export type Demandante = {
 	telefonoMovil: string
 	email: string
 	situacion: number
+	familiaProfesional: string
+	cvPath: string
+	cvUrl: string
+	imagenUrl: string
 	titulos: TituloDemandante[]
 
 	adjudicado: boolean
+	rechazada: boolean
 }
 
 export const situacionesDemandante = [
