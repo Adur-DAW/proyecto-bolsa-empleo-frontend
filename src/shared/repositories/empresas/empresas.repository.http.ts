@@ -14,7 +14,8 @@ export const EmpresasRepositoryHttp = {
 		idFamiliaProfesional?: number,
 		ordenarPor?: string,
 		pagina: number = 1,
-		limit: number = 20
+		limit: number = 20,
+		validado?: string
 	): Promise<RespuestaPaginada<Empresa>> => {
 		const queryParams = new URLSearchParams()
 
@@ -24,6 +25,7 @@ export const EmpresasRepositoryHttp = {
 			queryParams.append('id_familia', idFamiliaProfesional.toString())
 
 		if (ordenarPor) queryParams.append('ordenar_por', ordenarPor)
+		if (validado) queryParams.append('validado', validado)
 
 		queryParams.append('pagina', pagina.toString())
 		queryParams.append('limit', limit.toString())

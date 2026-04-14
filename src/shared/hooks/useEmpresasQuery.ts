@@ -6,16 +6,19 @@ interface UseEmpresasQueryProps {
   idFamiliaProfesional?: number | null
   ordenarPor?: string
   pagina?: number
+  validado?: string
 }
 
-export const useEmpresasQuery = ({ search, idFamiliaProfesional, ordenarPor, pagina = 1 }: UseEmpresasQueryProps) => {
+export const useEmpresasQuery = ({ search, idFamiliaProfesional, ordenarPor, pagina = 1, validado }: UseEmpresasQueryProps) => {
   return useQuery({
-    queryKey: ['empresas', { search, idFamiliaProfesional, ordenarPor, pagina }],
+    queryKey: ['empresas', { search, idFamiliaProfesional, ordenarPor, pagina, validado }],
     queryFn: () => empresasRepository.obtener(
       search,
       idFamiliaProfesional ?? undefined,
       ordenarPor,
-      pagina
+      pagina,
+      20,
+      validado
     ),
   })
 }

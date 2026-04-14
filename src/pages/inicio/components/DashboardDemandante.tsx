@@ -94,9 +94,11 @@ export default function DashboardDemandante() {
             {data.mis_candidaturas.map((candidatura: any) => (
               <Paper key={candidatura.id} sx={{ p: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="subtitle2" fontWeight="bold">
-                    {candidatura.oferta}
-                  </Typography>
+                  <Link to={`/ofertas/${candidatura.id}`} style={{ textDecoration: 'none' }}>
+                    <Typography variant="subtitle2" fontWeight="bold">
+                      {candidatura.oferta}
+                    </Typography>
+                  </Link>
                   <StatusChip adjudicada={candidatura.adjudicada} />
                 </Box>
                 <Typography 
@@ -115,7 +117,7 @@ export default function DashboardDemandante() {
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
                   <Typography variant="caption" color="text.secondary">
-                    Inscrito el: {dayjs(candidatura.fecha_inscripcion).format('DD/MM/YYYY')}
+                    Inscrito el: {candidatura.fecha_inscripcion ?  dayjs(candidatura.fecha_inscripcion).format('DD/MM/YYYY') : 'Fecha no disponible'}
                   </Typography>
                   <Button component={Link} to={`/ofertas/${candidatura.id}`} size="small" sx={{ textTransform: 'none', p: 0 }}>
                     Ver oferta

@@ -8,6 +8,7 @@ export default function useLogout() {
 	const onLogout = () => {
 		queryClient.invalidateQueries()
 		logout()
+		window.location.href = '/'
 	}
 
 	return {

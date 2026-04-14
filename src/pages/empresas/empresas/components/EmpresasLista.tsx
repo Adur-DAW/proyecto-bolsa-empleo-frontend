@@ -31,6 +31,7 @@ type EmpresasListaProps = {
 	idFamiliaProfesional?: number | null
 	ordenarPor?: string
 	query?: string
+	filtro?: string
 }
 
 export default function EmpresasLista({
@@ -38,6 +39,7 @@ export default function EmpresasLista({
 	idFamiliaProfesional,
 	ordenarPor,
 	query,
+	filtro,
 }: EmpresasListaProps) {
 	return (
 		<Stack spacing={3}>
@@ -47,6 +49,7 @@ export default function EmpresasLista({
 					idFamiliaProfesional={idFamiliaProfesional}
 					ordenarPor={ordenarPor}
 					query={query}
+					filtro={filtro}
 				/>
 			</PageDataContainer>
 		</Stack>
@@ -58,6 +61,7 @@ const EmpresasListaSuspense = ({
 	idFamiliaProfesional,
 	ordenarPor,
 	query,
+	filtro,
 }: EmpresasListaProps) => {
 	const { mismoRol } = useRol()
 	const [searchParams, setSearchParams] = useSearchParams()
@@ -79,6 +83,7 @@ const EmpresasListaSuspense = ({
 		idFamiliaProfesional,
 		ordenarPor,
 		pagina,
+		validado: filtro,
 	})
 
 	const allEmpresas = paginatedData?.data || []
@@ -104,13 +109,15 @@ const EmpresasListaSuspense = ({
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ['empresas'] }),
 	})
 
-	const onValidarClick = (e: any, idEmpresa: number) => {
+	const onValidarClick = (e: React.MouseEvent, idEmpresa: number) => {
 		e.stopPropagation()
+		e.preventDefault()
 		mutationAceptar.mutate(idEmpresa)
 	}
 
-	const onRechazarClick = (e: any, idEmpresa: number) => {
+	const onRechazarClick = (e: React.MouseEvent, idEmpresa: number) => {
 		e.stopPropagation()
+		e.preventDefault()
 		mutationRechazar.mutate(idEmpresa)
 	}
 

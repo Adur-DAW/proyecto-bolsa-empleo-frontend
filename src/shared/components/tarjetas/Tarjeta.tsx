@@ -125,7 +125,12 @@ export default function TarjetaEmpresa({
                 gap: 1.5,
                 mt: 1
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation()
+              }}
             >
               {acciones}
             </Box>

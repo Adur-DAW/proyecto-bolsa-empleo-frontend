@@ -1,8 +1,9 @@
-import { Autocomplete, Box, Paper, TextField, Typography, FormControl, Select, MenuItem, Button } from '@mui/material'
+import { Autocomplete, Box, Paper, TextField, Typography, FormControl, Select, MenuItem, Button, RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { MaestrosRepository } from '@/shared/repositories/MaestrosRepository'
 import { IconSearch } from '@tabler/icons-react'
 import { Control, Controller } from 'react-hook-form'
+import useRol from '@/shared/hooks/rol.hook'
 
 interface EmpresasFiltrosProps {
   control: Control<any>
@@ -16,6 +17,7 @@ export default function EmpresasFiltros({
   onLimpiar
 }: EmpresasFiltrosProps) {
 
+  const { rol } = useRol()
   const { data: familias = [] } = useQuery({
     queryKey: ['familias-profesionales'],
     queryFn: MaestrosRepository.obtenerFamilias,
@@ -27,6 +29,37 @@ export default function EmpresasFiltros({
         <Typography variant="h6" gutterBottom>
           Filtros
         </Typography>
+
+        {rol === 'centro' && (
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Ver empresas
+            </Typography>
+            <Controller
+              name="filtro"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup {...field}>
+                  <FormControlLabel
+                    value="todas"
+                    control={<Radio />}
+                    label="Todas"
+                  />
+                  <FormControlLabel
+                    value="validadas"
+                    control={<Radio />}
+                    label="Validadas"
+                  />
+                  <FormControlLabel
+                    value="pendientes"
+                    control={<Radio />}
+                    label="Pendientes de validar"
+                  />
+                </RadioGroup>
+              )}
+            />
+          </Box>
+        )}
 
         <Box sx={{ mb: 3 }}>
           <Typography variant="subtitle2" gutterBottom>

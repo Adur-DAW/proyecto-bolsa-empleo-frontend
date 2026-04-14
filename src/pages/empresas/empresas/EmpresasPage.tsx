@@ -10,6 +10,7 @@ type EmpresasFilterForm = {
 	search: string
 	idFamiliaProfesional: number | null
 	ordenarPor: string
+	filtro: string
 }
 
 export default function EmpresasPage() {
@@ -24,6 +25,7 @@ export default function EmpresasPage() {
 				? Number(searchParams.get('idFamiliaProfesional'))
 				: null,
 			ordenarPor: searchParams.get('ordenarPor') || 'nombre.asc',
+			filtro: searchParams.get('filtro') || 'todas',
 		},
 	})
 
@@ -35,6 +37,7 @@ export default function EmpresasPage() {
 			search: '',
 			idFamiliaProfesional: null,
 			ordenarPor: 'nombre.asc',
+			filtro: 'todas',
 		}
 		reset(emptyValues)
 		setSearchParams({})
@@ -47,6 +50,7 @@ export default function EmpresasPage() {
 		if (data.idFamiliaProfesional)
 			params.idFamiliaProfesional = data.idFamiliaProfesional.toString()
 		if (data.ordenarPor) params.ordenarPor = data.ordenarPor
+		if (data.filtro) params.filtro = data.filtro
 
 		setSearchParams(params)
 		setFiltros(data)
@@ -90,6 +94,7 @@ export default function EmpresasPage() {
 						idFamiliaProfesional={filtros.idFamiliaProfesional}
 						ordenarPor={filtros.ordenarPor}
 						query={query}
+						filtro={filtros.filtro}
 					/>
 				</Box>
 			</Box>

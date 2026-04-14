@@ -20,7 +20,7 @@ export default function DashboardAdmin() {
       {data.validaciones_pendientes > 0 && (
         <Paper
           component={Link}
-          to="/empresas"
+          to="/empresas?ordenarPor=nombre.asc&filtro=pendientes"
           sx={{
             p: 2, mb: 4,
             display: 'flex', alignItems: 'center', gap: 2,
