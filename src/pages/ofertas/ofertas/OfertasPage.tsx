@@ -84,13 +84,13 @@ export default function OfertasPage() {
 				/>
 
 				<Box sx={{ flex: 1 }}>
-					<Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2 }}>
+					<Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'flex-end', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 2 }}>
 						<TextField
 							size="small"
 							placeholder="Filtrar..."
 							value={filtroFrontend}
 							onChange={(e) => setFiltroFrontend(e.target.value)}
-							sx={{ width: 300 }}
+							sx={{ width: { xs: '100%', sm: 300 } }}
 						/>
 
 						{mismoRol('empresa') && (
@@ -100,7 +100,7 @@ export default function OfertasPage() {
 								to={'/ofertas/nueva'}
 								component={Link}
 								startIcon={<IconPlus />}
-								sx={{ ml: 2 }}
+								sx={{ ml: { xs: 0, sm: 0 } }}
 							>
 								Añadir nueva
 							</Button>

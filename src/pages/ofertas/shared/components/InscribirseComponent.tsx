@@ -25,8 +25,8 @@ export default function InscribirseComponent({
 	} = useMutation({
 		mutationFn: ofertasDemandanteRepository.registrarJWT,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['ofertas'] })
-			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id] })
+			queryClient.invalidateQueries({ queryKey: ['ofertas'], refetchType: 'all' })
+			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id], refetchType: 'all' })
 		},
 	})
 
@@ -36,8 +36,8 @@ export default function InscribirseComponent({
 	} = useMutation({
 		mutationFn: ofertasDemandanteRepository.eliminarJWT,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['ofertas'] })
-			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id] })
+			queryClient.invalidateQueries({ queryKey: ['ofertas'], refetchType: 'all' })
+			queryClient.invalidateQueries({ queryKey: ['oferta', oferta.id], refetchType: 'all' })
 		},
 	})
 

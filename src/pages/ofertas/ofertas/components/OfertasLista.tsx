@@ -140,7 +140,19 @@ const OfertasListaSuspense = ({
 				{ofertas.map((oferta) => (
 					<Tarjeta
 						key={oferta.id}
-						titulo={oferta.nombre}
+					titulo={
+						<Link
+							to={`/ofertas/${oferta.id}`}
+							style={{
+								textDecoration: 'none',
+								color: 'inherit',
+								display: 'inline',
+							}}
+							onClick={(e) => e.stopPropagation()}
+						>
+							{oferta.nombre}
+						</Link>
+					}
 						etiquetas={
 							<Box sx={{ display: 'flex', gap: 1 }}>
 								<Chip
@@ -175,7 +187,7 @@ const OfertasListaSuspense = ({
 									color: 'inherit',
 									display: 'flex',
 									alignItems: 'center',
-									gap: 4,
+									gap: 0.5,
 								}}
 								onClick={(e) => e.stopPropagation()}
 							>
@@ -222,34 +234,38 @@ const OfertasListaSuspense = ({
 								<Typography
 									variant="caption"
 									color="text.secondary"
-									sx={{ mb: 1, mr: 2 }}
+									sx={{ mb: { xs: 0, sm: 1 }, mr: { xs: 0, sm: 2 }, textAlign: { xs: 'center', sm: 'left' } }}
 								>
 									Publicada: {formatearFecha(oferta.fechaPublicacion)}
 								</Typography>
 
-								<Link to={`/ofertas/${oferta.id}`}>
+								<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
 									<Button
 										variant="contained"
 										color="primary"
 										size="small"
+										component={Link}
+										to={`/ofertas/${oferta.id}`}
 										startIcon={<IconEye size={18} />}
+										sx={{ flex: { xs: '1 1 100%', sm: '0 1 auto' } }}
 									>
 										Ver detalles
 									</Button>
-								</Link>
 
-								{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
-									<Button
-										variant="contained"
-										color="secondary"
-										size="small"
-										component={Link}
-										to={`/ofertas/${oferta.id}/editar`}
-										startIcon={<IconEdit size={18} />}
-									>
-										Editar
-									</Button>
-								)}
+									{mismoRol('empresa') && oferta.idEmpresa == usuario?.id && (
+										<Button
+											variant="contained"
+											color="secondary"
+											size="small"
+											component={Link}
+											to={`/ofertas/${oferta.id}/editar`}
+											startIcon={<IconEdit size={18} />}
+											sx={{ flex: { xs: '1 1 100%', sm: '0 1 auto' } }}
+										>
+											Editar
+										</Button>
+									)}
+								</Box>
 							</>
 						}
 					/>

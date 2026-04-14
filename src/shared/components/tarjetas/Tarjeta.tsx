@@ -12,7 +12,7 @@ import { ReactNode } from 'react'
 import { Link } from 'react-router'
 
 type TarjetaEmpresaProps = {
-  titulo: string
+  titulo: ReactNode
   subtitulo?: ReactNode
   avatar?: ReactNode
   etiquetas?: ReactNode
@@ -58,8 +58,8 @@ export default function TarjetaEmpresa({
       component={CardWrapper}
       {...wrapperProps}
     >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2.5, alignItems: 'flex-start' }}>
+      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
+        <Box sx={{ display: 'flex', gap: { xs: 1.5, sm: 2.5 }, alignItems: 'flex-start' }}>
           {avatar && (
             <Box
               sx={{
@@ -72,9 +72,9 @@ export default function TarjetaEmpresa({
           )}
 
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'flex-start', gap: { xs: 1, sm: 2 }, mb: 1 }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 0.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3, mb: 0.5, wordBreak: 'break-word' }}>
                   {titulo}
                 </Typography>
                 {subtitulo && (
@@ -84,7 +84,7 @@ export default function TarjetaEmpresa({
                 )}
               </Box>
               {etiquetas && (
-                <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+                <Stack direction="row" spacing={1} sx={{ flexShrink: 0, mt: { xs: 0.5, sm: 0 } }}>
                   {etiquetas}
                 </Stack>
               )}
@@ -119,8 +119,9 @@ export default function TarjetaEmpresa({
             <Box
               sx={{
                 display: 'flex',
+                flexDirection: { xs: 'column-reverse', sm: 'row' },
                 justifyContent: 'flex-end',
-                alignItems: 'center',
+                alignItems: { xs: 'stretch', sm: 'center' },
                 gap: 1.5,
                 mt: 1
               }}

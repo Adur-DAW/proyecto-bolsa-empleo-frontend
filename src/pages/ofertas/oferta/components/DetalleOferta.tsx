@@ -10,17 +10,17 @@ export default function DetalleOferta({ oferta }) {
 	return (
 		<Card sx={{ padding: 2, boxShadow: 2 }}>
 			<CardContent>
-				<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-					<Box sx={{ textAlign: 'left' }}>
-						<Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
+				<Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 3 }}>
+					<Box sx={{ textAlign: 'left', flex: 1 }}>
+						<Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'flex-start', sm: 'center' }, mb: 2 }}>
 							<AvatarSeguro
 								src={getImagenUrl(oferta.empresa?.imagenUrl)}
-								sx={{ width: 64, height: 64 }}
+								sx={{ width: { xs: 56, sm: 64 }, height: { xs: 56, sm: 64 } }}
 								variant="rounded"
 							>
 								{oferta.empresa?.nombre?.charAt(0)}
 							</AvatarSeguro>
-							<Typography variant="h6">
+							<Typography variant="h5" sx={{ fontWeight: 700, wordBreak: 'break-word' }}>
 								{oferta.nombre}
 							</Typography>
 						</Box>
@@ -34,7 +34,7 @@ export default function DetalleOferta({ oferta }) {
 							</Typography>
 							<Link to={`/empresas/${oferta.idEmpresa}`} style={{ textDecoration: 'none', color: 'inherit' }}>
 								<Typography variant="body2" component="span" sx={{ '&:hover': { textDecoration: 'underline', color: 'primary.main' } }}>
-									{oferta.empresa.nombre}
+									{oferta.empresa?.nombre}
 								</Typography>
 							</Link>
 						</Box>
@@ -137,6 +137,7 @@ export default function DetalleOferta({ oferta }) {
 										'& p': { mb: 2 },
 										'& ul, & ol': { mb: 2, pl: 4 },
 										'& li': { mb: 0.5 },
+										'& *': { maxWidth: '100% !important', wordBreak: 'break-word' }
 									}}
 									dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(oferta.readme) }}
 								/>
@@ -144,7 +145,7 @@ export default function DetalleOferta({ oferta }) {
 						)}
 					</Box>
 
-					<Box>
+					<Box sx={{ alignSelf: { xs: 'stretch', md: 'flex-start' } }}>
 						<InscribirseComponent oferta={oferta} />
 					</Box>
 				</Box>

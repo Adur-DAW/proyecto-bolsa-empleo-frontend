@@ -50,7 +50,14 @@ export default function DashboardDemandante() {
                           {oferta.nombre}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {oferta.empresa?.nombre} • {dayjs(oferta.fecha_publicacion).format('DD/MM/YYYY')}
+                          <Link 
+                            to={`/empresas/${oferta.empresa?.id_empresa}`}
+                            style={{ color: 'inherit', textDecoration: 'none' }}
+                          >
+                            <strong>{oferta.empresa?.nombre}</strong>
+                          </Link>
+                          {' • '}
+                          {dayjs(oferta.fecha_publicacion).format('DD/MM/YYYY')}
                         </Typography>
                       </Box>
                     </Box>
@@ -82,6 +89,7 @@ export default function DashboardDemandante() {
           <Typography variant="h6" gutterBottom>
             Mis últimas inscripciones
           </Typography>
+        
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {data.mis_candidaturas.map((candidatura: any) => (
               <Paper key={candidatura.id} sx={{ p: 2 }}>
@@ -91,12 +99,28 @@ export default function DashboardDemandante() {
                   </Typography>
                   <StatusChip adjudicada={candidatura.adjudicada} />
                 </Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'left' }}>
+                <Typography 
+                  variant="caption" 
+                  color="primary" 
+                  sx={{ 
+                    display: 'block', 
+                    textAlign: 'left', 
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                  component={Link}
+                  to={`/empresas/${candidatura.id_empresa}`}
+                >
                   {candidatura.empresa}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'left' }}>
-                  Inscrito el: {dayjs(candidatura.fecha_inscripcion).format('DD/MM/YYYY')}
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Inscrito el: {dayjs(candidatura.fecha_inscripcion).format('DD/MM/YYYY')}
+                  </Typography>
+                  <Button component={Link} to={`/ofertas/${candidatura.id}`} size="small" sx={{ textTransform: 'none', p: 0 }}>
+                    Ver oferta
+                  </Button>
+                </Box>
               </Paper>
             ))}
             {data.mis_candidaturas.length === 0 && (
